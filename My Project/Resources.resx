@@ -1,0 +1,265 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ChangeLogRT" xml:space="preserve">
+    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset1 Segoe UI Symbol;}{\f3\fnil\fcharset0 Segoe UI Symbol;}}
+{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
+{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
+\pard\cf1\b\f0\fs28\lang9 SkyeClip v1.0 What's New\par
+\cf0\fs24 Released ?? 2026\cf1\par
+\b0\par
+\cf2\b New Features\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Toasts\par
+\f1\'a3\'ab\f0  Notification Icon\f1\par
+\'a3\'ab\f0  Basic ClipBoard Functionality\cf1\b\lang9\par
+\par
+\cf2 Improvements\par
+\cf0\b0\f2\u10003?\f3\lang1033  \cf2\b\f0\lang9\par
+\par
+Fixes\par
+\cf0\b0\f2\u10005?\f3\lang1033  \cf2\b\f0\lang9\par
+\cf1\par
+\fs28 Thank you for using SkyeClip!\cf0\b0\fs24\par
+}
+ </value>
+  </data>
+  <data name="HelpRT" xml:space="preserve">
+    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}{\f2\fswiss Segoe UI;}{\f3\fnil\fcharset1 Cambria Math;}}
+{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
+{\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont3\mwrapIndent1440 }\viewkind4\uc1 
+\pard\cf1\b\f0\fs28\lang9 SkyeClip Help\par
+\par
+\cf2\f1\fs24 Overview\par
+\cf0\b0\par
+SkyeClip is a lightweight clipboard manager that stores your recent clips, lets you mark favorites, and provides quick access through the tray menu and hotkeys.\cf2\b\par
+\par
+Tray Menu HotKeys (Customizable)\par
+\cf0\par
+\b0\i &lt;Spacebar&gt;\par
+Toggle Favorite\par
+\i0 Marks or unmarks the selected clip as a Favorite. Favorited clips appear in the Favorites menu for quick access.\par
+\b\par
+\b0\i &lt;V&gt;\par
+Show Clip Viewer\par
+\i0 Opens the Clip Viewer \f2\emdash  a compact companion window that displays the full contents of the selected clip.\par
+\par
+\cf2\b\f1 Favorites\par
+\par
+\cf0\b0 Favorites let you keep important clips accessible at all times.\par
+\i How to use:\i0\par
+- Press Spacebar on a clip\par
+- Or right\f2\_click \f3\u8594?\f1  Toggle Favorite\par
+- Favorites appear in their own menu for quick access\par
+\cf2\b\lang9\par
+Clip Viewer\par
+\cf0\b0\par
+The Clip Viewer displays the full text of the selected clip.\par
+Useful for reading long clips without having to paste somewhere.\par
+\i Features:\i0\par
+- View full clip contents\par
+- Keyboard shortcut &lt;Ctrl+C&gt; to copy to clipboard\par
+\par
+\cf2\b App View\cf0\b0\par
+\par
+The App View is a compact control panel that provides quick access to SkyeClip\rquote s core features. It appears as a small window with buttons for common tasks, making it easy to navigate without opening a full application.\par
+\i Included functions:\i0\par
+- Settings \f2\emdash  Configure hotkeys, limits, and behavior\par
+- Log Viewer \emdash  View SkyeClip\rquote s internal activity log\par
+- Help \emdash  Open this help guide\par
+- About \emdash  View version information and credits\f1\par
+\par
+\cf2\b Settings\par
+\cf0\b0\par
+SkyeClip allows customization of:\par
+- Hotkeys\par
+- Maximum viewed clips\par
+- Whether or not to notify the user of new clips on the clipboard\par
+- and more\par
+\par
+}
+ </value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="IconApp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>IconApp.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="IconAppNotify" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>IconAppNotify.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAbout16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAbout16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAbout32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAbout32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionGitHub" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionGitHub.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionIcons816" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionIcons816.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionMicrosoft16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionMicrosoft16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionPayPal" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionPayPal.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageAttributionSQLite" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAttributionSQLite.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageChangeLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageChangeLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageDeleteLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageDeleteLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageExit16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageExit16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageExit32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageExit32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageFavorites16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageFavorites16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageHelp16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageHelp16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageHelp32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageHelp32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageLog16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageLog16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageOK" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageOK.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageRefreshLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageRefreshLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageSettings16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageSettings16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageSettings32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageSettings32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+</root>
