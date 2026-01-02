@@ -65,12 +65,10 @@ Namespace My.Resources
         '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
         '''{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
         '''\pard\cf1\b\f0\fs28\lang9 SkyeClip v1.0 What&apos;s New\par
-        '''\cf0\fs24 Released ?? 2026\cf1\par
+        '''\cf0\fs24 Released January 2026\cf1\par
         '''\b0\par
         '''\cf2\b New Features\par
-        '''\cf0\b0\f1\lang1033\&apos;a3\&apos;ab\f0  Toasts\par
-        '''\f1\&apos;a3\&apos;ab\f0  Notification Icon\f1\par
-        '''\ [rest of string was truncated]&quot;;.
+        '''\cf0\b0\f1\lang1033\&apos;a3\&apos;ab\f0  Toast notifications for quick visual feedback\par        ''' [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property ChangeLogRT() As String
             Get

@@ -122,18 +122,22 @@
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}\viewkind4\uc1 
 \pard\cf1\b\f0\fs28\lang9 SkyeClip v1.0 What's New\par
-\cf0\fs24 Released ?? 2026\cf1\par
+\cf0\fs24 Released January 2026\cf1\par
 \b0\par
 \cf2\b New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f0  Toasts\par
-\f1\'a3\'ab\f0  Notification Icon\f1\par
-\'a3\'ab\f0  Basic ClipBoard Functionality\cf1\b\lang9\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Toast notifications for quick visual feedback\par
+\f1\'a3\'ab\f0  Notification tray icon with fast access to your history\f1\par
+\'a3\'ab\f0  Core clipboard history with Favorites and Viewer support\cf1\b\lang9\par
 \par
 \cf2 Improvements\par
-\cf0\b0\f2\u10003?\f3\lang1033  \cf2\b\f0\lang9\par
-\par
+\cf0\b0\f2\u10003? Smarter filtering of incoming clipboard content\par
+\u10003? Favorites HotKey now keeps the menu open for smoother workflow\par
+\u10003? Viewer HotKey now works consistently in the Favorites menu\par
+\u10003? General performance and responsiveness improvements\par
+\cf2\b\f0\par
 Fixes\par
-\cf0\b0\f2\u10005?\f3\lang1033  \cf2\b\f0\lang9\par
+\cf0\b0\f2\u10005? Resolved an issue where Windows Explorer produced duplicate text clips\par
+\u10005? Various stability fixes across clipboard capture and menu refres\f3\lang1033 h\cf2\b\f0\lang9\par
 \cf1\par
 \fs28 Thank you for using SkyeClip!\cf0\b0\fs24\par
 }
@@ -182,7 +186,8 @@ The App View is a compact control panel that provides quick access to SkyeClip\r
 - Settings \f2\emdash  Configure hotkeys, limits, and behavior\par
 - Log Viewer \emdash  View SkyeClip\rquote s internal activity log\par
 - Help \emdash  Open this help guide\par
-- About \emdash  View version information and credits\f1\par
+- About \emdash  View version information and credits\par
+\f1\lang1033 - Exit App\lang9\par
 \par
 \cf2\b Settings\par
 \cf0\b0\par
@@ -190,6 +195,7 @@ SkyeClip allows customization of:\par
 - Hotkeys\par
 - Maximum viewed clips\par
 - Whether or not to notify the user of new clips on the clipboard\par
+- Purge Functions\par
 - and more\par
 \par
 }
