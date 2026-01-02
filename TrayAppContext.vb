@@ -170,7 +170,8 @@ Friend Class TrayAppContext
         If e.KeyCode = App.Settings.HotKeys.ToggleFavorite Then
             Dim cms = DirectCast(sender, ContextMenuStrip)
             Dim pos = cms.PointToClient(Cursor.Position)
-            Dim hovered As ToolStripMenuItem = cms.GetItemAt(pos)
+            Dim item As ToolStripItem = cms.GetItemAt(pos)
+            Dim hovered As ToolStripMenuItem = TryCast(item, ToolStripMenuItem)
             If hovered IsNot Nothing AndAlso hovered.Tag IsNot Nothing Then
                 Dim clipID As Integer
                 If Integer.TryParse(hovered.Tag.ToString(), clipID) Then

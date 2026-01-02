@@ -258,12 +258,12 @@ Friend Module App
     End Function
     Friend Function GetSourceAppInfo() As (AppName As String, IconBytes As Byte())
         Dim hwnd = Skye.WinAPI.GetForegroundWindow()
-        Dim pid As Integer
-        Dim result = Skye.WinAPI.GetWindowThreadProcessId(hwnd, pid)
+        Dim pid As UInteger
+        Dim result As UInteger = Skye.WinAPI.GetWindowThreadProcessId(hwnd, pid)
         If pid = 0 Then Return ("Unknown", Nothing)
 
         Try
-            Dim proc = Process.GetProcessById(pid)
+            Dim proc = Process.GetProcessById(CInt(pid))
             Dim exePath = proc.MainModule.FileName
 
             ' Friendly name

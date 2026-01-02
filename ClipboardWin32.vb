@@ -43,8 +43,8 @@ Module ClipboardWin32
                 Dim hData As IntPtr = Skye.WinAPI.GetClipboardData(fmt)
                 If hData = IntPtr.Zero Then Continue For
 
-                Dim size As UIntPtr = Skye.WinAPI.GlobalSize(hData)
-                Dim cb As Integer = CInt(size)
+                Dim size As Integer = Skye.WinAPI.GlobalSize(hData)
+                Dim cb As Integer = size
                 Dim pData As IntPtr = Skye.WinAPI.GlobalLock(hData)
                 If pData = IntPtr.Zero Then Continue For
 
@@ -83,8 +83,8 @@ Module ClipboardWin32
                 Dim hData As IntPtr = Skye.WinAPI.GetClipboardData(regId)
                 If hData = IntPtr.Zero Then Continue For
 
-                Dim size As UIntPtr = Skye.WinAPI.GlobalSize(hData)
-                Dim cb As Integer = CInt(size)
+                Dim size As Integer = Skye.WinAPI.GlobalSize(hData)
+                Dim cb As Integer = size
                 Dim pData As IntPtr = Skye.WinAPI.GlobalLock(hData)
                 If pData = IntPtr.Zero Then Continue For
 

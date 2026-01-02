@@ -136,7 +136,7 @@ Friend Class ClipRepository
                 insertEntry.Parameters.AddWithValue("@l", nowVal)
                 insertEntry.Parameters.AddWithValue("@hash", aggHash)
                 insertEntry.Parameters.AddWithValue("@app", sourceInfo.AppName)
-                insertEntry.Parameters.Add("@icon", DbType.Binary).Value = If(sourceInfo.IconBytes, DBNull.Value)
+                insertEntry.Parameters.Add("@icon", DbType.Binary).Value = If(sourceInfo.IconBytes IsNot Nothing, CType(sourceInfo.IconBytes, Object), DBNull.Value)
                 entryId = Convert.ToInt32(insertEntry.ExecuteScalar())
 
                 ' Insert formats only for new clips
@@ -286,7 +286,7 @@ Friend Class ClipRepository
 
                     ' SourceAppIcon (stored as BLOB)
                     If Not reader.IsDBNull(3) Then
-                        Dim length As Long = reader.GetBytes(3, 0, Nothing, 0, 0)
+                        Dim length As Integer = CInt(reader.GetBytes(3, 0, Nothing, 0, 0))
                         Dim buffer(length - 1) As Byte
                         reader.GetBytes(3, 0, buffer, 0, CInt(length))
                         ci.SourceAppIcon = buffer
@@ -333,7 +333,7 @@ Friend Class ClipRepository
 
                     ' SourceAppIcon (stored as BLOB)
                     If Not reader.IsDBNull(3) Then
-                        Dim length As Long = reader.GetBytes(3, 0, Nothing, 0, 0)
+                        Dim length As Integer = CInt(reader.GetBytes(3, 0, Nothing, 0, 0))
                         Dim buffer(length - 1) As Byte
                         reader.GetBytes(3, 0, buffer, 0, CInt(length))
                         ci.SourceAppIcon = buffer
@@ -426,7 +426,7 @@ Friend Class ClipRepository
         Return Convert.ToBase64String(hashBytes)
     End Function
     Private Shared Function FilterFormatsForHash(formats As List(Of ClipData)) As List(Of ClipData)
-        Dim importantIds As Integer() = {
+        Dim importantIds As UInteger() = {
             Skye.WinAPI.CF_UNICODETEXT,
             Skye.WinAPI.CF_RTF,
             Skye.WinAPI.CF_HTML,

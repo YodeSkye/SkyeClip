@@ -31,7 +31,9 @@ Partial Class ClipViewer
         FileName = New ColumnHeader()
         FileSize = New ColumnHeader()
         ILFileDrop = New ImageList(components)
+        WebView = New Microsoft.Web.WebView2.WinForms.WebView2()
         CType(PicBox, ComponentModel.ISupportInitialize).BeginInit()
+        CType(WebView, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' TxtBox
@@ -101,11 +103,24 @@ Partial Class ClipViewer
         ILFileDrop.ImageSize = New Size(16, 16)
         ILFileDrop.TransparentColor = Color.Transparent
         ' 
+        ' WebView
+        ' 
+        WebView.AllowExternalDrop = True
+        WebView.CreationProperties = Nothing
+        WebView.DefaultBackgroundColor = Color.White
+        WebView.Dock = DockStyle.Fill
+        WebView.Location = New Point(0, 0)
+        WebView.Name = "WebView"
+        WebView.Size = New Size(584, 284)
+        WebView.TabIndex = 4
+        WebView.ZoomFactor = 1R
+        ' 
         ' ClipViewer
         ' 
         AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(584, 284)
         ControlBox = False
+        Controls.Add(WebView)
         Controls.Add(LVFileDrop)
         Controls.Add(TxtBox)
         Controls.Add(RTFBox)
@@ -118,6 +133,7 @@ Partial Class ClipViewer
         SizeGripStyle = SizeGripStyle.Show
         StartPosition = FormStartPosition.Manual
         CType(PicBox, ComponentModel.ISupportInitialize).EndInit()
+        CType(WebView, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -130,4 +146,5 @@ Partial Class ClipViewer
     Friend WithEvents FileName As ColumnHeader
     Friend WithEvents FileSize As ColumnHeader
     Friend WithEvents ILFileDrop As ImageList
+    Friend WithEvents WebView As Microsoft.Web.WebView2.WinForms.WebView2
 End Class

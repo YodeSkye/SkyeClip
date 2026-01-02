@@ -18,23 +18,28 @@ Friend Class ClipViewer
     End Property
 
     ' Form Events
-    Private Sub ClipViewer_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Public Sub New()
+        InitializeComponent()
         Opacity = 0
-
-        ' Create WebBrowser manually
-        Browser.IsWebBrowserContextMenuEnabled = False
-        Browser.Dock = DockStyle.Fill
-        Browser.Visible = False
-        AddHandler Browser.PreviewKeyDown, AddressOf Browser_PreviewKeyDown
-        Controls.Add(Browser)
-
-        Dim emptyMenu As New ContextMenuStrip()
-        TxtBox.ContextMenuStrip = emptyMenu
 
         fadeInTimer = New Timer With {.Interval = 15}
         AddHandler fadeInTimer.Tick, AddressOf FadeIn_Tick
         fadeOutTimer = New Timer With {.Interval = 15}
         AddHandler fadeOutTimer.Tick, AddressOf FadeOut_Tick
+
+    End Sub
+    Private Async Sub ClipViewer_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        ' Initialize WebView
+        Await WebView.EnsureCoreWebView2Async()
+        WebView.CoreWebView2.Settings.AreDefaultScriptDialogsEnabled = False
+        WebView.CoreWebView2.Settings.AreDevToolsEnabled = False
+        WebView.CoreWebView2.Settings.IsStatusBarEnabled = False
+        WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent
+
+        Dim emptyMenu As New ContextMenuStrip()
+        TxtBox.ContextMenuStrip = emptyMenu
+
     End Sub
     Friend Sub ShowAtScreenPoint(clipID As Integer, screenPos As System.Drawing.Point)
         Location = New System.Drawing.Point(screenPos.X, screenPos.Y)
@@ -198,6 +203,21 @@ Friend Class ClipViewer
         LVFileDrop.Visible = True
         LVFileDrop.BringToFront()
     End Sub
+    Private Function ExtractHtmlFragment(rawHtml As String) As String
+        Const startTag As String = "<!--StartFragment-->"
+        Const endTag As String = "<!--EndFragment-->"
+
+        Dim startIndex As Integer = rawHtml.IndexOf(startTag)
+        Dim endIndex As Integer = rawHtml.IndexOf(endTag)
+
+        If startIndex >= 0 AndAlso endIndex > startIndex Then
+            startIndex += startTag.Length
+            Return rawHtml.Substring(startIndex, endIndex - startIndex)
+        End If
+
+        ' If no markers found, return the whole HTML
+        Return rawHtml
+    End Function
     Private Function DecodeFileDrop(bytes As Byte()) As String()
         ' Convert raw bytes to UTF-16 string
         Dim txt As String = System.Text.Encoding.Unicode.GetString(bytes)
@@ -225,10 +245,30 @@ Friend Class ClipViewer
         Return Nothing
     End Function
     Private Sub ShowHtml(bytes As Byte())
-        Dim html As String = System.Text.Encoding.UTF8.GetString(bytes)
-        Browser.DocumentText = html
-        Browser.Visible = True
-        Browser.BringToFront()
+        Dim rawhtml As String = System.Text.Encoding.UTF8.GetString(bytes)
+        Dim fragment As String = ExtractHtmlFragment(rawHtml)
+        ' Wrap in minimal HTML so WebView2 renders cleanly
+        Dim wrappedHtml As String =
+            "<html><body style='margin:0;padding:0;background:" &
+            ColorTranslator.ToHtml(Me.BackColor) & ";'>" &
+            fragment &
+            "</body></html>"
+
+        If WebView.CoreWebView2 Is Nothing Then
+            ' Delay until ready
+            AddHandler WebView.CoreWebView2InitializationCompleted,
+                Sub()
+                    WebView.CoreWebView2?.NavigateToString(wrappedHtml)
+                    WebView.Visible = True
+                    WebView.BringToFront()
+                End Sub
+            Return
+        End If
+        ' If it's already initialized, load immediately
+        WebView.CoreWebView2?.NavigateToString(wrappedHtml)
+        WebView.Visible = True
+        WebView.BringToFront()
+
     End Sub
     Private Sub ShowRtf(bytes As Byte())
         Dim rtf As String = System.Text.Encoding.UTF8.GetString(bytes)
