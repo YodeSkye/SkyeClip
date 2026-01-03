@@ -63,6 +63,10 @@ Friend Class ClipRepository
 
             Dim idxHashCmd As New SQLiteCommand("CREATE UNIQUE INDEX IF NOT EXISTS idx_clips_hash ON Clips(AggregateHash)", conn)
             idxHashCmd.ExecuteNonQuery()
+
+            Dim indexCmd As New SQLiteCommand("CREATE INDEX IF NOT EXISTS idx_ClipFormats_EntryId ON ClipFormats(EntryId);", conn)
+            indexCmd.ExecuteNonQuery()
+
         End Using
     End Sub
 
@@ -373,8 +377,8 @@ Friend Class ClipRepository
                     ", conn, tx)
                     cmd2.Parameters.AddWithValue("@id", clipID)
                     cmd2.ExecuteNonQuery()
-                    Debug.Print($"Deleted clip {clipID}")
-                    WriteToLog($"Deleted clip {clipID}")
+                    Debug.Print($"Deleted Clip {clipID}")
+                    WriteToLog($"Deleted Clip {clipID}")
                 End Using
 
                 tx.Commit()
@@ -408,8 +412,8 @@ Friend Class ClipRepository
                     ", conn, tx)
                     cmd2.Parameters.AddWithValue("@cutoff", cutoff)
                     Dim rows = cmd2.ExecuteNonQuery()
-                    Debug.Print($"Purge removed {rows} clips.")
-                    WriteToLog($"Purge removed {rows} clips.")
+                    Debug.Print($"Purge Removed {rows} Clips")
+                    WriteToLog($"Purge Removed {rows} Clips")
                 End Using
 
                 tx.Commit()
