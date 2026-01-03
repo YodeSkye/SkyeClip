@@ -20,6 +20,8 @@ Friend Class TrayAppContext
             .Image = My.Resources.ImageSettings16
         }}
     Friend ReadOnly repo As ClipRepository
+    Private ReadOnly ClipCM As New ContextMenuStrip()
+    Private ClipCMCurrentClipId As Integer
 
     ' Blink Notification
     Private ReadOnly blinkTimer As Timer
@@ -77,13 +79,23 @@ Friend Class TrayAppContext
         AddHandler Watcher.ClipboardChanged, AddressOf OnClipboardChanged
 
         ' Clipboard debounce & stabilization timer
-        clipboardTimer = New Timer()
-        clipboardTimer.Interval = 30 ' ms
+        clipboardTimer = New Timer With {.Interval = 30}
         AddHandler clipboardTimer.Tick, AddressOf OnClipboardStabilized
 
         ' Blink Timer for Notifications
         blinkTimer = New Timer With {.Interval = 250} ' milliseconds per toggle
         AddHandler blinkTimer.Tick, AddressOf BlinkTimer_Tick
+
+        ' Clip Context Menu
+        Dim cmi As ToolStripMenuItem
+        cmi = New ToolStripMenuItem("Preview", My.Resources.IconApp.ToBitmap, AddressOf OnClipCMPreviewClick) With {.Name = "Preview"}
+        ClipCM.Items.Add(cmi)
+        ClipCM.Items.Add(New ToolStripSeparator())
+        ClipCM.Items.Add("View Clip", My.Resources.imageClipViewer, AddressOf OnClipCMViewClip)
+        cmi = New ToolStripMenuItem("Favorite", My.Resources.ImageFavorites16, AddressOf OnClipCMFavorite) With {.Name = "Favorite"}
+        ClipCM.Items.Add(cmi)
+        ClipCM.Items.Add(New ToolStripSeparator())
+        ClipCM.Items.Add("Delete", My.Resources.ImageClearRemoveDelete, AddressOf OnClipCMDelete)
 
     End Sub
 
@@ -153,13 +165,23 @@ Friend Class TrayAppContext
 
                 ' Rebuild the menu
                 BuildMenu()
-
             Case MouseButtons.Right
-                ' You can add right‑click logic here later
+                If Integer.TryParse(item.Tag.ToString(), ClipCMCurrentClipId) Then
+                    ClipCM.Items("Preview").Text = item.Text
+                    Dim favItem = DirectCast(ClipCM.Items("Favorite"), ToolStripMenuItem)
+                    favItem.Checked = item.Checked
+                    If favItem.Checked Then
+                        favItem.Text = "Unfavorite"
+                    Else
+                        favItem.Text = "Favorite"
+                    End If
+                    ClipCM.Show(Cursor.Position)
+                End If
         End Select
 
     End Sub
     Private Sub OnMenuClosing(sender As Object, e As ToolStripDropDownClosingEventArgs)
+        'Debug.WriteLine(suppressClose.ToString & " - " & e.CloseReason.ToString)
         If suppressClose AndAlso e.CloseReason = ToolStripDropDownCloseReason.AppClicked Then
             e.Cancel = True
         End If
@@ -193,7 +215,7 @@ Friend Class TrayAppContext
                 Dim hovered As ToolStripMenuItem = DirectCast(item, ToolStripMenuItem)
                 Dim clipID As Integer
                 If Integer.TryParse(hovered.Tag.ToString(), clipID) Then
-                    App.ShowClipViewer(clipID, App.CMTray.Bounds, hovered)
+                    App.ShowClipViewer(clipID, App.CMTray.Bounds, hovered, False)
                 End If
             End If
         ElseIf HotKeyMatches(e, App.Settings.HotKeys.DevTools) Then
@@ -218,6 +240,22 @@ Friend Class TrayAppContext
                 Dim screenPos As Point = Cursor.Position
                 App.ShowAppView()
         End Select
+    End Sub
+    Private Sub OnClipCMPreviewClick(sender As Object, e As EventArgs)
+        repo.RestoreClip(ClipCMCurrentClipId)
+        RefreshMenu()
+    End Sub
+    Private Sub OnClipCMViewClip(sender As Object, e As EventArgs)
+        App.HideClipViewer()
+        App.ShowClipViewer(ClipCMCurrentClipId, ClipCM.Bounds, DirectCast(ClipCM.Items(2), ToolStripMenuItem), True)
+    End Sub
+    Private Sub OnClipCMFavorite(sender As Object, e As EventArgs)
+        repo.ToggleFavorite(ClipCMCurrentClipId)
+        RefreshMenu()
+    End Sub
+    Private Sub OnClipCMDelete(sender As Object, e As EventArgs)
+        repo.DeleteClip(ClipCMCurrentClipId)
+        RefreshMenu()
     End Sub
     Private Sub BlinkTimer_Tick(sender As Object, e As EventArgs)
         blinkState = Not blinkState

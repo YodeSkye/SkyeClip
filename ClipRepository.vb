@@ -351,6 +351,37 @@ Friend Class ClipRepository
         Return clips
     End Function
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Friend Sub DeleteClip(clipID As Integer)
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+
+            Using tx = conn.BeginTransaction()
+
+                ' Delete all formats for this clip
+                Using cmd1 As New SQLiteCommand("
+                        DELETE FROM ClipFormats
+                        WHERE EntryId = @id;
+                    ", conn, tx)
+                    cmd1.Parameters.AddWithValue("@id", clipID)
+                    cmd1.ExecuteNonQuery()
+                End Using
+
+                ' Delete the clip itself
+                Using cmd2 As New SQLiteCommand("
+                        DELETE FROM Clips
+                        WHERE Id = @id;
+                    ", conn, tx)
+                    cmd2.Parameters.AddWithValue("@id", clipID)
+                    cmd2.ExecuteNonQuery()
+                    Debug.Print($"Deleted clip {clipID}")
+                    WriteToLog($"Deleted clip {clipID}")
+                End Using
+
+                tx.Commit()
+            End Using
+        End Using
+    End Sub
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Sub PurgeClips(cutoff As DateTime)
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()

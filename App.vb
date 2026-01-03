@@ -93,7 +93,7 @@ Friend Module App
     Private FrmDevTools As DevTools
 
     ' FORMS
-    Friend Sub ShowClipViewer(clipID As Integer, menuBounds As Rectangle, hovered As ToolStripMenuItem)
+    Friend Sub ShowClipViewer(clipID As Integer, menuBounds As Rectangle, hovered As ToolStripMenuItem, focus As Boolean)
         If FrmClipViewer Is Nothing OrElse FrmClipViewer.IsDisposed Then FrmClipViewer = New ClipViewer()
 
         Dim screenBounds As Rectangle = Screen.FromPoint(Cursor.Position).WorkingArea
@@ -115,6 +115,7 @@ Friend Module App
         If finalY < screenBounds.Top Then finalY = screenBounds.Top
 
         FrmClipViewer.ShowAtScreenPoint(clipID, New Point(finalX, finalY))
+        If focus Then FrmClipViewer.Focus()
     End Sub
     Friend Sub HideClipViewer()
         If FrmClipViewer IsNot Nothing AndAlso Not FrmClipViewer.IsDisposed Then
