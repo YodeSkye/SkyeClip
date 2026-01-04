@@ -219,7 +219,16 @@ Friend Class TrayAppContext
                 End If
             End If
         ElseIf e.KeyCode = App.Settings.HotKeys.ShowScratchPad Then
-            App.ShowScratchPad()
+            Dim cms = DirectCast(sender, ContextMenuStrip)
+            Dim pos = cms.PointToClient(Cursor.Position)
+            Dim item = cms.GetItemAt(pos)
+            If TypeOf item Is ToolStripMenuItem AndAlso item.Tag IsNot Nothing Then
+                Dim hovered As ToolStripMenuItem = DirectCast(item, ToolStripMenuItem)
+                Dim clipID As Integer
+                If Integer.TryParse(hovered.Tag.ToString(), clipID) Then
+                    App.ShowScratchPad(clipID)
+                End If
+            End If
         ElseIf HotKeyMatches(e, App.Settings.HotKeys.DevTools) Then
             App.ShowDevTools()
         End If

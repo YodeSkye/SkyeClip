@@ -29,9 +29,11 @@ Friend Module App
 #If DEBUG Then
     Friend ReadOnly LogPath As String = IO.Path.GetTempPath & GetAssemblyName() & "LogDEV.txt" 'LogPath is the path to the log file.
     Friend ReadOnly DBPath As String = UserPath & Application.ProductName & "ClipboardDEV.db" 'DatabasePath is the path to the SQLite database file.
+    Friend ReadOnly ScratchPadPath As String = UserPath & Application.ProductName & "ScratchPadDEV.rtf" 'ScratchPadPath is the path to the ScratchPad KeepText RTF file.
 #Else
     Friend ReadOnly LogPath As String = IO.Path.GetTempPath & GetAssemblyName() & "Log.txt" 'LogPath is the path to the log file.
     Friend ReadOnly DBPath As String = UserPath & Application.ProductName & "Clipboard.db" 'DatabasePath is the path to the SQLite database file.
+    Friend ReadOnly ScratchPadPath As String = UserPath & Application.ProductName & "ScratchPad.rtf" 'ScratchPadPath is the path to the ScratchPad KeepText RTF file.
 #End If
     Friend ReadOnly DBConnectionString As String = "Data Source=" & DBPath & ";Version=3;"
 
@@ -146,11 +148,11 @@ Friend Module App
             End If
         End If
     End Sub
-    Friend Sub ShowScratchPad()
+    Friend Sub ShowScratchPad(ClipID As Integer)
         If FmrScratchPad Is Nothing OrElse FmrScratchPad.IsDisposed Then
-            FmrScratchPad = New ScratchPad()
+            FmrScratchPad = New ScratchPad
         End If
-        FmrScratchPad.Show()
+        FmrScratchPad.Show(ClipID)
     End Sub
     Friend Sub HideScratchPad()
         If FmrScratchPad IsNot Nothing AndAlso Not FmrScratchPad.IsDisposed Then

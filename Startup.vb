@@ -21,6 +21,11 @@ Module Startup
         ' Initialize the application
         App.WriteToLog(GetAssemblyName() & " Started...")
         App.Settings.Load()
+        If App.Settings.ScratchPadKeepText AndAlso IO.File.Exists(App.ScratchPadPath) Then
+            App.ScratchPadText = IO.File.ReadAllText(App.ScratchPadPath)
+        Else
+            App.ScratchPadText = String.Empty
+        End If
 
         ' Start the application
         Application.EnableVisualStyles()

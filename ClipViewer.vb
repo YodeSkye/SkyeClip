@@ -163,46 +163,6 @@ Friend Class ClipViewer
         End Select
 
     End Sub
-    Private Sub ShowFileDrop(bytes As Byte())
-        Dim files = DecodeFileDrop(bytes)
-
-        LVFileDrop.Items.Clear()
-        ILFileDrop.Images.Clear()
-
-        For Each path In files
-            Dim iconIndex As Integer = -1
-
-            Try
-                Dim icon As Icon = Nothing
-                If Directory.Exists(path) Then
-                    icon = GetFolderIcon(path)
-                ElseIf File.Exists(path) Then
-                    icon = Icon.ExtractAssociatedIcon(path)
-                End If
-                If icon IsNot Nothing Then
-                    ILFileDrop.Images.Add(icon)
-                    iconIndex = ILFileDrop.Images.Count - 1
-                End If
-            Catch
-            End Try
-
-            Dim item As New ListViewItem("", iconIndex)
-            item.SubItems.Add(IO.Path.GetFileName(path))
-
-            If File.Exists(path) Then
-                Dim size = New FileInfo(path).Length
-                item.SubItems.Add(Skye.Common.FormatFileSize(size, Skye.Common.FormatFileSizeUnits.Auto))
-            Else
-                item.SubItems.Add("")
-            End If
-
-            item.Tag = path
-            LVFileDrop.Items.Add(item)
-        Next
-
-        LVFileDrop.Visible = True
-        LVFileDrop.BringToFront()
-    End Sub
     Private Function ExtractHtmlFragment(rawHtml As String) As String
         Const startTag As String = "<!--StartFragment-->"
         Const endTag As String = "<!--EndFragment-->"
@@ -244,9 +204,49 @@ Friend Class ClipViewer
         End If
         Return Nothing
     End Function
+    Private Sub ShowFileDrop(bytes As Byte())
+        Dim files = DecodeFileDrop(bytes)
+
+        LVFileDrop.Items.Clear()
+        ILFileDrop.Images.Clear()
+
+        For Each path In files
+            Dim iconIndex As Integer = -1
+
+            Try
+                Dim icon As Icon = Nothing
+                If Directory.Exists(path) Then
+                    icon = GetFolderIcon(path)
+                ElseIf File.Exists(path) Then
+                    icon = Icon.ExtractAssociatedIcon(path)
+                End If
+                If icon IsNot Nothing Then
+                    ILFileDrop.Images.Add(icon)
+                    iconIndex = ILFileDrop.Images.Count - 1
+                End If
+            Catch
+            End Try
+
+            Dim item As New ListViewItem("", iconIndex)
+            item.SubItems.Add(IO.Path.GetFileName(path))
+
+            If File.Exists(path) Then
+                Dim size = New FileInfo(path).Length
+                item.SubItems.Add(Skye.Common.FormatFileSize(size, Skye.Common.FormatFileSizeUnits.Auto))
+            Else
+                item.SubItems.Add("")
+            End If
+
+            item.Tag = path
+            LVFileDrop.Items.Add(item)
+        Next
+
+        LVFileDrop.Visible = True
+        LVFileDrop.BringToFront()
+    End Sub
     Private Sub ShowHtml(bytes As Byte())
         Dim rawhtml As String = System.Text.Encoding.UTF8.GetString(bytes)
-        Dim fragment As String = ExtractHtmlFragment(rawHtml)
+        Dim fragment As String = ExtractHtmlFragment(rawhtml)
         ' Wrap in minimal HTML so WebView2 renders cleanly
         Dim wrappedHtml As String =
             "<html><body style='margin:0;padding:0;background:" &
