@@ -19,6 +19,7 @@ Friend Module App
     Friend ReadOnly AttributionIcons8 As String = "https://icons8.com/" 'AttributionIcons8 is the URL for Icons8, which provides icons used in the application.
     Friend ReadOnly SponsorGitHub As String = "https://github.com/sponsors/YodeSkye" 'SponsorGitHub is the URL for the GitHub Sponsors page of the application's developer.
     Friend ReadOnly SponsorPayPal As String = "https://www.paypal.com/donate/?hosted_button_id=RVH5T9H69G6CS" 'SponsorPayPal is the URL for the PayPal donation page for the application's developer.
+    Friend ScratchPadText As String = String.Empty
     Friend Property ChangeLogLastVersionShown As String = String.Empty
     Friend Property CBLivePreview As String
     Friend Property AppHandle As IntPtr
@@ -43,9 +44,13 @@ Friend Module App
         Friend Shared AutoPurge As Boolean ' whether to automatically purge old clipboard entries when older than a certain date
         Friend Shared LastPurgeDate As DateTime ' the last date when automatic purge was performed
         Friend Shared PurgeDays As Integer ' number of days after which clipboard entries are purged
+        Friend Shared ScratchPadLocation As Point
+        Friend Shared ScratchPadSize As Size
+        Friend Shared ScratchPadKeepText As Boolean
         Friend Class HotKeys
             Friend Shared ToggleFavorite As Keys
             Friend Shared ShowViewer As Keys
+            Friend Shared ShowScratchPad As Keys
             Friend Shared DevTools As Keys = Keys.Control Or Keys.Shift Or Keys.D 'Not a Saved Setting
         End Class
 
@@ -59,8 +64,16 @@ Friend Module App
             AutoPurge = RegistryHelper.GetBool("AutoPurge", False)
             LastPurgeDate = RegistryHelper.GetDateTime("LastPurgeDate", DateTime.MinValue)
             PurgeDays = RegistryHelper.GetInt("PurgeDays", 30)
+            Dim x As Integer = RegistryHelper.GetInt("ScratchPadLocationX", -AdjustScreenBoundsNormalWindow - 1)
+            Dim y As Integer = RegistryHelper.GetInt("ScratchPadLocationY", -1)
+            ScratchPadLocation = New Point(x, y)
+            Dim w As Integer = RegistryHelper.GetInt("ScratchPadSizeW", -1)
+            Dim h As Integer = RegistryHelper.GetInt("ScratchPadSizeH", -1)
+            ScratchPadSize = New Size(w, h)
+            ScratchPadKeepText = RegistryHelper.GetBool("ScratchPadKeepText", False)
             HotKeys.ToggleFavorite = CType(RegistryHelper.GetInt("HotKeyToggleFavorite", CInt(Keys.Space)), Keys)
             HotKeys.ShowViewer = CType(RegistryHelper.GetInt("HotKeyShowViewer", CInt(Keys.V)), Keys)
+            HotKeys.ShowScratchPad = CType(RegistryHelper.GetInt("HotKeyShowScratchPad", CInt(Keys.S)), Keys)
             WriteToLog("Settings Loaded (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
         End Sub
         Friend Shared Sub Save()
@@ -73,8 +86,14 @@ Friend Module App
             RegistryHelper.SetBool("AutoPurge", AutoPurge)
             RegistryHelper.SetDateTime("LastPurgeDate", LastPurgeDate)
             RegistryHelper.SetInt("PurgeDays", PurgeDays)
+            RegistryHelper.SetInt("ScratchPadLocationX", ScratchPadLocation.X)
+            RegistryHelper.SetInt("ScratchPadLocationY", ScratchPadLocation.Y)
+            RegistryHelper.SetInt("ScratchPadSizeW", ScratchPadSize.Width)
+            RegistryHelper.SetInt("ScratchPadSizeH", ScratchPadSize.Height)
+            RegistryHelper.SetBool("ScratchPadKeepText", ScratchPadKeepText)
             RegistryHelper.SetInt("HotKeyToggleFavorite", CInt(HotKeys.ToggleFavorite))
             RegistryHelper.SetInt("HotKeyShowViewer", CInt(HotKeys.ShowViewer))
+            RegistryHelper.SetInt("HotKeyShowScratchPad", CInt(HotKeys.ShowScratchPad))
             WriteToLog("Settings Saved (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
         End Sub
 
@@ -84,6 +103,7 @@ Friend Module App
     Friend Tray As TrayAppContext
     Friend CMTray As ContextMenuStrip
     Private FrmClipViewer As ClipViewer
+    Friend FmrScratchPad As ScratchPad
     Private FrmAppView As AppView
     Private FrmSettings As SkyeClip.Settings
     Friend FrmLog As Log
@@ -123,6 +143,19 @@ Friend Module App
                 FrmClipViewer.fadeInTimer.Stop()
                 FrmClipViewer.fadeOutTimer.Stop()
                 FrmClipViewer.Close()
+            End If
+        End If
+    End Sub
+    Friend Sub ShowScratchPad()
+        If FmrScratchPad Is Nothing OrElse FmrScratchPad.IsDisposed Then
+            FmrScratchPad = New ScratchPad()
+        End If
+        FmrScratchPad.Show()
+    End Sub
+    Friend Sub HideScratchPad()
+        If FmrScratchPad IsNot Nothing AndAlso Not FmrScratchPad.IsDisposed Then
+            If Not FmrScratchPad.Bounds.Contains(Cursor.Position) Then
+                FmrScratchPad.Close()
             End If
         End If
     End Sub

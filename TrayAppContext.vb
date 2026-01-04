@@ -218,6 +218,8 @@ Friend Class TrayAppContext
                     App.ShowClipViewer(clipID, App.CMTray.Bounds, hovered, False)
                 End If
             End If
+        ElseIf e.KeyCode = App.Settings.HotKeys.ShowScratchPad Then
+            App.ShowScratchPad()
         ElseIf HotKeyMatches(e, App.Settings.HotKeys.DevTools) Then
             App.ShowDevTools()
         End If
