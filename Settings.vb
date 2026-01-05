@@ -1,6 +1,4 @@
 ﻿
-Imports System.Windows.Forms.Design.AxImporter
-
 Public Class Settings
 
     ' Declarations
@@ -16,6 +14,7 @@ Public Class Settings
         TxtBoxMaxClipPreviewLength.Text = App.Settings.MaxClipPreviewLength.ToString
         ChkBoxBlinkOnNewClip.Checked = App.Settings.BlinkOnNewClip
         ChkBoxNotifyOnNewClip.Checked = App.Settings.NotifyOnNewClip
+        ChkBoxShowOpenSourceApp.Checked = App.Settings.ShowOpenSourceApp
         TxtBoxHotKeyToggleFavorite.Text = FormatHotKey(App.Settings.HotKeys.ToggleFavorite)
         TxtBoxHotKeyShowViewer.Text = FormatHotKey(App.Settings.HotKeys.ShowViewer)
         TxtBoxPurgeDays.Text = App.Settings.PurgeDays.ToString
@@ -159,6 +158,9 @@ Public Class Settings
     End Sub
     Private Sub ChkBoxNotifyOnNewClip_Click(sender As Object, e As EventArgs) Handles ChkBoxNotifyOnNewClip.Click
         App.Settings.NotifyOnNewClip = Not App.Settings.NotifyOnNewClip
+    End Sub
+    Private Sub ChkBoxShowOpenSourceApp_Click(sender As Object, e As EventArgs) Handles ChkBoxShowOpenSourceApp.Click
+        App.Settings.ShowOpenSourceApp = Not App.Settings.ShowOpenSourceApp
     End Sub
 
     ' Methods

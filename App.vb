@@ -48,6 +48,7 @@ Friend Module App
         Friend Shared AutoPurge As Boolean ' whether to automatically purge old clipboard entries when older than a certain date
         Friend Shared LastPurgeDate As DateTime ' the last date when automatic purge was performed
         Friend Shared PurgeDays As Integer ' number of days after which clipboard entries are purged
+        Friend Shared ShowOpenSourceApp As Boolean ' whether to show the source application on clip context menu
         Friend Shared ScratchPadLocation As Point
         Friend Shared ScratchPadSize As Size
         Friend Shared ScratchPadKeepText As Boolean
@@ -68,6 +69,7 @@ Friend Module App
             AutoPurge = RegistryHelper.GetBool("AutoPurge", False)
             LastPurgeDate = RegistryHelper.GetDateTime("LastPurgeDate", DateTime.MinValue)
             PurgeDays = RegistryHelper.GetInt("PurgeDays", 30)
+            ShowOpenSourceApp = RegistryHelper.GetBool("ShowOpenSourceApp", False)
             Dim x As Integer = RegistryHelper.GetInt("ScratchPadLocationX", -AdjustScreenBoundsNormalWindow - 1)
             Dim y As Integer = RegistryHelper.GetInt("ScratchPadLocationY", -1)
             ScratchPadLocation = New Point(x, y)
@@ -90,6 +92,7 @@ Friend Module App
             RegistryHelper.SetBool("AutoPurge", AutoPurge)
             RegistryHelper.SetDateTime("LastPurgeDate", LastPurgeDate)
             RegistryHelper.SetInt("PurgeDays", PurgeDays)
+            RegistryHelper.SetBool("ShowOpenSourceApp", ShowOpenSourceApp)
             RegistryHelper.SetInt("ScratchPadLocationX", ScratchPadLocation.X)
             RegistryHelper.SetInt("ScratchPadLocationY", ScratchPadLocation.Y)
             RegistryHelper.SetInt("ScratchPadSizeW", ScratchPadSize.Width)
@@ -309,36 +312,56 @@ Friend Module App
             Return $"< {count} Files >"
         End If
     End Function
-    Friend Function GetSourceAppInfo() As (AppName As String, IconBytes As Byte())
+    Friend Function GetSourceAppInfo() As (AppName As String, IconBytes As Byte(), ExePath As String)
         Dim hwnd = Skye.WinAPI.GetForegroundWindow()
         Dim pid As UInteger
         Dim result As UInteger = Skye.WinAPI.GetWindowThreadProcessId(hwnd, pid)
-        If pid = 0 Then Return ("Unknown", Nothing)
+        If pid = 0 Then Return ("Unknown", Nothing, Nothing)
 
         Try
             Dim proc = Process.GetProcessById(CInt(pid))
-            Dim exePath = proc.MainModule.FileName
+            Dim exePath As String = Nothing
+
+            Try
+                exePath = proc.MainModule.FileName
+            Catch
+                ' Some protected processes throw here
+                exePath = Nothing
+            End Try
 
             ' Friendly name
-            Dim appName = Path.GetFileNameWithoutExtension(exePath)
-            Dim verInfo = FileVersionInfo.GetVersionInfo(exePath)
-            If Not String.IsNullOrWhiteSpace(verInfo.ProductName) Then
-                appName = verInfo.ProductName
+            Dim appName As String = "Unknown"
+
+            If Not String.IsNullOrWhiteSpace(exePath) Then
+                appName = Path.GetFileNameWithoutExtension(exePath)
+
+                Dim verInfo = FileVersionInfo.GetVersionInfo(exePath)
+                If Not String.IsNullOrWhiteSpace(verInfo.ProductName) Then
+                    appName = verInfo.ProductName
+                End If
             End If
 
             ' Extract icon
-            Dim ico = Icon.ExtractAssociatedIcon(exePath)
             Dim iconBytes As Byte() = Nothing
-            If ico IsNot Nothing Then
-                Using ms As New MemoryStream()
-                    ico.ToBitmap().Save(ms, Imaging.ImageFormat.Png)
-                    iconBytes = ms.ToArray()
-                End Using
+
+            If Not String.IsNullOrWhiteSpace(exePath) Then
+                Try
+                    Dim ico = Icon.ExtractAssociatedIcon(exePath)
+                    If ico IsNot Nothing Then
+                        Using ms As New MemoryStream()
+                            ico.ToBitmap().Save(ms, Imaging.ImageFormat.Png)
+                            iconBytes = ms.ToArray()
+                        End Using
+                    End If
+                Catch
+                    ' Ignore icon extraction failures
+                End Try
             End If
 
-            Return (appName, iconBytes)
+            Return (appName, iconBytes, exePath)
+
         Catch
-            Return ("Unknown", Nothing)
+            Return ("Unknown", Nothing, Nothing)
         End Try
     End Function
     Friend Function GetAssemblyName() As String
@@ -377,6 +400,25 @@ Friend Module App
     Friend Function GetSimpleVersion() As String
         Dim ver = Assembly.GetExecutingAssembly().GetName().Version
         GetSimpleVersion = ver.Major.ToString & "." & ver.Minor.ToString
+    End Function
+    Friend Function IsLegitimateSourceApp(path As String) As Boolean
+        If String.IsNullOrWhiteSpace(path) Then Return False
+        If Not File.Exists(path) Then Return False
+
+        Dim p = path.ToLower()
+
+        ' Exclude temp EXEs
+        If p.Contains("\appdata\local\temp\") Then Return False
+
+        ' Exclude system processes
+        Dim win = Environment.GetFolderPath(Environment.SpecialFolder.Windows).ToLower()
+        If p.StartsWith(win & "\system32") Then Return False
+        If p.StartsWith(win & "\syswow64") Then Return False
+
+        ' Exclude UWP apps
+        If p.Contains("\windowsapps\") Then Return False
+
+        Return True
     End Function
     Friend Sub WriteToLog(message As String)
         If String.IsNullOrWhiteSpace(message) Then Exit Sub

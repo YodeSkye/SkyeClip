@@ -13,12 +13,21 @@ Friend Class ClipRepository
         Public Property FormatName As String
         Public Property DataBytes As Byte()
     End Class
-    Friend Class ClipInfo
+    Friend Class BasicClipInfo
         Public Property Id As Integer
         Public Property Preview As String
-        Public Property LastUsedAt As DateTime ' optional
+        Public Property LastUsedAt As DateTime
         Public Property SourceAppIcon As Byte()
         Public Property IsFavorite As Boolean
+    End Class
+    Friend Class FullClipInfo
+        Public Property Id As Integer
+        Public Property Preview As String
+        Public Property SourceAppName As String
+        Public Property SourceAppPath As String
+        Public Property SourceAppIcon As Byte()
+        Public Property IsFavorite As Boolean
+        Public Property LastUsedAt As DateTime
     End Class
 
     ' Constructor
@@ -38,6 +47,7 @@ Friend Class ClipRepository
                 LastUsedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
                 AggregateHash TEXT NOT NULL,
                 SourceAppName TEXT,
+                SourceAppPath TEXT,
                 SourceAppIcon BLOB,
                 IsFavorite INTEGER DEFAULT 0
             )", conn)
@@ -53,6 +63,9 @@ Friend Class ClipRepository
                 Data BLOB NOT NULL
             )", conn)
             createFormatsCmd.ExecuteNonQuery()
+
+            ' Run migrations
+            RunMigrations(conn)
 
             ' Indexes (safe to re-run)
             Dim idxCreatedCmd As New SQLiteCommand("CREATE INDEX IF NOT EXISTS idx_clips_created ON Clips(CreatedAt)", conn)
@@ -144,14 +157,15 @@ Friend Class ClipRepository
                 ' New clip → insert metadata
                 Dim sourceInfo = GetSourceAppInfo()
                 Dim insertEntry As New SQLiteCommand("
-                    INSERT INTO Clips (Preview, CreatedAt, LastUsedAt, AggregateHash, SourceAppName, SourceAppIcon)
-                    VALUES (@p, @c, @l, @hash, @app, @icon);
+                    INSERT INTO Clips (Preview, CreatedAt, LastUsedAt, AggregateHash, SourceAppName, SourceAppPath, SourceAppIcon)
+                    VALUES (@p, @c, @l, @hash, @app, @apppath, @icon);
                     SELECT last_insert_rowid();", conn)
                 insertEntry.Parameters.AddWithValue("@p", preview)
                 insertEntry.Parameters.AddWithValue("@c", nowVal)
                 insertEntry.Parameters.AddWithValue("@l", nowVal)
                 insertEntry.Parameters.AddWithValue("@hash", aggHash)
                 insertEntry.Parameters.AddWithValue("@app", sourceInfo.AppName)
+                insertEntry.Parameters.AddWithValue("@apppath", sourceInfo.ExePath)
                 insertEntry.Parameters.Add("@icon", DbType.Binary).Value = If(sourceInfo.IconBytes IsNot Nothing, CType(sourceInfo.IconBytes, Object), DBNull.Value)
                 entryId = Convert.ToInt32(insertEntry.ExecuteScalar())
 
@@ -274,8 +288,50 @@ Friend Class ClipRepository
         End Try
     End Sub
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
-    Friend Function GetRecentClips(limit As Integer) As List(Of ClipInfo)
-        Dim clips As New List(Of ClipInfo)
+    Friend Function GetClipById(clipID As Integer) As FullClipInfo
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+
+            Dim cmd As New SQLiteCommand("
+            SELECT Id, Preview, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite, LastUsedAt
+            FROM Clips
+            WHERE Id = @id", conn)
+
+            cmd.Parameters.AddWithValue("@id", clipID)
+
+            Using reader = cmd.ExecuteReader()
+                If reader.Read() Then
+                    Dim ci As New FullClipInfo With {
+                    .Id = reader.GetInt32(0),
+                    .Preview = If(reader.IsDBNull(1), "", reader.GetString(1)),
+                    .SourceAppName = If(reader.IsDBNull(2), "", reader.GetString(2)),
+                    .SourceAppPath = If(reader.IsDBNull(3), "", reader.GetString(3)),
+                    .IsFavorite = (Not reader.IsDBNull(5) AndAlso reader.GetInt32(5) = 1)
+                }
+
+                    ' Icon
+                    If Not reader.IsDBNull(4) Then
+                        Dim length As Integer = CInt(reader.GetBytes(4, 0, Nothing, 0, 0))
+                        Dim buffer(length - 1) As Byte
+                        reader.GetBytes(4, 0, buffer, 0, length)
+                        ci.SourceAppIcon = buffer
+                    End If
+
+                    ' LastUsedAt
+                    If Not reader.IsDBNull(6) Then
+                        ci.LastUsedAt = reader.GetDateTime(6)
+                    End If
+
+                    Return ci
+                End If
+            End Using
+        End Using
+
+        Return Nothing
+    End Function
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Friend Function GetRecentClips(limit As Integer) As List(Of BasicClipInfo)
+        Dim clips As New List(Of BasicClipInfo)
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
 
@@ -290,7 +346,7 @@ Friend Class ClipRepository
 
             Using reader = cmd.ExecuteReader()
                 While reader.Read()
-                    Dim ci As New ClipInfo With {
+                    Dim ci As New BasicClipInfo With {
                         .Id = reader.GetInt32(0),
                         .Preview = If(reader.IsDBNull(1), "", reader.GetString(1))
                     }
@@ -320,8 +376,8 @@ Friend Class ClipRepository
         Return clips
     End Function
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
-    Friend Function GetFavoriteClips(limit As Integer) As List(Of ClipInfo)
-        Dim clips As New List(Of ClipInfo)
+    Friend Function GetFavoriteClips(limit As Integer) As List(Of BasicClipInfo)
+        Dim clips As New List(Of BasicClipInfo)
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
 
@@ -337,7 +393,7 @@ Friend Class ClipRepository
 
             Using reader = cmd.ExecuteReader()
                 While reader.Read()
-                    Dim ci As New ClipInfo With {
+                    Dim ci As New BasicClipInfo With {
                         .Id = reader.GetInt32(0),
                         .Preview = If(reader.IsDBNull(1), "", reader.GetString(1))
                     }
@@ -434,16 +490,31 @@ Friend Class ClipRepository
     End Sub
 
     ' Methods
-    'Private Shared Function ComputeAggregateHash(formats As IEnumerable(Of ClipData)) As String
-    '    ' Collect all bytes into a single buffer
-    '    Using ms As New IO.MemoryStream()
-    '        For Each cd In formats.OrderBy(Function(f) f.FormatId)
-    '            ms.Write(cd.DataBytes, 0, cd.DataBytes.Length)
-    '        Next
-    '        Dim hashBytes As Byte() = Security.Cryptography.SHA256.HashData(ms.ToArray())
-    '        Return Convert.ToHexString(hashBytes)
-    '    End Using
-    'End Function
+    Private Shared Sub RunMigrations(conn As SQLiteConnection)
+
+        ' Clips Table
+        EnsureColumn(conn, "Clips", "SourceAppPath", "TEXT")
+
+        ' ClipFormats Table
+        ' (Add future columns here)
+
+    End Sub
+    Private Shared Sub EnsureColumn(conn As SQLiteConnection, table As String, column As String, definition As String)
+        ' Check if column exists
+        Using pragma As New SQLiteCommand($"PRAGMA table_info({table});", conn)
+            Using reader = pragma.ExecuteReader()
+                While reader.Read()
+                    If reader("name").ToString().Equals(column, StringComparison.OrdinalIgnoreCase) Then
+                        Return ' Column already exists
+                    End If
+                End While
+            End Using
+        End Using
+        ' Add missing column
+        Using alter As New SQLiteCommand($"ALTER TABLE {table} ADD COLUMN {column} {definition};", conn)
+            alter.ExecuteNonQuery()
+        End Using
+    End Sub
     Private Shared Function ComputeAggregateHash(formats As List(Of ClipData)) As String
 
         'Debug.Print("Hashing formats:")

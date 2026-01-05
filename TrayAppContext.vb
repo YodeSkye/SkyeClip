@@ -100,6 +100,8 @@ Friend Class TrayAppContext
         ClipCM.Items.Add(cmi)
         ClipCM.Items.Add("View Clip", My.Resources.imageClipViewer16, AddressOf OnClipCMViewClip)
         ClipCM.Items.Add("Send To Scratch Pad", My.Resources.imageScratchPad16, AddressOf OnCLipCMScratchPad)
+        cmi = New ToolStripMenuItem("Open Source App", Nothing, AddressOf OnCLipCMOpenSourceApp) With {.Name = "OpenSourceApp"}
+        ClipCM.Items.Add(cmi)
         ClipCM.Items.Add(New ToolStripSeparator())
         ClipCM.Items.Add("Delete", My.Resources.ImageClearRemoveDelete16, AddressOf OnClipCMDelete)
 
@@ -165,11 +167,7 @@ Friend Class TrayAppContext
             Case MouseButtons.Left
                 Dim clipID As Integer
                 If Not Integer.TryParse(item.Tag.ToString(), clipID) Then Exit Sub
-
-                ' Restore the clip
                 repo.RestoreClip(clipID)
-
-                ' Rebuild the menu
                 BuildMenu()
             Case MouseButtons.Right
                 If Integer.TryParse(item.Tag.ToString(), ClipCMCurrentClipId) Then
@@ -180,6 +178,24 @@ Friend Class TrayAppContext
                         favItem.Text = "Unfavorite"
                     Else
                         favItem.Text = "Favorite"
+                    End If
+                    If App.Settings.ShowOpenSourceApp Then
+                        Dim clip = repo.GetClipById(ClipCMCurrentClipId)
+                        Dim openItem = DirectCast(ClipCM.Items("OpenSourceApp"), ToolStripMenuItem)
+                        openItem.Visible = True
+                        If App.IsLegitimateSourceApp(clip.SourceAppPath) Then
+                            openItem.Enabled = True
+                            Using ms As New MemoryStream(clip.SourceAppIcon)
+                                openItem.Image = Image.FromStream(ms)
+                            End Using
+                            openItem.Tag = clip.SourceAppPath
+                        Else
+                            openItem.Enabled = False
+                            openItem.Image = Nothing
+                        End If
+                    Else
+                        Dim openItem = DirectCast(ClipCM.Items("OpenSourceApp"), ToolStripMenuItem)
+                        openItem.Visible = False
                     End If
                     ClipCM.Show(Cursor.Position)
                 End If
@@ -279,6 +295,16 @@ Friend Class TrayAppContext
     End Sub
     Private Sub OnCLipCMScratchPad(sender As Object, e As EventArgs)
         App.ShowScratchPad(ClipCMCurrentClipId)
+    End Sub
+    Private Sub OnCLipCMOpenSourceApp(sender As Object, e As EventArgs)
+        Dim item = DirectCast(sender, ToolStripMenuItem)
+        Dim exePath = TryCast(item.Tag, String)
+        If String.IsNullOrWhiteSpace(exePath) Then Exit Sub
+        Try
+            Process.Start(exePath)
+        Catch
+            App.WriteToLog("Unable to Open the Source Application: " & exePath)
+        End Try
     End Sub
     Private Sub OnClipCMDelete(sender As Object, e As EventArgs)
         repo.DeleteClip(ClipCMCurrentClipId)

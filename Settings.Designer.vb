@@ -43,6 +43,7 @@ Partial Class Settings
         TxtBoxPurgeDays = New TextBox()
         ChkBoxAutoPurge = New CheckBox()
         BtnPurgeNow = New Button()
+        ChkBoxShowOpenSourceApp = New CheckBox()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -256,11 +257,24 @@ Partial Class Settings
         BtnPurgeNow.Text = "Purge Now"
         BtnPurgeNow.UseVisualStyleBackColor = True
         ' 
+        ' ChkBoxShowOpenSourceApp
+        ' 
+        ChkBoxShowOpenSourceApp.AutoSize = True
+        TipSettings.SetImage(ChkBoxShowOpenSourceApp, Nothing)
+        ChkBoxShowOpenSourceApp.Location = New Point(287, 91)
+        ChkBoxShowOpenSourceApp.Name = "ChkBoxShowOpenSourceApp"
+        ChkBoxShowOpenSourceApp.Size = New Size(194, 25)
+        ChkBoxShowOpenSourceApp.TabIndex = 45
+        TipSettings.SetText(ChkBoxShowOpenSourceApp, "Show a notification toast when the clipboard changes.")
+        ChkBoxShowOpenSourceApp.Text = "Show Open Source App"
+        ChkBoxShowOpenSourceApp.UseVisualStyleBackColor = True
+        ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(484, 507)
+        Controls.Add(ChkBoxShowOpenSourceApp)
         Controls.Add(BtnPurgeNow)
         Controls.Add(ChkBoxAutoPurge)
         Controls.Add(TxtBoxPurgeDays)
@@ -311,4 +325,5 @@ Partial Class Settings
     Friend WithEvents TxtBoxPurgeDays As TextBox
     Friend WithEvents ChkBoxAutoPurge As CheckBox
     Friend WithEvents BtnPurgeNow As Button
+    Friend WithEvents ChkBoxShowOpenSourceApp As CheckBox
 End Class
