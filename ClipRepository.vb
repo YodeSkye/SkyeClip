@@ -95,11 +95,23 @@ Friend Class ClipRepository
             Dim s = Encoding.Unicode.GetString(Skye.Common.TrimUnicodeNull(uni.DataBytes))
             s = s.Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ")
             s = System.Text.RegularExpressions.Regex.Replace(s, "\s+", " ").Trim()
-            preview = If(String.IsNullOrWhiteSpace(s), "< No Preview >", Skye.Common.Trunc(s, App.Settings.MaxClipPreviewLength))
+
+            If String.IsNullOrWhiteSpace(s) Then
+                preview = "< No Preview >"
+            Else
+                preview = Skye.Common.Trunc(s, App.Settings.MaxClipPreviewLength)
+                Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").ToLower().Contains("rtf", StringComparison.OrdinalIgnoreCase))
+                Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").ToLower().Contains("html", StringComparison.OrdinalIgnoreCase))
+                If hasRtf Then preview &= App.CBRTFSuffix
+                If hasHtml Then preview &= App.CBHTMLSuffix
+            End If
+
         ElseIf filedrop IsNot Nothing Then
             preview = App.BuildFileDropPreview
+
         ElseIf dib IsNot Nothing Then
             preview = "< Image >"
+
         Else
             Dim f0 = formats.First()
             preview = If(String.IsNullOrWhiteSpace(f0.FormatName), $"Format {f0.FormatId}", f0.FormatName)

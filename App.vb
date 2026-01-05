@@ -14,6 +14,8 @@ Friend Module App
     Friend ReadOnly AdjustScreenBoundsNormalWindow As Byte = 8 'AdjustScreenBoundsNormalWindow is the number of pixels to adjust the screen bounds for normal windows.
     Friend ReadOnly AdjustScreenBoundsDialogWindow As Byte = 10 'AdjustScreenBoundsDialogWindow is the number of pixels to adjust the screen bounds for dialog windows.
     Friend ReadOnly CBEmptyString As String = "< Clipboard Empty >"
+    Friend ReadOnly CBRTFSuffix As String = " <RTF>"
+    Friend ReadOnly CBHTMLSuffix As String = " <HTML>"
     Friend ReadOnly AttributionMicrosoft As String = "https://www.microsoft.com" 'AttributionMicrosoft is the URL for Microsoft, which provides various APIs and libraries used in the application.
     Friend ReadOnly AttributionSQLite As String = "https://www.sqlite.org/index.html" 'AttributionSQLite is the URL for SQLite, which provides database functionality in the application.
     Friend ReadOnly AttributionIcons8 As String = "https://icons8.com/" 'AttributionIcons8 is the URL for Icons8, which provides icons used in the application.
@@ -252,22 +254,37 @@ Friend Module App
             Return CBEmptyString
         End If
 
+        Dim hasRtf As Boolean = data.GetDataPresent(DataFormats.Rtf)
+        Dim hasHtml As Boolean = data.GetDataPresent(DataFormats.Html)
+
+        ' --- TEXT PREVIEW ---
         If data.GetDataPresent(DataFormats.UnicodeText) Then
             Dim raw = CStr(data.GetData(DataFormats.UnicodeText))
 
             Dim t = raw.Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ")
             t = System.Text.RegularExpressions.Regex.Replace(t, "\s+", " ").Trim()
             t = Skye.Common.Trunc(t, App.Settings.MaxClipPreviewLength)
+
             If String.IsNullOrWhiteSpace(t) Then
-                Return "< No Preview >"
+                t = "< No Preview >"
             End If
+
+            ' Append format tags
+            If hasRtf Then
+                t &= CBRTFSuffix
+            ElseIf hasHtml Then
+                t &= CBHTMLSuffix
+            End If
+
             Return t
         End If
 
+        ' --- IMAGE ---
         If data.GetDataPresent(DataFormats.Bitmap) Then
             Return "< Image >"
         End If
 
+        ' --- FILE DROP ---
         If data.GetDataPresent(DataFormats.FileDrop) Then
             Return BuildFileDropPreview()
         End If
