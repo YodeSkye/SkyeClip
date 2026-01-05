@@ -15,6 +15,11 @@ Friend Class TrayAppContext
             .Image = My.Resources.IconApp.ToBitmap
         },
         New CommonAction With {
+            .Text = "Scratch Pad",
+            .Handler = AddressOf OnScratchPad_MouseDown,
+            .Image = My.Resources.imageScratchPad16
+        },
+        New CommonAction With {
             .Text = "App View",
             .Handler = AddressOf OnAppView_MouseDown,
             .Image = My.Resources.ImageSettings16
@@ -91,11 +96,12 @@ Friend Class TrayAppContext
         cmi = New ToolStripMenuItem("Preview", My.Resources.IconApp.ToBitmap, AddressOf OnClipCMPreviewClick) With {.Name = "Preview"}
         ClipCM.Items.Add(cmi)
         ClipCM.Items.Add(New ToolStripSeparator())
-        ClipCM.Items.Add("View Clip", My.Resources.imageClipViewer, AddressOf OnClipCMViewClip)
         cmi = New ToolStripMenuItem("Favorite", My.Resources.ImageFavorites16, AddressOf OnClipCMFavorite) With {.Name = "Favorite"}
         ClipCM.Items.Add(cmi)
+        ClipCM.Items.Add("View Clip", My.Resources.imageClipViewer16, AddressOf OnClipCMViewClip)
+        ClipCM.Items.Add("Send To Scratch Pad", My.Resources.imageScratchPad16, AddressOf OnCLipCMScratchPad)
         ClipCM.Items.Add(New ToolStripSeparator())
-        ClipCM.Items.Add("Delete", My.Resources.ImageClearRemoveDelete, AddressOf OnClipCMDelete)
+        ClipCM.Items.Add("Delete", My.Resources.ImageClearRemoveDelete16, AddressOf OnClipCMDelete)
 
     End Sub
 
@@ -242,6 +248,13 @@ Friend Class TrayAppContext
             Case MouseButtons.Right
         End Select
     End Sub
+    Private Sub OnScratchPad_MouseDown(sender As Object, e As MouseEventArgs)
+        Select Case e.Button
+            Case MouseButtons.Left
+                App.ShowScratchPad(-1)
+            Case MouseButtons.Right
+        End Select
+    End Sub
     Private Sub OnAppView_MouseDown(sender As Object, e As MouseEventArgs)
         Select Case e.Button
             Case MouseButtons.Left
@@ -256,13 +269,16 @@ Friend Class TrayAppContext
         repo.RestoreClip(ClipCMCurrentClipId)
         RefreshMenu()
     End Sub
+    Private Sub OnClipCMFavorite(sender As Object, e As EventArgs)
+        repo.ToggleFavorite(ClipCMCurrentClipId)
+        RefreshMenu()
+    End Sub
     Private Sub OnClipCMViewClip(sender As Object, e As EventArgs)
         App.HideClipViewer()
         App.ShowClipViewer(ClipCMCurrentClipId, ClipCM.Bounds, DirectCast(ClipCM.Items(2), ToolStripMenuItem), True)
     End Sub
-    Private Sub OnClipCMFavorite(sender As Object, e As EventArgs)
-        repo.ToggleFavorite(ClipCMCurrentClipId)
-        RefreshMenu()
+    Private Sub OnCLipCMScratchPad(sender As Object, e As EventArgs)
+        App.ShowScratchPad(ClipCMCurrentClipId)
     End Sub
     Private Sub OnClipCMDelete(sender As Object, e As EventArgs)
         repo.DeleteClip(ClipCMCurrentClipId)

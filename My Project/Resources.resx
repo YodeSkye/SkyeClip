@@ -232,11 +232,11 @@ SkyeClip allows customization of:\par
   <data name="ImageChangeLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageChangeLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageClearRemoveDelete" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageClearRemoveDelete.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ImageClearRemoveDelete16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageClearRemoveDelete16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="imageClipViewer" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>imageClipViewer.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="imageClipViewer16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>imageClipViewer16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageDeleteLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageDeleteLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -259,8 +259,8 @@ SkyeClip allows customization of:\par
   <data name="ImageHelp32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageHelp32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ImageKeepText" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>ImageKeepText.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ImageKeepText16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageKeepText16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageLog16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageLog16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -271,8 +271,14 @@ SkyeClip allows customization of:\par
   <data name="ImageOK" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageOK.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImageOK16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageOK16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ImageRefreshLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageRefreshLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="imageScratchPad16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>imageScratchPad16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageSettings16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageSettings16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

@@ -1,35 +1,39 @@
 ﻿
 Imports System.Data.SQLite
+Imports System.IO
 Imports System.Text
 Imports System.Text.RegularExpressions
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement
-Imports Skye.UI
 
 Friend Class ScratchPad
 
     ' Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private OKText As String
     Private _clipID As Integer = -1
 
     ' Form Events
     Private Sub ScratchPad_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = App.GetAppTitle & " " & Text
+        OKText = TipScratchPad.GetText(BtnOK)
         If App.Settings.ScratchPadLocation.Y >= 0 Then Me.Location = App.Settings.ScratchPadLocation
         If App.Settings.ScratchPadSize.Height >= 0 Then Me.Size = App.Settings.ScratchPadSize
         ChkBoxKeepText.Checked = App.Settings.ScratchPadKeepText
+        SetOk()
         If Not String.IsNullOrWhiteSpace(App.ScratchPadText) Then
             RTB.Rtf = App.ScratchPadText
         End If
     End Sub
-    Friend Overloads Sub Show(ClipID As Integer)
-        _clipID = ClipID
+    Friend Overloads Sub Show(clipID As Integer)
+        _clipID = clipID
         MyBase.Show()
         BringToFront()
 
-        Dim dt = LoadFormatsForClip(ClipID)
-        Dim best = PickBestFormat(dt)
-        If best IsNot Nothing Then ShowClipData(best)
+        If clipID >= 0 Then
+            Dim dt = LoadFormatsForClip(clipID)
+            Dim best = PickBestFormat(dt)
+            If best IsNot Nothing Then ShowClipData(best)
+        End If
 
     End Sub
     Private Sub ScratchPad_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
@@ -83,10 +87,79 @@ Friend Class ScratchPad
             App.Settings.ScratchPadSize = Me.Size
         End If
     End Sub
+    Private Sub ScratchPad_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown, RTB.KeyDown
+        Select Case e.KeyCode
+            Case Keys.Z 'Undo & Redo
+                If e.Control Then
+                    If e.Shift Then
+                        Redo()
+                    Else
+                        Undo()
+                    End If
+                End If
+                e.SuppressKeyPress = True
+            Case Keys.X 'Cut
+                If e.Control Then
+                    If e.Shift Then
+                        CutPlain()
+                    Else
+                        Cut()
+                    End If
+                End If
+                e.SuppressKeyPress = True
+            Case Keys.C 'Copy
+                If e.Control Then
+                    If e.Shift Then
+                        CopyPlain()
+                    Else
+                        Copy()
+                    End If
+                End If
+                e.SuppressKeyPress = True
+            Case Keys.V 'Paste
+                If e.Control Then
+                    If e.Shift Then
+                        PastePlain()
+                    Else
+                        Paste()
+                    End If
+                End If
+                e.SuppressKeyPress = True
+            Case Keys.D 'Delete
+                Delete()
+                e.SuppressKeyPress = True
+            Case Keys.A 'Select All
+                SelectAll()
+                e.SuppressKeyPress = True
+        End Select
+    End Sub
 
     ' Control Events
+    Private Sub RTB_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles RTB.PreviewKeyDown
+
+        ' === CTRL ONLY ===
+        If e.Control AndAlso Not e.Shift Then
+            Select Case e.KeyCode
+                Case Keys.Z, Keys.X, Keys.C, Keys.V, Keys.D, Keys.A
+                    e.IsInputKey = True
+            End Select
+        End If
+
+        ' === CTRL + SHIFT ===
+        If e.Control AndAlso e.Shift Then
+            Select Case e.KeyCode
+                Case Keys.Z, Keys.X, Keys.C, Keys.V, Keys.D, Keys.A
+                    e.IsInputKey = True
+            End Select
+        End If
+
+    End Sub
     Private Sub ChkBoxKeepText_Click(sender As Object, e As EventArgs) Handles ChkBoxKeepText.Click
         App.Settings.ScratchPadKeepText = ChkBoxKeepText.Checked
+        SetOk()
+    End Sub
+    Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
+        Close()
     End Sub
     Private Sub BtnExport_Click(sender As Object, e As EventArgs) Handles BtnExport.Click
 
@@ -164,6 +237,87 @@ Friend Class ScratchPad
     End Sub
     Private Sub ShowRaw(bytes As Byte(), format As String)
         RTB.Text &= $"[{format}] {bytes.Length} bytes"
+    End Sub
+    Private Sub Undo()
+        If RTB.CanUndo Then RTB.Undo()
+    End Sub
+    Private Sub Redo()
+        If RTB.CanRedo Then RTB.Redo()
+    End Sub
+    Private Sub Cut()
+        Copy()
+        RTB.SelectedText = String.Empty
+    End Sub
+    Private Sub CutPlain()
+        CopyPlain()
+        RTB.SelectedText = String.Empty
+    End Sub
+    Private Sub Copy()
+        If RTB.SelectionLength = 0 Then Return
+
+        Dim data As New DataObject()
+        data.SetData(DataFormats.Rtf, RTB.SelectedRtf)
+        data.SetData(DataFormats.UnicodeText, RTB.SelectedText)
+        Clipboard.SetDataObject(data, True)
+
+    End Sub
+    Private Sub CopyPlain()
+        If RTB.SelectionLength = 0 Then Return
+
+        ' Clipboard.SetText(RTB.SelectedText, TextDataFormat.UnicodeText)
+        Dim data As New DataObject()
+        data.SetData(DataFormats.UnicodeText, RTB.SelectedText)
+        Clipboard.SetDataObject(data, True)
+
+    End Sub
+    Private Sub Paste()
+        Dim rtf As String = Nothing
+
+        ' Try to get RTF as a string
+        If Clipboard.TryGetData(Of String)(rtf, DataFormats.Rtf) Then
+            RTB.SelectedRtf = rtf
+            Return
+        End If
+
+        ' Old API fallback (required for Office, browsers, etc.)
+#Disable Warning WFDEV005
+        Dim obj = Clipboard.GetData(DataFormats.Rtf)
+#Enable Warning WFDEV005
+        If TypeOf obj Is String Then
+            RTB.SelectedRtf = DirectCast(obj, String)
+            Return
+        End If
+        If TypeOf obj Is MemoryStream Then
+            Using ms = DirectCast(obj, MemoryStream)
+                RTB.LoadFile(ms, RichTextBoxStreamType.RichText)
+            End Using
+            Return
+        End If
+
+        ' Fallback: plain text
+        If Clipboard.ContainsText() Then
+            RTB.SelectedText = Clipboard.GetText(TextDataFormat.UnicodeText)
+        End If
+
+    End Sub
+    Private Sub PastePlain()
+        If Clipboard.ContainsText() Then
+            RTB.SelectedText = Clipboard.GetText(TextDataFormat.UnicodeText)
+        End If
+    End Sub
+    Private Sub Delete()
+        RTB.SelectedText = String.Empty
+    End Sub
+    Private Sub SelectAll()
+        RTB.SelectAll()
+    End Sub
+    Private Sub SetOk()
+        Select Case App.Settings.ScratchPadKeepText
+            Case True
+                TipScratchPad.SetText(BtnOK, OKText & " (Saving Text)")
+            Case False
+                TipScratchPad.SetText(BtnOK, OKText & " (Without Saving Text)")
+        End Select
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > Screen.PrimaryScreen.WorkingArea.Right Then location.X = Screen.PrimaryScreen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow

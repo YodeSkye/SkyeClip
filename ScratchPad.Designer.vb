@@ -26,6 +26,7 @@ Partial Class ScratchPad
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ScratchPad))
         RTB = New Skye.UI.RichTextBox()
         PanelBottom = New Panel()
+        BtnOK = New Button()
         ChkBoxKeepText = New CheckBox()
         BtnExport = New Button()
         TipScratchPad = New Skye.UI.ToolTipEX(components)
@@ -42,7 +43,7 @@ Partial Class ScratchPad
         RTB.ScrollBars = RichTextBoxScrollBars.ForcedBoth
         RTB.ShortcutsEnabled = False
         RTB.ShowSelectionMargin = True
-        RTB.Size = New Size(800, 399)
+        RTB.Size = New Size(800, 368)
         RTB.TabIndex = 0
         RTB.Text = ""
         TipScratchPad.SetText(RTB, Nothing)
@@ -50,37 +51,51 @@ Partial Class ScratchPad
         ' 
         ' PanelBottom
         ' 
+        PanelBottom.Controls.Add(BtnOK)
         PanelBottom.Controls.Add(ChkBoxKeepText)
         PanelBottom.Controls.Add(BtnExport)
         PanelBottom.Dock = DockStyle.Bottom
         TipScratchPad.SetImage(PanelBottom, Nothing)
-        PanelBottom.Location = New Point(0, 399)
+        PanelBottom.Location = New Point(0, 368)
         PanelBottom.Name = "PanelBottom"
-        PanelBottom.Size = New Size(800, 51)
+        PanelBottom.Size = New Size(800, 82)
         PanelBottom.TabIndex = 1
         TipScratchPad.SetText(PanelBottom, Nothing)
         ' 
+        ' BtnOK
+        ' 
+        BtnOK.Anchor = AnchorStyles.Bottom
+        BtnOK.Image = My.Resources.Resources.ImageOK
+        TipScratchPad.SetImage(BtnOK, My.Resources.Resources.ImageOK16)
+        BtnOK.Location = New Point(368, 6)
+        BtnOK.Name = "BtnOK"
+        BtnOK.Size = New Size(64, 64)
+        BtnOK.TabIndex = 22
+        TipScratchPad.SetText(BtnOK, "Close Scratch Pad")
+        BtnOK.UseVisualStyleBackColor = True
+        ' 
         ' ChkBoxKeepText
         ' 
+        ChkBoxKeepText.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         ChkBoxKeepText.Appearance = Appearance.Button
-        ChkBoxKeepText.Image = My.Resources.Resources.ImageKeepText
-        TipScratchPad.SetImage(ChkBoxKeepText, Nothing)
-        ChkBoxKeepText.Location = New Point(12, 7)
+        ChkBoxKeepText.Image = My.Resources.Resources.ImageKeepText16
+        TipScratchPad.SetImage(ChkBoxKeepText, My.Resources.Resources.ImageKeepText16)
+        ChkBoxKeepText.Location = New Point(12, 38)
         ChkBoxKeepText.Name = "ChkBoxKeepText"
         ChkBoxKeepText.Size = New Size(32, 32)
-        ChkBoxKeepText.TabIndex = 21
+        ChkBoxKeepText.TabIndex = 10
         TipScratchPad.SetText(ChkBoxKeepText, "Keep Text?" & vbCrLf & "Do you wish to save the contents of the ScratchPad for next time?")
         ChkBoxKeepText.UseVisualStyleBackColor = True
         ' 
         ' BtnExport
         ' 
-        BtnExport.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        BtnExport.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         BtnExport.Image = My.Resources.Resources.ImageExport16
-        TipScratchPad.SetImage(BtnExport, Nothing)
-        BtnExport.Location = New Point(756, 7)
+        TipScratchPad.SetImage(BtnExport, My.Resources.Resources.ImageExport16)
+        BtnExport.Location = New Point(756, 38)
         BtnExport.Name = "BtnExport"
         BtnExport.Size = New Size(32, 32)
-        BtnExport.TabIndex = 20
+        BtnExport.TabIndex = 30
         TipScratchPad.SetText(BtnExport, "Export" & vbCrLf & "Saves the contents of the ScratchPad to a file.")
         BtnExport.UseVisualStyleBackColor = True
         ' 
@@ -97,11 +112,12 @@ Partial Class ScratchPad
         Controls.Add(PanelBottom)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         TipScratchPad.SetImage(Me, Nothing)
+        KeyPreview = True
         Name = "ScratchPad"
         SizeGripStyle = SizeGripStyle.Show
         StartPosition = FormStartPosition.CenterScreen
         TipScratchPad.SetText(Me, Nothing)
-        Text = "ScratchPad"
+        Text = "Scratch Pad"
         PanelBottom.ResumeLayout(False)
         ResumeLayout(False)
     End Sub
@@ -111,4 +127,5 @@ Partial Class ScratchPad
     Friend WithEvents BtnExport As Button
     Friend WithEvents ChkBoxKeepText As CheckBox
     Friend WithEvents TipScratchPad As Skye.UI.ToolTipEX
+    Friend WithEvents BtnOK As Button
 End Class
