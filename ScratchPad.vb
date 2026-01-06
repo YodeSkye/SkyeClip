@@ -161,11 +161,111 @@ Friend Class ScratchPad
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
     End Sub
-    Private Sub BtnExport_Click(sender As Object, e As EventArgs) Handles BtnExport.Click
-
+    Private Sub BtnExport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnExport.MouseDown
+        Select Case e.Button
+            Case MouseButtons.Left
+                Export()
+            Case MouseButtons.Right
+                Import()
+        End Select
+    End Sub
+    Private Sub CMRTB_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMRTB.Opening
+        If RTB.CanUndo OrElse RTB.CanRedo Then
+            CMIUndo.Enabled = True
+        Else
+            CMIUndo.Enabled = False
+        End If
+        CMICut.Enabled = RTB.SelectedText.Length > 0
+        CMICopy.Enabled = RTB.SelectedText.Length > 0
+        CMIDelete.Enabled = RTB.SelectedText.Length > 0
+        CMIPaste.Enabled = Clipboard.ContainsText()
+        If RTB.TextLength = 0 OrElse RTB.SelectionLength = RTB.TextLength Then
+            CMISelectAll.Enabled = False
+        Else
+            CMISelectAll.Enabled = True
+        End If
+    End Sub
+    Private Sub CMIUndo_Click(sender As Object, e As EventArgs) Handles CMIUndo.Click
+        Dim shift As Boolean = (Control.ModifierKeys And Keys.Shift) = Keys.Shift
+        If shift Then
+            Redo()
+        Else
+            Undo()
+        End If
+    End Sub
+    Private Sub CMICut_Click(sender As Object, e As EventArgs) Handles CMICut.Click
+        Dim shift As Boolean = (Control.ModifierKeys And Keys.Shift) = Keys.Shift
+        If shift Then
+            CutPlain()
+        Else
+            Cut()
+        End If
+    End Sub
+    Private Sub CMICopy_Click(sender As Object, e As EventArgs) Handles CMICopy.Click
+        Dim shift As Boolean = (Control.ModifierKeys And Keys.Shift) = Keys.Shift
+        If shift Then
+            CopyPlain()
+        Else
+            Copy()
+        End If
+    End Sub
+    Private Sub CMIPaste_Click(sender As Object, e As EventArgs) Handles CMIPaste.Click
+        Dim shift As Boolean = (Control.ModifierKeys And Keys.Shift) = Keys.Shift
+        If shift Then
+            PastePlain()
+        Else
+            Paste()
+        End If
+    End Sub
+    Private Sub CMIDelete_Click(sender As Object, e As EventArgs) Handles CMIDelete.Click
+        Delete()
+    End Sub
+    Private Sub CMISelectAll_Click(sender As Object, e As EventArgs) Handles CMISelectAll.Click
+        SelectAll()
     End Sub
 
     ' Methods
+    Private Sub Export()
+        Dim uiSaveFile As New SaveFileDialog With {
+            .Title = "Export Scratch Pad Content",
+            .Filter = "Rich Text Format (*.rtf)|*.rtf|Plain Text (*.txt)|*.txt|All Files (*.*)|*.*",
+            .DefaultExt = "rtf",
+            .AddExtension = True,
+            .OverwritePrompt = True,
+            .SupportMultiDottedExtensions = True,
+            .InitialDirectory = Environment.GetFolderPath(System.Environment.SpecialFolder.Personal)}
+        If uiSaveFile.ShowDialog() = DialogResult.OK Then
+            Dim ext = Path.GetExtension(uiSaveFile.FileName).ToLowerInvariant()
+            Select Case ext
+                Case ".txt"
+                    RTB.SaveFile(uiSaveFile.FileName, RichTextBoxStreamType.PlainText)
+                Case Else
+                    RTB.SaveFile(uiSaveFile.FileName, RichTextBoxStreamType.RichText)
+            End Select
+        End If
+    End Sub
+    Private Sub Import()
+        Dim uiOpenFile As New OpenFileDialog With {
+            .Title = "Import Content into Scratch Pad",
+            .Filter = "Rich Text Format (*.rtf)|*.rtf|Plain Text (*.txt)|*.txt|All Files (*.*)|*.*",
+            .DefaultExt = "rtf",
+            .AddExtension = True,
+            .SupportMultiDottedExtensions = True,
+            .InitialDirectory = Environment.GetFolderPath(System.Environment.SpecialFolder.Personal)}
+        If uiOpenFile.ShowDialog() = DialogResult.OK Then
+            Dim ext = Path.GetExtension(uiOpenFile.FileName).ToLowerInvariant()
+            Select Case ext
+                Case ".txt"
+                    RTB.LoadFile(uiOpenFile.FileName, RichTextBoxStreamType.PlainText)
+                Case Else
+                    Try
+                        RTB.LoadFile(uiOpenFile.FileName, RichTextBoxStreamType.RichText)
+                    Catch ex As Exception
+                        WriteToLog("Error Importing File into Scratch Pad: " & ex.Message)
+                    End Try
+            End Select
+        End If
+    End Sub
     Private Function LoadFormatsForClip(clipID As Integer) As DataTable
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()

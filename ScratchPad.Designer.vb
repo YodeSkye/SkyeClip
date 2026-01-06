@@ -25,17 +25,28 @@ Partial Class ScratchPad
         components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ScratchPad))
         RTB = New Skye.UI.RichTextBox()
+        CMRTB = New ContextMenuStrip(components)
+        CMIUndo = New ToolStripMenuItem()
+        ToolStripSeparator1 = New ToolStripSeparator()
+        CMICut = New ToolStripMenuItem()
+        CMICopy = New ToolStripMenuItem()
+        CMIPaste = New ToolStripMenuItem()
+        CMIDelete = New ToolStripMenuItem()
+        ToolStripSeparator2 = New ToolStripSeparator()
+        CMISelectAll = New ToolStripMenuItem()
         PanelBottom = New Panel()
         BtnOK = New Button()
         ChkBoxKeepText = New CheckBox()
         BtnExport = New Button()
         TipScratchPad = New Skye.UI.ToolTipEX(components)
+        CMRTB.SuspendLayout()
         PanelBottom.SuspendLayout()
         SuspendLayout()
         ' 
         ' RTB
         ' 
         RTB.BorderStyle = BorderStyle.None
+        RTB.ContextMenuStrip = CMRTB
         RTB.Dock = DockStyle.Fill
         TipScratchPad.SetImage(RTB, Nothing)
         RTB.Location = New Point(0, 0)
@@ -48,6 +59,66 @@ Partial Class ScratchPad
         RTB.Text = ""
         TipScratchPad.SetText(RTB, Nothing)
         RTB.WordWrap = False
+        ' 
+        ' CMRTB
+        ' 
+        TipScratchPad.SetImage(CMRTB, Nothing)
+        CMRTB.Items.AddRange(New ToolStripItem() {CMIUndo, ToolStripSeparator1, CMICut, CMICopy, CMIPaste, CMIDelete, ToolStripSeparator2, CMISelectAll})
+        CMRTB.Name = "CMRTB"
+        CMRTB.Size = New Size(142, 148)
+        TipScratchPad.SetText(CMRTB, Nothing)
+        ' 
+        ' CMIUndo
+        ' 
+        CMIUndo.Image = My.Resources.Resources.ImageEditUndo16
+        CMIUndo.Name = "CMIUndo"
+        CMIUndo.Size = New Size(141, 22)
+        CMIUndo.Text = "Undo / Redo"
+        ' 
+        ' ToolStripSeparator1
+        ' 
+        ToolStripSeparator1.Name = "ToolStripSeparator1"
+        ToolStripSeparator1.Size = New Size(138, 6)
+        ' 
+        ' CMICut
+        ' 
+        CMICut.Image = My.Resources.Resources.ImageEditCut16
+        CMICut.Name = "CMICut"
+        CMICut.Size = New Size(141, 22)
+        CMICut.Text = "Cut"
+        ' 
+        ' CMICopy
+        ' 
+        CMICopy.Image = My.Resources.Resources.ImageEditCopy16
+        CMICopy.Name = "CMICopy"
+        CMICopy.Size = New Size(141, 22)
+        CMICopy.Text = "Copy"
+        ' 
+        ' CMIPaste
+        ' 
+        CMIPaste.Image = My.Resources.Resources.ImageEditPaste16
+        CMIPaste.Name = "CMIPaste"
+        CMIPaste.Size = New Size(141, 22)
+        CMIPaste.Text = "Paste"
+        ' 
+        ' CMIDelete
+        ' 
+        CMIDelete.Image = My.Resources.Resources.ImageEditDelete16
+        CMIDelete.Name = "CMIDelete"
+        CMIDelete.Size = New Size(141, 22)
+        CMIDelete.Text = "Delete"
+        ' 
+        ' ToolStripSeparator2
+        ' 
+        ToolStripSeparator2.Name = "ToolStripSeparator2"
+        ToolStripSeparator2.Size = New Size(138, 6)
+        ' 
+        ' CMISelectAll
+        ' 
+        CMISelectAll.Image = My.Resources.Resources.ImageEditSelectAll16
+        CMISelectAll.Name = "CMISelectAll"
+        CMISelectAll.Size = New Size(141, 22)
+        CMISelectAll.Text = "Select All"
         ' 
         ' PanelBottom
         ' 
@@ -84,7 +155,7 @@ Partial Class ScratchPad
         ChkBoxKeepText.Name = "ChkBoxKeepText"
         ChkBoxKeepText.Size = New Size(32, 32)
         ChkBoxKeepText.TabIndex = 10
-        TipScratchPad.SetText(ChkBoxKeepText, "Keep Text?" & vbCrLf & "Do you wish to save the contents of the ScratchPad for next time?")
+        TipScratchPad.SetText(ChkBoxKeepText, "Keep Text?" & vbCrLf & "Do you wish to save the contents of the Scratch Pad for next time?")
         ChkBoxKeepText.UseVisualStyleBackColor = True
         ' 
         ' BtnExport
@@ -96,7 +167,7 @@ Partial Class ScratchPad
         BtnExport.Name = "BtnExport"
         BtnExport.Size = New Size(32, 32)
         BtnExport.TabIndex = 30
-        TipScratchPad.SetText(BtnExport, "Export" & vbCrLf & "Saves the contents of the ScratchPad to a file.")
+        TipScratchPad.SetText(BtnExport, "Export" & vbCrLf & "Saves the contents of the Scratch Pad to a file." & vbCrLf & "Right-Click = Load the contents of a file to the Scratch Pad." & vbCrLf & "Both plain text and rich text files are supported.")
         BtnExport.UseVisualStyleBackColor = True
         ' 
         ' TipScratchPad
@@ -118,6 +189,7 @@ Partial Class ScratchPad
         StartPosition = FormStartPosition.CenterScreen
         TipScratchPad.SetText(Me, Nothing)
         Text = "Scratch Pad"
+        CMRTB.ResumeLayout(False)
         PanelBottom.ResumeLayout(False)
         ResumeLayout(False)
     End Sub
@@ -128,4 +200,13 @@ Partial Class ScratchPad
     Friend WithEvents ChkBoxKeepText As CheckBox
     Friend WithEvents TipScratchPad As Skye.UI.ToolTipEX
     Friend WithEvents BtnOK As Button
+    Friend WithEvents CMRTB As ContextMenuStrip
+    Friend WithEvents CMIUndo As ToolStripMenuItem
+    Friend WithEvents CMICut As ToolStripMenuItem
+    Friend WithEvents CMICopy As ToolStripMenuItem
+    Friend WithEvents CMIPaste As ToolStripMenuItem
+    Friend WithEvents CMIDelete As ToolStripMenuItem
+    Friend WithEvents CMISelectAll As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
+    Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
 End Class
