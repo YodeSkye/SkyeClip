@@ -150,14 +150,14 @@ Partial Class Settings
         ' TxtBoxHotKeyToggleFavorite
         ' 
         TxtBoxHotKeyToggleFavorite.BorderStyle = BorderStyle.FixedSingle
-        TipSettings.SetImage(TxtBoxHotKeyToggleFavorite, Nothing)
+        TipSettings.SetImage(TxtBoxHotKeyToggleFavorite, My.Resources.Resources.ImageFavorites16)
         TxtBoxHotKeyToggleFavorite.Location = New Point(171, 234)
         TxtBoxHotKeyToggleFavorite.Name = "TxtBoxHotKeyToggleFavorite"
         TxtBoxHotKeyToggleFavorite.ReadOnly = True
         TxtBoxHotKeyToggleFavorite.ShortcutsEnabled = False
         TxtBoxHotKeyToggleFavorite.Size = New Size(144, 29)
         TxtBoxHotKeyToggleFavorite.TabIndex = 50
-        TipSettings.SetText(TxtBoxHotKeyToggleFavorite, "Key or Key Combination to use on the tray menu to favorite a clip.")
+        TipSettings.SetText(TxtBoxHotKeyToggleFavorite, "Key or Key Combination to use on the tray menu to Favorite a clip.")
         TxtBoxHotKeyToggleFavorite.TextAlign = HorizontalAlignment.Center
         ' 
         ' LblHotKeyToggleFavorite
@@ -186,14 +186,14 @@ Partial Class Settings
         ' TxtBoxHotKeyShowViewer
         ' 
         TxtBoxHotKeyShowViewer.BorderStyle = BorderStyle.FixedSingle
-        TipSettings.SetImage(TxtBoxHotKeyShowViewer, Nothing)
+        TipSettings.SetImage(TxtBoxHotKeyShowViewer, My.Resources.Resources.imageClipViewer16)
         TxtBoxHotKeyShowViewer.Location = New Point(171, 287)
         TxtBoxHotKeyShowViewer.Name = "TxtBoxHotKeyShowViewer"
         TxtBoxHotKeyShowViewer.ReadOnly = True
         TxtBoxHotKeyShowViewer.ShortcutsEnabled = False
         TxtBoxHotKeyShowViewer.Size = New Size(144, 29)
         TxtBoxHotKeyShowViewer.TabIndex = 60
-        TipSettings.SetText(TxtBoxHotKeyShowViewer, "Key or Key Combination to use on the tray menu to show the clip viewer.")
+        TipSettings.SetText(TxtBoxHotKeyShowViewer, "Key or Key Combination to use on the tray menu to show the Clip Viewer.")
         TxtBoxHotKeyShowViewer.TextAlign = HorizontalAlignment.Center
         ' 
         ' LblHotKeyShowViewer
@@ -273,7 +273,7 @@ Partial Class Settings
         ChkBoxShowOpenSourceApp.RightToLeft = RightToLeft.Yes
         ChkBoxShowOpenSourceApp.Size = New Size(194, 25)
         ChkBoxShowOpenSourceApp.TabIndex = 40
-        TipSettings.SetText(ChkBoxShowOpenSourceApp, "Show a notification toast when the clipboard changes.")
+        TipSettings.SetText(ChkBoxShowOpenSourceApp, "Controls whether ""Open Source App"" appears as an Option in the Clip Context Menu.")
         ChkBoxShowOpenSourceApp.Text = "Show Open Source App"
         ChkBoxShowOpenSourceApp.UseVisualStyleBackColor = True
         ' 
@@ -286,21 +286,21 @@ Partial Class Settings
         ChkBoxKeepScratchPadText.RightToLeft = RightToLeft.Yes
         ChkBoxKeepScratchPadText.Size = New Size(177, 25)
         ChkBoxKeepScratchPadText.TabIndex = 45
-        TipSettings.SetText(ChkBoxKeepScratchPadText, "Show a notification toast when the clipboard changes.")
+        TipSettings.SetText(ChkBoxKeepScratchPadText, "Keep the contents of the Scratch Pad between sessions?")
         ChkBoxKeepScratchPadText.Text = "Keep Scratch Pad Text"
         ChkBoxKeepScratchPadText.UseVisualStyleBackColor = True
         ' 
         ' TxtBoxHotKeyShowScratchPad
         ' 
         TxtBoxHotKeyShowScratchPad.BorderStyle = BorderStyle.FixedSingle
-        TipSettings.SetImage(TxtBoxHotKeyShowScratchPad, Nothing)
+        TipSettings.SetImage(TxtBoxHotKeyShowScratchPad, My.Resources.Resources.imageScratchPad16)
         TxtBoxHotKeyShowScratchPad.Location = New Point(171, 340)
         TxtBoxHotKeyShowScratchPad.Name = "TxtBoxHotKeyShowScratchPad"
         TxtBoxHotKeyShowScratchPad.ReadOnly = True
         TxtBoxHotKeyShowScratchPad.ShortcutsEnabled = False
         TxtBoxHotKeyShowScratchPad.Size = New Size(144, 29)
         TxtBoxHotKeyShowScratchPad.TabIndex = 65
-        TipSettings.SetText(TxtBoxHotKeyShowScratchPad, "Key or Key Combination to use on the tray menu to show the clip viewer.")
+        TipSettings.SetText(TxtBoxHotKeyShowScratchPad, "Key or Key Combination to use on the tray menu to show the clipboard Scratch Pad.")
         TxtBoxHotKeyShowScratchPad.TextAlign = HorizontalAlignment.Center
         ' 
         ' LblHotKeyShowScratchPad
@@ -323,7 +323,7 @@ Partial Class Settings
         ChkBoxPlaySoundWithNotify.RightToLeft = RightToLeft.Yes
         ChkBoxPlaySoundWithNotify.Size = New Size(191, 25)
         ChkBoxPlaySoundWithNotify.TabIndex = 36
-        TipSettings.SetText(ChkBoxPlaySoundWithNotify, "Show a notification toast when the clipboard changes.")
+        TipSettings.SetText(ChkBoxPlaySoundWithNotify, "Play a Sound with the Notification Toast.")
         ChkBoxPlaySoundWithNotify.Text = "Play Sound With Notify"
         ChkBoxPlaySoundWithNotify.UseVisualStyleBackColor = True
         ' 
@@ -336,7 +336,7 @@ Partial Class Settings
         ChkBoxAutoStartWithWindows.RightToLeft = RightToLeft.Yes
         ChkBoxAutoStartWithWindows.Size = New Size(206, 25)
         ChkBoxAutoStartWithWindows.TabIndex = 29
-        TipSettings.SetText(ChkBoxAutoStartWithWindows, "Blink the tray icon several times when the clipboard changes.")
+        TipSettings.SetText(ChkBoxAutoStartWithWindows, "Auto-Start the App with Windows.")
         ChkBoxAutoStartWithWindows.Text = "Auto-Start With Windows"
         ChkBoxAutoStartWithWindows.UseVisualStyleBackColor = True
         ' 
