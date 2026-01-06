@@ -152,7 +152,7 @@ Friend Class TrayAppContext
                 .Message = App.CBLivePreview,
                 .Icon = My.Resources.IconApp,
                 .Duration = 4000,
-                .PlaySound = True}
+                .PlaySound = App.Settings.PlaySoundWithNotify}
                 Skye.UI.Toast.ShowToast(toast)
             End If
         End If

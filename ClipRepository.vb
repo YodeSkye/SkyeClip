@@ -168,6 +168,7 @@ Friend Class ClipRepository
                 insertEntry.Parameters.AddWithValue("@apppath", sourceInfo.ExePath)
                 insertEntry.Parameters.Add("@icon", DbType.Binary).Value = If(sourceInfo.IconBytes IsNot Nothing, CType(sourceInfo.IconBytes, Object), DBNull.Value)
                 entryId = Convert.ToInt32(insertEntry.ExecuteScalar())
+                App.WriteToLog("New Clip Saved: ID=" & entryId & " """ & preview & """")
 
                 ' Insert formats only for new clips
                 For Each cd In formats

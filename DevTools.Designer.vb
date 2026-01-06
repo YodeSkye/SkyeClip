@@ -34,6 +34,7 @@ Partial Class DevTools
         BtnSaveFormats = New Button()
         BtnSaveClips = New Button()
         BtnRefresh = New Button()
+        BtnViewFormatData = New Button()
         CType(SplitContainerClips, ComponentModel.ISupportInitialize).BeginInit()
         SplitContainerClips.Panel1.SuspendLayout()
         SplitContainerClips.Panel2.SuspendLayout()
@@ -92,7 +93,7 @@ Partial Class DevTools
         ' 
         LblClipFormats.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         LblClipFormats.AutoSize = True
-        LblClipFormats.Location = New Point(4, 183)
+        LblClipFormats.Location = New Point(4, 181)
         LblClipFormats.Margin = New Padding(4, 0, 4, 0)
         LblClipFormats.Name = "LblClipFormats"
         LblClipFormats.Size = New Size(137, 21)
@@ -114,6 +115,7 @@ Partial Class DevTools
         ' 
         ' PanelToolbox
         ' 
+        PanelToolbox.Controls.Add(BtnViewFormatData)
         PanelToolbox.Controls.Add(BtnDeleteFormat)
         PanelToolbox.Controls.Add(BtnDeleteClip)
         PanelToolbox.Controls.Add(BtnSaveFormats)
@@ -150,7 +152,7 @@ Partial Class DevTools
         ' 
         ' BtnSaveFormats
         ' 
-        BtnSaveFormats.Location = New Point(246, 17)
+        BtnSaveFormats.Location = New Point(239, 17)
         BtnSaveFormats.Margin = New Padding(4)
         BtnSaveFormats.Name = "BtnSaveFormats"
         BtnSaveFormats.Size = New Size(121, 32)
@@ -177,6 +179,15 @@ Partial Class DevTools
         BtnRefresh.TabIndex = 0
         BtnRefresh.Text = "Refresh"
         BtnRefresh.UseVisualStyleBackColor = True
+        ' 
+        ' BtnViewFormatData
+        ' 
+        BtnViewFormatData.Location = New Point(388, 17)
+        BtnViewFormatData.Name = "BtnViewFormatData"
+        BtnViewFormatData.Size = New Size(163, 32)
+        BtnViewFormatData.TabIndex = 5
+        BtnViewFormatData.Text = "View Format Data"
+        BtnViewFormatData.UseVisualStyleBackColor = True
         ' 
         ' DevTools
         ' 
@@ -214,4 +225,5 @@ Partial Class DevTools
     Friend WithEvents BtnSaveFormats As Button
     Friend WithEvents BtnSaveClips As Button
     Friend WithEvents BtnRefresh As Button
+    Friend WithEvents BtnViewFormatData As Button
 End Class

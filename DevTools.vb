@@ -50,6 +50,18 @@ Public Class DevTools
 
         LoadFormatsForSelectedClip()
     End Sub
+    Private Sub BtnViewFormatData_Click(sender As Object, e As EventArgs) Handles BtnViewFormatData.Click
+        If DGVClipFormats.SelectedRows.Count = 0 Then Exit Sub
+
+        Dim id As Integer = CInt(DGVClipFormats.SelectedRows(0).Cells("ID").Value)
+        Dim formatName As String = CStr(DGVClipFormats.SelectedRows(0).Cells("FormatName").Value)
+
+        Dim bytes = LoadFormatBlobData(id)
+
+        Dim viewer As New DevToolsFormatViewer()
+        viewer.SetData(formatName, bytes)
+        viewer.Show(Me)
+    End Sub
     Private Sub BtnDeleteClip_Click(sender As Object, e As EventArgs) Handles BtnDeleteClip.Click
         If DGVClips.SelectedRows.Count = 0 Then Exit Sub
 
@@ -139,6 +151,22 @@ Public Class DevTools
             conn.Open()
             Using cmd As New SQLiteCommand("SELECT COUNT(*) FROM ClipFormats;", conn)
                 Return Convert.ToInt32(cmd.ExecuteScalar())
+            End Using
+        End Using
+    End Function
+    Private Function LoadFormatBlobData(formatId As Integer) As Byte()
+        Using conn As New SQLiteConnection(MyConnectionString)
+            conn.Open()
+
+            Using cmd As New SQLiteCommand("SELECT Data FROM ClipFormats WHERE ID=@id", conn)
+                cmd.Parameters.AddWithValue("@id", formatId)
+
+                Dim result = cmd.ExecuteScalar()
+                If result Is DBNull.Value OrElse result Is Nothing Then
+                    Return Nothing
+                End If
+
+                Return CType(result, Byte())
             End Using
         End Using
     End Function

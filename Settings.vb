@@ -14,6 +14,7 @@ Public Class Settings
         TxtBoxMaxClipPreviewLength.Text = App.Settings.MaxClipPreviewLength.ToString
         ChkBoxBlinkOnNewClip.Checked = App.Settings.BlinkOnNewClip
         ChkBoxNotifyOnNewClip.Checked = App.Settings.NotifyOnNewClip
+        ChkBoxPlaySoundWithNotify.Checked = App.Settings.PlaySoundWithNotify
         ChkBoxShowOpenSourceApp.Checked = App.Settings.ShowOpenSourceApp
         ChkBoxKeepScratchPadText.Checked = App.Settings.ScratchPadKeepText
         TxtBoxHotKeyToggleFavorite.Text = FormatHotKey(App.Settings.HotKeys.ToggleFavorite)
@@ -169,6 +170,9 @@ Public Class Settings
     End Sub
     Private Sub ChkBoxNotifyOnNewClip_Click(sender As Object, e As EventArgs) Handles ChkBoxNotifyOnNewClip.Click
         App.Settings.NotifyOnNewClip = Not App.Settings.NotifyOnNewClip
+    End Sub
+    Private Sub ChkBoxPlaySoundWithNotify_Click(sender As Object, e As EventArgs) Handles ChkBoxPlaySoundWithNotify.Click
+        App.Settings.PlaySoundWithNotify = Not App.Settings.PlaySoundWithNotify
     End Sub
     Private Sub ChkBoxShowOpenSourceApp_Click(sender As Object, e As EventArgs) Handles ChkBoxShowOpenSourceApp.Click
         App.Settings.ShowOpenSourceApp = Not App.Settings.ShowOpenSourceApp

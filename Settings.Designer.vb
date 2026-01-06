@@ -47,6 +47,7 @@ Partial Class Settings
         ChkBoxKeepScratchPadText = New CheckBox()
         TxtBoxHotKeyShowScratchPad = New TextBox()
         LblHotKeyShowScratchPad = New Label()
+        ChkBoxPlaySoundWithNotify = New CheckBox()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -136,7 +137,7 @@ Partial Class Settings
         ' 
         ChkBoxNotifyOnNewClip.AutoSize = True
         TipSettings.SetImage(ChkBoxNotifyOnNewClip, Nothing)
-        ChkBoxNotifyOnNewClip.Location = New Point(308, 43)
+        ChkBoxNotifyOnNewClip.Location = New Point(308, 34)
         ChkBoxNotifyOnNewClip.Name = "ChkBoxNotifyOnNewClip"
         ChkBoxNotifyOnNewClip.RightToLeft = RightToLeft.Yes
         ChkBoxNotifyOnNewClip.Size = New Size(164, 25)
@@ -266,7 +267,7 @@ Partial Class Settings
         ' 
         ChkBoxShowOpenSourceApp.AutoSize = True
         TipSettings.SetImage(ChkBoxShowOpenSourceApp, Nothing)
-        ChkBoxShowOpenSourceApp.Location = New Point(278, 74)
+        ChkBoxShowOpenSourceApp.Location = New Point(278, 87)
         ChkBoxShowOpenSourceApp.Name = "ChkBoxShowOpenSourceApp"
         ChkBoxShowOpenSourceApp.RightToLeft = RightToLeft.Yes
         ChkBoxShowOpenSourceApp.Size = New Size(194, 25)
@@ -279,7 +280,7 @@ Partial Class Settings
         ' 
         ChkBoxKeepScratchPadText.AutoSize = True
         TipSettings.SetImage(ChkBoxKeepScratchPadText, Nothing)
-        ChkBoxKeepScratchPadText.Location = New Point(295, 105)
+        ChkBoxKeepScratchPadText.Location = New Point(295, 118)
         ChkBoxKeepScratchPadText.Name = "ChkBoxKeepScratchPadText"
         ChkBoxKeepScratchPadText.RightToLeft = RightToLeft.Yes
         ChkBoxKeepScratchPadText.Size = New Size(177, 25)
@@ -312,11 +313,25 @@ Partial Class Settings
         TipSettings.SetText(LblHotKeyShowScratchPad, Nothing)
         LblHotKeyShowScratchPad.TextAlign = ContentAlignment.TopCenter
         ' 
+        ' ChkBoxPlaySoundWithNotify
+        ' 
+        ChkBoxPlaySoundWithNotify.AutoSize = True
+        TipSettings.SetImage(ChkBoxPlaySoundWithNotify, Nothing)
+        ChkBoxPlaySoundWithNotify.Location = New Point(281, 56)
+        ChkBoxPlaySoundWithNotify.Name = "ChkBoxPlaySoundWithNotify"
+        ChkBoxPlaySoundWithNotify.RightToLeft = RightToLeft.Yes
+        ChkBoxPlaySoundWithNotify.Size = New Size(191, 25)
+        ChkBoxPlaySoundWithNotify.TabIndex = 36
+        TipSettings.SetText(ChkBoxPlaySoundWithNotify, "Show a notification toast when the clipboard changes.")
+        ChkBoxPlaySoundWithNotify.Text = "Play Sound With Notify"
+        ChkBoxPlaySoundWithNotify.UseVisualStyleBackColor = True
+        ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(484, 569)
+        Controls.Add(ChkBoxPlaySoundWithNotify)
         Controls.Add(TxtBoxHotKeyShowScratchPad)
         Controls.Add(LblHotKeyShowScratchPad)
         Controls.Add(ChkBoxKeepScratchPadText)
@@ -375,4 +390,5 @@ Partial Class Settings
     Friend WithEvents ChkBoxKeepScratchPadText As CheckBox
     Friend WithEvents TxtBoxHotKeyShowScratchPad As TextBox
     Friend WithEvents LblHotKeyShowScratchPad As Label
+    Friend WithEvents ChkBoxPlaySoundWithNotify As CheckBox
 End Class

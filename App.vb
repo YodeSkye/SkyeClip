@@ -45,6 +45,7 @@ Friend Module App
         Friend Shared MaxClipPreviewLength As Integer ' in characters
         Friend Shared BlinkOnNewClip As Boolean ' whether to blink the tray icon on new clipboard entry
         Friend Shared NotifyOnNewClip As Boolean ' whether to show a notification on new clipboard entry
+        Friend Shared PlaySoundWithNotify As Boolean ' whether to play a sound with notification
         Friend Shared AutoPurge As Boolean ' whether to automatically purge old clipboard entries when older than a certain date
         Friend Shared LastPurgeDate As DateTime ' the last date when automatic purge was performed
         Friend Shared PurgeDays As Integer ' number of days after which clipboard entries are purged
@@ -66,6 +67,7 @@ Friend Module App
             MaxClipPreviewLength = RegistryHelper.GetInt("MaxClipPreviewLength", 60)
             BlinkOnNewClip = RegistryHelper.GetBool("BlinkOnNewClip", True)
             NotifyOnNewClip = RegistryHelper.GetBool("NotifyOnNewClip", True)
+            PlaySoundWithNotify = RegistryHelper.GetBool("PlaySoundWithNotify", False)
             AutoPurge = RegistryHelper.GetBool("AutoPurge", False)
             LastPurgeDate = RegistryHelper.GetDateTime("LastPurgeDate", DateTime.MinValue)
             PurgeDays = RegistryHelper.GetInt("PurgeDays", 30)
@@ -89,6 +91,7 @@ Friend Module App
             RegistryHelper.SetInt("MaxClipPreviewLength", MaxClipPreviewLength)
             RegistryHelper.SetBool("BlinkOnNewClip", BlinkOnNewClip)
             RegistryHelper.SetBool("NotifyOnNewClip", NotifyOnNewClip)
+            RegistryHelper.SetBool("PlaySoundWithNotify", PlaySoundWithNotify)
             RegistryHelper.SetBool("AutoPurge", AutoPurge)
             RegistryHelper.SetDateTime("LastPurgeDate", LastPurgeDate)
             RegistryHelper.SetInt("PurgeDays", PurgeDays)
