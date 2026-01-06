@@ -10,6 +10,7 @@ Public Class Settings
         Text = "Settings for " & GetAppTitle()
 
         'Settings
+        ChkBoxAutoStartWithWindows.Checked = App.Settings.AutoStartWithWindows
         TxtBoxMaxClips.Text = App.Settings.MaxClips.ToString
         TxtBoxMaxClipPreviewLength.Text = App.Settings.MaxClipPreviewLength.ToString
         ChkBoxBlinkOnNewClip.Checked = App.Settings.BlinkOnNewClip
@@ -161,6 +162,10 @@ Public Class Settings
             TxtBoxPurgeDays.Text = interval.ToString
             TxtBoxPurgeDays.SelectAll()
         End If
+    End Sub
+    Private Sub ChkBoxAutoStartWithWindows_Click(sender As Object, e As EventArgs) Handles ChkBoxAutoStartWithWindows.Click
+        App.Settings.AutoStartWithWindows = Not App.Settings.AutoStartWithWindows
+        App.SetAutoStart()
     End Sub
     Private Sub ChkBoxAutoPurge_Click(sender As Object, e As EventArgs) Handles ChkBoxAutoPurge.Click
         App.Settings.AutoPurge = Not App.Settings.AutoPurge

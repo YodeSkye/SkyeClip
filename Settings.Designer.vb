@@ -48,6 +48,7 @@ Partial Class Settings
         TxtBoxHotKeyShowScratchPad = New TextBox()
         LblHotKeyShowScratchPad = New Label()
         ChkBoxPlaySoundWithNotify = New CheckBox()
+        ChkBoxAutoStartWithWindows = New CheckBox()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -55,7 +56,7 @@ Partial Class Settings
         BtnOK.Anchor = AnchorStyles.Bottom
         BtnOK.Image = My.Resources.Resources.ImageOK
         TipSettings.SetImage(BtnOK, Nothing)
-        BtnOK.Location = New Point(210, 492)
+        BtnOK.Location = New Point(210, 469)
         BtnOK.Margin = New Padding(4)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
@@ -124,7 +125,7 @@ Partial Class Settings
         ' 
         ChkBoxBlinkOnNewClip.AutoSize = True
         TipSettings.SetImage(ChkBoxBlinkOnNewClip, Nothing)
-        ChkBoxBlinkOnNewClip.Location = New Point(317, 12)
+        ChkBoxBlinkOnNewClip.Location = New Point(317, 43)
         ChkBoxBlinkOnNewClip.Name = "ChkBoxBlinkOnNewClip"
         ChkBoxBlinkOnNewClip.RightToLeft = RightToLeft.Yes
         ChkBoxBlinkOnNewClip.Size = New Size(155, 25)
@@ -137,7 +138,7 @@ Partial Class Settings
         ' 
         ChkBoxNotifyOnNewClip.AutoSize = True
         TipSettings.SetImage(ChkBoxNotifyOnNewClip, Nothing)
-        ChkBoxNotifyOnNewClip.Location = New Point(308, 34)
+        ChkBoxNotifyOnNewClip.Location = New Point(308, 65)
         ChkBoxNotifyOnNewClip.Name = "ChkBoxNotifyOnNewClip"
         ChkBoxNotifyOnNewClip.RightToLeft = RightToLeft.Yes
         ChkBoxNotifyOnNewClip.Size = New Size(164, 25)
@@ -150,7 +151,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyToggleFavorite.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyToggleFavorite, Nothing)
-        TxtBoxHotKeyToggleFavorite.Location = New Point(171, 217)
+        TxtBoxHotKeyToggleFavorite.Location = New Point(171, 234)
         TxtBoxHotKeyToggleFavorite.Name = "TxtBoxHotKeyToggleFavorite"
         TxtBoxHotKeyToggleFavorite.ReadOnly = True
         TxtBoxHotKeyToggleFavorite.ShortcutsEnabled = False
@@ -162,7 +163,7 @@ Partial Class Settings
         ' LblHotKeyToggleFavorite
         ' 
         TipSettings.SetImage(LblHotKeyToggleFavorite, Nothing)
-        LblHotKeyToggleFavorite.Location = New Point(169, 196)
+        LblHotKeyToggleFavorite.Location = New Point(169, 213)
         LblHotKeyToggleFavorite.Name = "LblHotKeyToggleFavorite"
         LblHotKeyToggleFavorite.Size = New Size(146, 24)
         LblHotKeyToggleFavorite.TabIndex = 7
@@ -174,7 +175,7 @@ Partial Class Settings
         ' 
         LblHotKeys.Font = New Font("Segoe UI", 12F, FontStyle.Underline, GraphicsUnit.Point, CByte(0))
         TipSettings.SetImage(LblHotKeys, Nothing)
-        LblHotKeys.Location = New Point(171, 172)
+        LblHotKeys.Location = New Point(171, 189)
         LblHotKeys.Name = "LblHotKeys"
         LblHotKeys.Size = New Size(144, 24)
         LblHotKeys.TabIndex = 9
@@ -186,7 +187,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyShowViewer.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyShowViewer, Nothing)
-        TxtBoxHotKeyShowViewer.Location = New Point(171, 270)
+        TxtBoxHotKeyShowViewer.Location = New Point(171, 287)
         TxtBoxHotKeyShowViewer.Name = "TxtBoxHotKeyShowViewer"
         TxtBoxHotKeyShowViewer.ReadOnly = True
         TxtBoxHotKeyShowViewer.ShortcutsEnabled = False
@@ -198,7 +199,7 @@ Partial Class Settings
         ' LblHotKeyShowViewer
         ' 
         TipSettings.SetImage(LblHotKeyShowViewer, Nothing)
-        LblHotKeyShowViewer.Location = New Point(169, 249)
+        LblHotKeyShowViewer.Location = New Point(169, 266)
         LblHotKeyShowViewer.Name = "LblHotKeyShowViewer"
         LblHotKeyShowViewer.Size = New Size(146, 24)
         LblHotKeyShowViewer.TabIndex = 10
@@ -267,7 +268,7 @@ Partial Class Settings
         ' 
         ChkBoxShowOpenSourceApp.AutoSize = True
         TipSettings.SetImage(ChkBoxShowOpenSourceApp, Nothing)
-        ChkBoxShowOpenSourceApp.Location = New Point(278, 87)
+        ChkBoxShowOpenSourceApp.Location = New Point(278, 118)
         ChkBoxShowOpenSourceApp.Name = "ChkBoxShowOpenSourceApp"
         ChkBoxShowOpenSourceApp.RightToLeft = RightToLeft.Yes
         ChkBoxShowOpenSourceApp.Size = New Size(194, 25)
@@ -280,7 +281,7 @@ Partial Class Settings
         ' 
         ChkBoxKeepScratchPadText.AutoSize = True
         TipSettings.SetImage(ChkBoxKeepScratchPadText, Nothing)
-        ChkBoxKeepScratchPadText.Location = New Point(295, 118)
+        ChkBoxKeepScratchPadText.Location = New Point(295, 149)
         ChkBoxKeepScratchPadText.Name = "ChkBoxKeepScratchPadText"
         ChkBoxKeepScratchPadText.RightToLeft = RightToLeft.Yes
         ChkBoxKeepScratchPadText.Size = New Size(177, 25)
@@ -293,7 +294,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyShowScratchPad.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyShowScratchPad, Nothing)
-        TxtBoxHotKeyShowScratchPad.Location = New Point(171, 323)
+        TxtBoxHotKeyShowScratchPad.Location = New Point(171, 340)
         TxtBoxHotKeyShowScratchPad.Name = "TxtBoxHotKeyShowScratchPad"
         TxtBoxHotKeyShowScratchPad.ReadOnly = True
         TxtBoxHotKeyShowScratchPad.ShortcutsEnabled = False
@@ -305,7 +306,7 @@ Partial Class Settings
         ' LblHotKeyShowScratchPad
         ' 
         TipSettings.SetImage(LblHotKeyShowScratchPad, Nothing)
-        LblHotKeyShowScratchPad.Location = New Point(169, 302)
+        LblHotKeyShowScratchPad.Location = New Point(169, 319)
         LblHotKeyShowScratchPad.Name = "LblHotKeyShowScratchPad"
         LblHotKeyShowScratchPad.Size = New Size(146, 24)
         LblHotKeyShowScratchPad.TabIndex = 1101
@@ -317,7 +318,7 @@ Partial Class Settings
         ' 
         ChkBoxPlaySoundWithNotify.AutoSize = True
         TipSettings.SetImage(ChkBoxPlaySoundWithNotify, Nothing)
-        ChkBoxPlaySoundWithNotify.Location = New Point(281, 56)
+        ChkBoxPlaySoundWithNotify.Location = New Point(281, 87)
         ChkBoxPlaySoundWithNotify.Name = "ChkBoxPlaySoundWithNotify"
         ChkBoxPlaySoundWithNotify.RightToLeft = RightToLeft.Yes
         ChkBoxPlaySoundWithNotify.Size = New Size(191, 25)
@@ -326,11 +327,25 @@ Partial Class Settings
         ChkBoxPlaySoundWithNotify.Text = "Play Sound With Notify"
         ChkBoxPlaySoundWithNotify.UseVisualStyleBackColor = True
         ' 
+        ' ChkBoxAutoStartWithWindows
+        ' 
+        ChkBoxAutoStartWithWindows.AutoSize = True
+        TipSettings.SetImage(ChkBoxAutoStartWithWindows, Nothing)
+        ChkBoxAutoStartWithWindows.Location = New Point(266, 12)
+        ChkBoxAutoStartWithWindows.Name = "ChkBoxAutoStartWithWindows"
+        ChkBoxAutoStartWithWindows.RightToLeft = RightToLeft.Yes
+        ChkBoxAutoStartWithWindows.Size = New Size(206, 25)
+        ChkBoxAutoStartWithWindows.TabIndex = 29
+        TipSettings.SetText(ChkBoxAutoStartWithWindows, "Blink the tray icon several times when the clipboard changes.")
+        ChkBoxAutoStartWithWindows.Text = "Auto-Start With Windows"
+        ChkBoxAutoStartWithWindows.UseVisualStyleBackColor = True
+        ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(484, 569)
+        ClientSize = New Size(484, 546)
+        Controls.Add(ChkBoxAutoStartWithWindows)
         Controls.Add(ChkBoxPlaySoundWithNotify)
         Controls.Add(TxtBoxHotKeyShowScratchPad)
         Controls.Add(LblHotKeyShowScratchPad)
@@ -391,4 +406,5 @@ Partial Class Settings
     Friend WithEvents TxtBoxHotKeyShowScratchPad As TextBox
     Friend WithEvents LblHotKeyShowScratchPad As Label
     Friend WithEvents ChkBoxPlaySoundWithNotify As CheckBox
+    Friend WithEvents ChkBoxAutoStartWithWindows As CheckBox
 End Class

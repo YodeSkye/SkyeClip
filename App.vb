@@ -41,6 +41,7 @@ Friend Module App
 
     ' Settings
     Friend Class Settings
+        Friend Shared AutoStartWithWindows As Boolean ' whether to auto-start with Windows
         Friend Shared MaxClips As Integer ' maximum number of clipboard entries to show
         Friend Shared MaxClipPreviewLength As Integer ' in characters
         Friend Shared BlinkOnNewClip As Boolean ' whether to blink the tray icon on new clipboard entry
@@ -50,9 +51,9 @@ Friend Module App
         Friend Shared LastPurgeDate As DateTime ' the last date when automatic purge was performed
         Friend Shared PurgeDays As Integer ' number of days after which clipboard entries are purged
         Friend Shared ShowOpenSourceApp As Boolean ' whether to show the source application on clip context menu
-        Friend Shared ScratchPadLocation As Point
-        Friend Shared ScratchPadSize As Size
-        Friend Shared ScratchPadKeepText As Boolean
+        Friend Shared ScratchPadLocation As Point ' location of the ScratchPad window
+        Friend Shared ScratchPadSize As Size ' size of the ScratchPad window
+        Friend Shared ScratchPadKeepText As Boolean ' whether to keep text in the ScratchPad
         Friend Class HotKeys
             Friend Shared ToggleFavorite As Keys
             Friend Shared ShowViewer As Keys
@@ -63,6 +64,7 @@ Friend Module App
         Friend Shared Sub Load()
             Dim starttime As TimeSpan = DateTime.Now.TimeOfDay
             ChangeLogLastVersionShown = RegistryHelper.GetString("ChangeLogLastVersionShown", String.Empty)
+            AutoStartWithWindows = RegistryHelper.GetBool("AutoStartWithWindows", False)
             MaxClips = RegistryHelper.GetInt("MaxClips", 30)
             MaxClipPreviewLength = RegistryHelper.GetInt("MaxClipPreviewLength", 60)
             BlinkOnNewClip = RegistryHelper.GetBool("BlinkOnNewClip", True)
@@ -87,6 +89,7 @@ Friend Module App
         Friend Shared Sub Save()
             Dim starttime As TimeSpan = DateTime.Now.TimeOfDay
             RegistryHelper.SetString("ChangeLogLastVersionShown", ChangeLogLastVersionShown)
+            RegistryHelper.SetBool("AutoStartWithWindows", AutoStartWithWindows)
             RegistryHelper.SetInt("MaxClips", MaxClips)
             RegistryHelper.SetInt("MaxClipPreviewLength", MaxClipPreviewLength)
             RegistryHelper.SetBool("BlinkOnNewClip", BlinkOnNewClip)
@@ -503,6 +506,21 @@ Friend Module App
         End Using
         Return bmp
     End Function
+    Friend Function IsAutoStartEnabled() As Boolean
+        Dim runKey As String = "Software\Microsoft\Windows\CurrentVersion\Run"
+        Dim value As String = RegistryHelper.GetStringFromHKCU(runKey, "SkyeClip", String.Empty)
+        Return Not String.IsNullOrEmpty(value)
+    End Function
+    Friend Sub SetAutoStart()
+        If Settings.AutoStartWithWindows Then
+            Dim runKey As String = "Software\Microsoft\Windows\CurrentVersion\Run"
+            Dim exePath As String = """" & Application.ExecutablePath & """"
+            RegistryHelper.SetStringInHKCU(runKey, "SkyeClip", exePath)
+        Else
+            Dim runKey As String = "Software\Microsoft\Windows\CurrentVersion\Run"
+            RegistryHelper.DeleteValueInHKCU(runKey, "SkyeClip")
+        End If
+    End Sub
 
     Private Class RegistryHelper
 #If DEBUG Then
@@ -599,6 +617,25 @@ Friend Module App
         Public Shared Sub SetStringArray(name As String, values As String())
             Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
                 key.SetValue(name, values, RegistryValueKind.MultiString)
+            End Using
+        End Sub
+
+        Public Shared Function GetStringFromHKCU(subKey As String, valueName As String, defaultValue As String) As String
+            Using key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(subKey, writable:=False)
+                If key Is Nothing Then Return defaultValue
+                Dim v = key.GetValue(valueName)
+                If v Is Nothing Then Return defaultValue
+                Return CStr(v)
+            End Using
+        End Function
+        Public Shared Sub SetStringInHKCU(subKey As String, valueName As String, valueData As String)
+            Using key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(subKey)
+                key.SetValue(valueName, valueData, Microsoft.Win32.RegistryValueKind.String)
+            End Using
+        End Sub
+        Public Shared Sub DeleteValueInHKCU(subKey As String, valueName As String)
+            Using key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(subKey, writable:=True)
+                key?.DeleteValue(valueName, throwOnMissingValue:=False)
             End Using
         End Sub
 

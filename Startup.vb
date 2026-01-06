@@ -21,6 +21,13 @@ Module Startup
         ' Initialize the application
         App.WriteToLog(GetAssemblyName() & " Started...")
         App.Settings.Load()
+        ' Check autostart setting
+        Dim autostart As Boolean = App.IsAutoStartEnabled
+        If autostart <> App.Settings.AutoStartWithWindows Then
+            App.Settings.AutoStartWithWindows = autostart
+            App.Settings.Save()
+        End If
+        ' Load scratchpad text if setting enabled
         If App.Settings.ScratchPadKeepText AndAlso IO.File.Exists(App.ScratchPadPath) Then
             App.ScratchPadText = IO.File.ReadAllText(App.ScratchPadPath)
         Else
