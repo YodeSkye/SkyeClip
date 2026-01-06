@@ -1,4 +1,6 @@
 ﻿Public Class DevToolsFormatViewer
+
+    ' Methods
     Public Sub SetData(formatName As String, bytes As Byte())
         Text = "Format Data Viewer - " & formatName
 
