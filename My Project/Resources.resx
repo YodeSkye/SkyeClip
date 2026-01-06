@@ -118,10 +118,27 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ChangeLogRT" xml:space="preserve">
-    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset1 Segoe UI Symbol;}{\f3\fnil\fcharset0 Segoe UI Symbol;}}
+    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil Segoe UI;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}\viewkind4\uc1 
-\pard\cf1\b\f0\fs28\lang9 SkyeClip v1.0 What's New\par
+\pard\cf1\b\f0\fs28\lang9 SkyeClip v1.1 What's New\par
+\cf0\fs24 Released ?? 2026\par
+\par
+\cf2 New Features\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Added Scratch Pad, a lightweight built\f2\_\f0 in editor for quick notes and temporary text. Supports rich text and plain text, import/export, full editing shortcuts, a dedicated context menu with Shift\f2\_\f0 modified actions and optional persistence via Keep Text.\f1\par
+\'a3\'ab\f0  Open Source App. Added a new action to the clip context menu that lets you reopen the application a clip originated from. Includes safe, path\f2\_\f0 based legitimacy filtering to avoid system or background processes.\par
+\f1\'a3\'ab\f0  Source App Metadata. SkyeClip now stores the originating app\f2\rquote\f0 s name, executable path, and icon for each new clip, enabling richer app\f2\_\f0 aware actions.\par
+\f1\'a3\'ab\f0  Clip Action Context Menu. Introduced a dedicated right\f2\_\f0 click menu for individual clips featuring Set Clip, Favorite / Unfavorite, View Clip, and Delete. This focused interaction avoids keeping the tray menu open and significantly improves mouse\f2\_\f0 driven workflows.\par
+\cf1\b\lang9\par
+\cf2 Improvements\par
+\cf0\b0\f3\u10003?\f4\lang1033  Added "&lt;RTF&gt;" or "&lt;HTML&gt;" the the clip previews, depending on the type.\f5\lang9\par
+\f3\u10003? \f4\lang1033 Migrated the HTML preview subsystem from IE to WebView2 for modern, accurate rendering\par
+\f3\lang9\u10003?\f4\lang1033  Enhanced stability and performance of the preview window\f5\lang9\par
+\cf2\b\f0\par
+Fixes\par
+\cf0\b0\f3\u10005? \par
+\cf1\b\f0\fs28\par
+\fs24 SkyeClip v1.0\fs28\par
 \cf0\fs24 Released January 2026\cf1\par
 \b0\par
 \cf2\b New Features\par
@@ -130,14 +147,14 @@
 \'a3\'ab\f0  Core clipboard history with Favorites and Viewer support\cf1\b\lang9\par
 \par
 \cf2 Improvements\par
-\cf0\b0\f2\u10003? Smarter filtering of incoming clipboard content\par
+\cf0\b0\f3\u10003? Smarter filtering of incoming clipboard content\par
 \u10003? Favorites HotKey now keeps the menu open for smoother workflow\par
 \u10003? Viewer HotKey now works consistently in the Favorites menu\par
 \u10003? General performance and responsiveness improvements\par
 \cf2\b\f0\par
 Fixes\par
-\cf0\b0\f2\u10005? Resolved an issue where Windows Explorer produced duplicate text clips\par
-\u10005? Various stability fixes across clipboard capture and menu refres\f3\lang1033 h\cf2\b\f0\lang9\par
+\cf0\b0\f3\u10005? Resolved an issue where Windows Explorer produced duplicate text clips\par
+\u10005? Various stability fixes across clipboard capture and menu refres\f4\lang1033 h\cf2\b\f0\lang9\par
 \cf1\par
 \fs28 Thank you for using SkyeClip!\cf0\b0\fs24\par
 }
@@ -151,8 +168,11 @@ Fixes\par
 \par
 \cf2\f1\fs24 Overview\par
 \cf0\b0\par
-SkyeClip is a lightweight clipboard manager that stores your recent clips, lets you mark favorites, and provides quick access through the tray menu and hotkeys.\cf2\b\par
-\par
+SkyeClip is a lightweight clipboard manager that stores your recent clips, lets you mark favorites, and provides quick access through the tray menu and hotkeys.\par
+\cf2\b\par
+Tray Menu\par
+\cf0\b0 To make it easier to identify the type of content stored in each clip, SkyeClip adds small format indicators to the end of the preview text. Clips that contain Rich Text Format data will include the suffix &lt;RTF&gt;. Clips that contain HTML data will include the suffix &lt;HTML&gt;. These indicators appear only in the preview list to help you quickly understand what formats are available for each clip. The full Clip Viewer still shows the complete content using the appropriate viewer (plain text, rich text, HTML, image, or file list)\par
+\cf2\b\par
 Tray Menu HotKeys (Customizable)\par
 \cf0\par
 \b0\i &lt;Spacebar&gt;\par
@@ -179,6 +199,45 @@ Useful for reading long clips without having to paste somewhere.\par
 - View full clip contents\par
 - Keyboard shortcut &lt;Ctrl+C&gt; to copy to clipboard\par
 \par
+\cf2\b Scratch Pad\cf0\b0\f2\par
+\par
+Scratch Pad is a lightweight, always\_available editor built into SkyeClip. It\rquote s designed for quick notes, temporary text, code snippets, and anything you want to keep handy while working. Scratch Pad supports both Rich Text (RTF) and Plain Text, and you can import or export content at any time.\par
+\par
+\i Keyboard Shortcuts\par
+Standard Editing\par
+\i0 Ctrl+Z\f1\lang1033  = \f2\lang9 Undo\par
+Ctrl+X\f1\lang1033  = \f2\lang9 Cut \f1\lang1033 S\f2\lang9 elected \f1\lang1033 T\f2\lang9 ext\par
+Ctrl+C\f1\lang1033  = \f2\lang9 Copy \f1\lang1033 S\f2\lang9 elected \f1\lang1033 T\f2\lang9 ext\par
+Ctrl+V\f1\lang1033  = \f2\lang9 Paste \f1\lang1033 T\f2\lang9 ext\par
+\f1\lang1033 Ctrl+D = Delete Text\f2\lang9\par
+Ctrl+A\f1\lang1033  = \f2\lang9 Select \f1\lang1033 A\f2\lang9 ll \f1\lang1033 T\f2\lang9 ext\par
+\i Shift\_Modified Variants\f1\lang1033  (\f2\lang9 Some shortcuts behave differently when Shift is held\f1\lang1033 )\f2\lang9\par
+\i0\f1\lang1033 Shift+Ctrl+C = Redo\par
+Shift+Ctrl+X = Cut as Plain T\f2\lang9 ext (\f1\lang1033 S\f2\lang9 trips \f1\lang1033 F\f2\lang9 ormatting\f1\lang1033 )\f2\lang9\par
+Shift+Ctrl+C\f1\lang1033  = \f2\lang9 Copy \f1\lang1033 a\f2\lang9 s \f1\lang1033 Pl\f2\lang9 ain \f1\lang1033 T\f2\lang9 ext (\f1\lang1033 S\f2\lang9 trips \f1\lang1033 F\f2\lang9 ormatting)\par
+Shift+Ctrl+V\f1\lang1033  = \f2\lang9 Paste \f1\lang1033 a\f2\lang9 s \f1\lang1033 P\f2\lang9 lain \f1\lang1033 T\f2\lang9 ext\par
+\par
+\i\f1\lang1033 C\f2\lang9 ontext Menu\par
+\i0\f1\lang1033 Undo/Redo = Undo (If available)\par
+Shift+Undo/Redo = Redo (If available)\par
+Cut = Cut Selected Text\par
+Shift+Cut = Cut As Plain Text\par
+\f2\lang9 Copy\f1\lang1033  = \f2\lang9 Copies \f1\lang1033 S\f2\lang9 elected \f1\lang1033 T\f2\lang9 ext\par
+\f1\lang1033 Shift+Copy = Copies as Plain Text\f2\lang9\par
+\f1\lang1033 Paste = Paste Text\par
+Shift+Paste = Paste as Plain Text\par
+Delete = Delete Text\par
+Select All = Select All Text\f2\lang9\par
+\par
+\i Keep Text Between Sessions\i0\par
+Scratch Pad includes a Keep Text toggle. When enabled\f1\lang1033 , y\f2\lang9 our text is automatically saved when you close \f1\lang1033 the Scratch Pad. \f2\lang9 It is restored exactly as you left it\f1\lang1033 . \f2\lang9 When disabled, Scratch Pad starts empty each time \f1\lang1033 you open it\f2\lang9 .\par
+\par
+\i Exporting Content\i0\par
+You can export your Scratch Pad content at any time. Scratch Pad supports\f1\lang1033  \f2\lang9 Rich Text (.rtf)\f1\lang1033  and \f2\lang9 preserves formatting\f1\lang1033 , as well as \f2\lang9 Plain Text (.txt)\f1\lang1033  that\f2\lang9  saves clean Unicode text\f1\lang1033 . \f2\lang9 Scratch Pad automatically chooses the correct format based on the file extension you select.\par
+\par
+\i Importing Content\f1\lang1033\par
+\i0\f2\lang9 You can import\f1\lang1033  Rich Text (\f2\lang9 .rtf\f1\lang1033 )\f2\lang9  files\f1\lang1033  \f2\lang9 with formatting\f1\lang1033 , as well as Plain Text (\f2\lang9 .txt\f1\lang1033 )\f2\lang9  files\f1\lang1033 . \f2\lang9 Imported content replaces whatever is currently in Scratch Pad.\par
+\f1\par
 \cf2\b App View\cf0\b0\par
 \par
 The App View is a compact control panel that provides quick access to SkyeClip\rquote s core features. It appears as a small window with buttons for common tasks, making it easy to navigate without opening a full application.\par

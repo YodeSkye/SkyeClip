@@ -35,6 +35,7 @@ Partial Class ScratchPad
         ToolStripSeparator2 = New ToolStripSeparator()
         CMISelectAll = New ToolStripMenuItem()
         PanelBottom = New Panel()
+        BtnHelp = New Button()
         BtnOK = New Button()
         ChkBoxKeepText = New CheckBox()
         BtnExport = New Button()
@@ -122,6 +123,7 @@ Partial Class ScratchPad
         ' 
         ' PanelBottom
         ' 
+        PanelBottom.Controls.Add(BtnHelp)
         PanelBottom.Controls.Add(BtnOK)
         PanelBottom.Controls.Add(ChkBoxKeepText)
         PanelBottom.Controls.Add(BtnExport)
@@ -133,6 +135,18 @@ Partial Class ScratchPad
         PanelBottom.TabIndex = 1
         TipScratchPad.SetText(PanelBottom, Nothing)
         ' 
+        ' BtnHelp
+        ' 
+        BtnHelp.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
+        BtnHelp.Image = My.Resources.Resources.ImageHelp16
+        TipScratchPad.SetImage(BtnHelp, My.Resources.Resources.ImageExport16)
+        BtnHelp.Location = New Point(756, 38)
+        BtnHelp.Name = "BtnHelp"
+        BtnHelp.Size = New Size(32, 32)
+        BtnHelp.TabIndex = 40
+        TipScratchPad.SetText(BtnHelp, "Help")
+        BtnHelp.UseVisualStyleBackColor = True
+        ' 
         ' BtnOK
         ' 
         BtnOK.Anchor = AnchorStyles.Bottom
@@ -141,7 +155,7 @@ Partial Class ScratchPad
         BtnOK.Location = New Point(368, 6)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
-        BtnOK.TabIndex = 22
+        BtnOK.TabIndex = 30
         TipScratchPad.SetText(BtnOK, "Close Scratch Pad")
         BtnOK.UseVisualStyleBackColor = True
         ' 
@@ -160,14 +174,14 @@ Partial Class ScratchPad
         ' 
         ' BtnExport
         ' 
-        BtnExport.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
+        BtnExport.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         BtnExport.Image = My.Resources.Resources.ImageExport16
         TipScratchPad.SetImage(BtnExport, My.Resources.Resources.ImageExport16)
-        BtnExport.Location = New Point(756, 38)
+        BtnExport.Location = New Point(50, 38)
         BtnExport.Name = "BtnExport"
         BtnExport.Size = New Size(32, 32)
-        BtnExport.TabIndex = 30
-        TipScratchPad.SetText(BtnExport, "Export" & vbCrLf & "Saves the contents of the Scratch Pad to a file." & vbCrLf & "Right-Click = Load the contents of a file to the Scratch Pad." & vbCrLf & "Both plain text and rich text files are supported.")
+        BtnExport.TabIndex = 20
+        TipScratchPad.SetText(BtnExport, "Export" & vbCrLf & "Saves the contents of the Scratch Pad to a file." & vbCrLf & "Right-Click = Load the contents of a file to the Scratch Pad (Clears Current Text)." & vbCrLf & "Both plain text and rich text files are supported.")
         BtnExport.UseVisualStyleBackColor = True
         ' 
         ' TipScratchPad
@@ -209,4 +223,5 @@ Partial Class ScratchPad
     Friend WithEvents CMISelectAll As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
+    Friend WithEvents BtnHelp As Button
 End Class

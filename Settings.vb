@@ -15,8 +15,10 @@ Public Class Settings
         ChkBoxBlinkOnNewClip.Checked = App.Settings.BlinkOnNewClip
         ChkBoxNotifyOnNewClip.Checked = App.Settings.NotifyOnNewClip
         ChkBoxShowOpenSourceApp.Checked = App.Settings.ShowOpenSourceApp
+        ChkBoxKeepScratchPadText.Checked = App.Settings.ScratchPadKeepText
         TxtBoxHotKeyToggleFavorite.Text = FormatHotKey(App.Settings.HotKeys.ToggleFavorite)
         TxtBoxHotKeyShowViewer.Text = FormatHotKey(App.Settings.HotKeys.ShowViewer)
+        TxtBoxHotKeyShowScratchPad.Text = FormatHotKey(App.Settings.HotKeys.ShowScratchPad)
         TxtBoxPurgeDays.Text = App.Settings.PurgeDays.ToString
         ChkBoxAutoPurge.Checked = App.Settings.AutoPurge
 
@@ -125,12 +127,21 @@ Public Class Settings
     End Sub
     Private Sub TxtBoxHotKeyShowViewer_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHotKeyShowViewer.KeyDown
         e.SuppressKeyPress = True
-        Dim mods As Keys = e.Modifiers
-        Dim key As Keys = e.KeyCode
+        Dim mods = e.Modifiers
+        Dim key = e.KeyCode
         If key = Keys.ControlKey OrElse key = Keys.ShiftKey OrElse key = Keys.Menu Then Return 'Ignore modifier-only presses
-        Dim combo As Keys = mods Or key
+        Dim combo = mods Or key
         TxtBoxHotKeyShowViewer.Text = FormatHotKey(combo)
         App.Settings.HotKeys.ShowViewer = combo
+    End Sub
+    Private Sub TxtBoxHotKeyShowScratchPad_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHotKeyShowScratchPad.KeyDown
+        e.SuppressKeyPress = True
+        Dim mods = e.Modifiers
+        Dim key = e.KeyCode
+        If key = Keys.ControlKey OrElse key = Keys.ShiftKey OrElse key = Keys.Menu Then Return 'Ignore modifier-only presses
+        Dim combo = mods Or key
+        TxtBoxHotKeyShowScratchPad.Text = FormatHotKey(combo)
+        App.Settings.HotKeys.ShowScratchPad = combo
     End Sub
     Private Sub TxtBoxPurgeDays_Validated(sender As Object, e As EventArgs) Handles TxtBoxPurgeDays.Validated
         If Not String.IsNullOrEmpty(TxtBoxPurgeDays.Text) Then
@@ -161,6 +172,9 @@ Public Class Settings
     End Sub
     Private Sub ChkBoxShowOpenSourceApp_Click(sender As Object, e As EventArgs) Handles ChkBoxShowOpenSourceApp.Click
         App.Settings.ShowOpenSourceApp = Not App.Settings.ShowOpenSourceApp
+    End Sub
+    Private Sub ChkBoxKeepScratchPadText_Click(sender As Object, e As EventArgs) Handles ChkBoxKeepScratchPadText.Click
+        App.Settings.ScratchPadKeepText = Not App.Settings.ScratchPadKeepText
     End Sub
 
     ' Methods

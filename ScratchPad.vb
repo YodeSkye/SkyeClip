@@ -14,6 +14,7 @@ Friend Class ScratchPad
 
     ' Form Events
     Private Sub ScratchPad_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        App.HideSettings()
         Text = App.GetAppTitle & " " & Text
         OKText = TipScratchPad.GetText(BtnOK)
         If App.Settings.ScratchPadLocation.Y >= 0 Then Me.Location = App.Settings.ScratchPadLocation
@@ -169,6 +170,10 @@ Friend Class ScratchPad
                 Import()
         End Select
     End Sub
+    Private Sub BtnHelp_Click(sender As Object, e As EventArgs) Handles BtnHelp.Click
+        App.HideHelp()
+        App.ShowHelp(1460)
+    End Sub
     Private Sub CMRTB_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles CMRTB.Opening
         If RTB.CanUndo OrElse RTB.CanRedo Then
             CMIUndo.Enabled = True
@@ -246,7 +251,7 @@ Friend Class ScratchPad
     End Sub
     Private Sub Import()
         Dim uiOpenFile As New OpenFileDialog With {
-            .Title = "Import Content into Scratch Pad",
+            .Title = "Import Content into Scratch Pad (Clears Current Text)",
             .Filter = "Rich Text Format (*.rtf)|*.rtf|Plain Text (*.txt)|*.txt|All Files (*.*)|*.*",
             .DefaultExt = "rtf",
             .AddExtension = True,

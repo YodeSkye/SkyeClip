@@ -46,6 +46,9 @@ Public Class Help
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
     End Sub
+    Private Sub RTxBxHelp_SelectionChanged(sender As Object, e As EventArgs) Handles RTxBxHelp.SelectionChanged
+        Debug.WriteLine(RTxBxHelp.SelectionStart.ToString)
+    End Sub
 
     'Procedures
     Private Sub CheckMove(ByRef location As Point)

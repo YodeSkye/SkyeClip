@@ -44,6 +44,9 @@ Partial Class Settings
         ChkBoxAutoPurge = New CheckBox()
         BtnPurgeNow = New Button()
         ChkBoxShowOpenSourceApp = New CheckBox()
+        ChkBoxKeepScratchPadText = New CheckBox()
+        TxtBoxHotKeyShowScratchPad = New TextBox()
+        LblHotKeyShowScratchPad = New Label()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -51,7 +54,7 @@ Partial Class Settings
         BtnOK.Anchor = AnchorStyles.Bottom
         BtnOK.Image = My.Resources.Resources.ImageOK
         TipSettings.SetImage(BtnOK, Nothing)
-        BtnOK.Location = New Point(210, 430)
+        BtnOK.Location = New Point(210, 492)
         BtnOK.Margin = New Padding(4)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
@@ -122,6 +125,7 @@ Partial Class Settings
         TipSettings.SetImage(ChkBoxBlinkOnNewClip, Nothing)
         ChkBoxBlinkOnNewClip.Location = New Point(317, 12)
         ChkBoxBlinkOnNewClip.Name = "ChkBoxBlinkOnNewClip"
+        ChkBoxBlinkOnNewClip.RightToLeft = RightToLeft.Yes
         ChkBoxBlinkOnNewClip.Size = New Size(155, 25)
         ChkBoxBlinkOnNewClip.TabIndex = 30
         TipSettings.SetText(ChkBoxBlinkOnNewClip, "Blink the tray icon several times when the clipboard changes.")
@@ -132,10 +136,11 @@ Partial Class Settings
         ' 
         ChkBoxNotifyOnNewClip.AutoSize = True
         TipSettings.SetImage(ChkBoxNotifyOnNewClip, Nothing)
-        ChkBoxNotifyOnNewClip.Location = New Point(317, 43)
+        ChkBoxNotifyOnNewClip.Location = New Point(308, 43)
         ChkBoxNotifyOnNewClip.Name = "ChkBoxNotifyOnNewClip"
+        ChkBoxNotifyOnNewClip.RightToLeft = RightToLeft.Yes
         ChkBoxNotifyOnNewClip.Size = New Size(164, 25)
-        ChkBoxNotifyOnNewClip.TabIndex = 40
+        ChkBoxNotifyOnNewClip.TabIndex = 35
         TipSettings.SetText(ChkBoxNotifyOnNewClip, "Show a notification toast when the clipboard changes.")
         ChkBoxNotifyOnNewClip.Text = "Notify On New Clip"
         ChkBoxNotifyOnNewClip.UseVisualStyleBackColor = True
@@ -144,7 +149,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyToggleFavorite.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyToggleFavorite, Nothing)
-        TxtBoxHotKeyToggleFavorite.Location = New Point(171, 202)
+        TxtBoxHotKeyToggleFavorite.Location = New Point(171, 217)
         TxtBoxHotKeyToggleFavorite.Name = "TxtBoxHotKeyToggleFavorite"
         TxtBoxHotKeyToggleFavorite.ReadOnly = True
         TxtBoxHotKeyToggleFavorite.ShortcutsEnabled = False
@@ -156,7 +161,7 @@ Partial Class Settings
         ' LblHotKeyToggleFavorite
         ' 
         TipSettings.SetImage(LblHotKeyToggleFavorite, Nothing)
-        LblHotKeyToggleFavorite.Location = New Point(169, 181)
+        LblHotKeyToggleFavorite.Location = New Point(169, 196)
         LblHotKeyToggleFavorite.Name = "LblHotKeyToggleFavorite"
         LblHotKeyToggleFavorite.Size = New Size(146, 24)
         LblHotKeyToggleFavorite.TabIndex = 7
@@ -168,7 +173,7 @@ Partial Class Settings
         ' 
         LblHotKeys.Font = New Font("Segoe UI", 12F, FontStyle.Underline, GraphicsUnit.Point, CByte(0))
         TipSettings.SetImage(LblHotKeys, Nothing)
-        LblHotKeys.Location = New Point(171, 157)
+        LblHotKeys.Location = New Point(171, 172)
         LblHotKeys.Name = "LblHotKeys"
         LblHotKeys.Size = New Size(144, 24)
         LblHotKeys.TabIndex = 9
@@ -180,7 +185,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyShowViewer.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyShowViewer, Nothing)
-        TxtBoxHotKeyShowViewer.Location = New Point(171, 255)
+        TxtBoxHotKeyShowViewer.Location = New Point(171, 270)
         TxtBoxHotKeyShowViewer.Name = "TxtBoxHotKeyShowViewer"
         TxtBoxHotKeyShowViewer.ReadOnly = True
         TxtBoxHotKeyShowViewer.ShortcutsEnabled = False
@@ -192,7 +197,7 @@ Partial Class Settings
         ' LblHotKeyShowViewer
         ' 
         TipSettings.SetImage(LblHotKeyShowViewer, Nothing)
-        LblHotKeyShowViewer.Location = New Point(169, 234)
+        LblHotKeyShowViewer.Location = New Point(169, 249)
         LblHotKeyShowViewer.Name = "LblHotKeyShowViewer"
         LblHotKeyShowViewer.Size = New Size(146, 24)
         LblHotKeyShowViewer.TabIndex = 10
@@ -204,7 +209,7 @@ Partial Class Settings
         ' 
         LblPurgeDays1.AutoSize = True
         TipSettings.SetImage(LblPurgeDays1, Nothing)
-        LblPurgeDays1.Location = New Point(10, 332)
+        LblPurgeDays1.Location = New Point(10, 395)
         LblPurgeDays1.Name = "LblPurgeDays1"
         LblPurgeDays1.Size = New Size(170, 21)
         LblPurgeDays1.TabIndex = 12
@@ -216,7 +221,7 @@ Partial Class Settings
         ' 
         LblPurgeDays2.AutoSize = True
         TipSettings.SetImage(LblPurgeDays2, Nothing)
-        LblPurgeDays2.Location = New Point(232, 332)
+        LblPurgeDays2.Location = New Point(232, 395)
         LblPurgeDays2.Name = "LblPurgeDays2"
         LblPurgeDays2.Size = New Size(44, 21)
         LblPurgeDays2.TabIndex = 13
@@ -226,7 +231,7 @@ Partial Class Settings
         ' TxtBoxPurgeDays
         ' 
         TipSettings.SetImage(TxtBoxPurgeDays, Nothing)
-        TxtBoxPurgeDays.Location = New Point(176, 329)
+        TxtBoxPurgeDays.Location = New Point(176, 392)
         TxtBoxPurgeDays.Name = "TxtBoxPurgeDays"
         TxtBoxPurgeDays.Size = New Size(58, 29)
         TxtBoxPurgeDays.TabIndex = 70
@@ -237,7 +242,7 @@ Partial Class Settings
         ' 
         ChkBoxAutoPurge.AutoSize = True
         TipSettings.SetImage(ChkBoxAutoPurge, Nothing)
-        ChkBoxAutoPurge.Location = New Point(325, 333)
+        ChkBoxAutoPurge.Location = New Point(325, 396)
         ChkBoxAutoPurge.Name = "ChkBoxAutoPurge"
         ChkBoxAutoPurge.Size = New Size(109, 25)
         ChkBoxAutoPurge.TabIndex = 80
@@ -248,7 +253,7 @@ Partial Class Settings
         ' BtnPurgeNow
         ' 
         TipSettings.SetImage(BtnPurgeNow, Nothing)
-        BtnPurgeNow.Location = New Point(155, 361)
+        BtnPurgeNow.Location = New Point(155, 424)
         BtnPurgeNow.Name = "BtnPurgeNow"
         BtnPurgeNow.Size = New Size(99, 32)
         BtnPurgeNow.TabIndex = 1000
@@ -261,19 +266,60 @@ Partial Class Settings
         ' 
         ChkBoxShowOpenSourceApp.AutoSize = True
         TipSettings.SetImage(ChkBoxShowOpenSourceApp, Nothing)
-        ChkBoxShowOpenSourceApp.Location = New Point(287, 91)
+        ChkBoxShowOpenSourceApp.Location = New Point(278, 74)
         ChkBoxShowOpenSourceApp.Name = "ChkBoxShowOpenSourceApp"
+        ChkBoxShowOpenSourceApp.RightToLeft = RightToLeft.Yes
         ChkBoxShowOpenSourceApp.Size = New Size(194, 25)
-        ChkBoxShowOpenSourceApp.TabIndex = 45
+        ChkBoxShowOpenSourceApp.TabIndex = 40
         TipSettings.SetText(ChkBoxShowOpenSourceApp, "Show a notification toast when the clipboard changes.")
         ChkBoxShowOpenSourceApp.Text = "Show Open Source App"
         ChkBoxShowOpenSourceApp.UseVisualStyleBackColor = True
+        ' 
+        ' ChkBoxKeepScratchPadText
+        ' 
+        ChkBoxKeepScratchPadText.AutoSize = True
+        TipSettings.SetImage(ChkBoxKeepScratchPadText, Nothing)
+        ChkBoxKeepScratchPadText.Location = New Point(295, 105)
+        ChkBoxKeepScratchPadText.Name = "ChkBoxKeepScratchPadText"
+        ChkBoxKeepScratchPadText.RightToLeft = RightToLeft.Yes
+        ChkBoxKeepScratchPadText.Size = New Size(177, 25)
+        ChkBoxKeepScratchPadText.TabIndex = 45
+        TipSettings.SetText(ChkBoxKeepScratchPadText, "Show a notification toast when the clipboard changes.")
+        ChkBoxKeepScratchPadText.Text = "Keep Scratch Pad Text"
+        ChkBoxKeepScratchPadText.UseVisualStyleBackColor = True
+        ' 
+        ' TxtBoxHotKeyShowScratchPad
+        ' 
+        TxtBoxHotKeyShowScratchPad.BorderStyle = BorderStyle.FixedSingle
+        TipSettings.SetImage(TxtBoxHotKeyShowScratchPad, Nothing)
+        TxtBoxHotKeyShowScratchPad.Location = New Point(171, 323)
+        TxtBoxHotKeyShowScratchPad.Name = "TxtBoxHotKeyShowScratchPad"
+        TxtBoxHotKeyShowScratchPad.ReadOnly = True
+        TxtBoxHotKeyShowScratchPad.ShortcutsEnabled = False
+        TxtBoxHotKeyShowScratchPad.Size = New Size(144, 29)
+        TxtBoxHotKeyShowScratchPad.TabIndex = 65
+        TipSettings.SetText(TxtBoxHotKeyShowScratchPad, "Key or Key Combination to use on the tray menu to show the clip viewer.")
+        TxtBoxHotKeyShowScratchPad.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' LblHotKeyShowScratchPad
+        ' 
+        TipSettings.SetImage(LblHotKeyShowScratchPad, Nothing)
+        LblHotKeyShowScratchPad.Location = New Point(169, 302)
+        LblHotKeyShowScratchPad.Name = "LblHotKeyShowScratchPad"
+        LblHotKeyShowScratchPad.Size = New Size(146, 24)
+        LblHotKeyShowScratchPad.TabIndex = 1101
+        LblHotKeyShowScratchPad.Text = "Show Scratch Pad"
+        TipSettings.SetText(LblHotKeyShowScratchPad, Nothing)
+        LblHotKeyShowScratchPad.TextAlign = ContentAlignment.TopCenter
         ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(484, 507)
+        ClientSize = New Size(484, 569)
+        Controls.Add(TxtBoxHotKeyShowScratchPad)
+        Controls.Add(LblHotKeyShowScratchPad)
+        Controls.Add(ChkBoxKeepScratchPadText)
         Controls.Add(ChkBoxShowOpenSourceApp)
         Controls.Add(BtnPurgeNow)
         Controls.Add(ChkBoxAutoPurge)
@@ -326,4 +372,7 @@ Partial Class Settings
     Friend WithEvents ChkBoxAutoPurge As CheckBox
     Friend WithEvents BtnPurgeNow As Button
     Friend WithEvents ChkBoxShowOpenSourceApp As CheckBox
+    Friend WithEvents ChkBoxKeepScratchPadText As CheckBox
+    Friend WithEvents TxtBoxHotKeyShowScratchPad As TextBox
+    Friend WithEvents LblHotKeyShowScratchPad As Label
 End Class

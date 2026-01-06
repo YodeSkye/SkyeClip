@@ -181,8 +181,11 @@ Friend Module App
     Friend Sub ShowSettings()
         If FrmSettings Is Nothing OrElse FrmSettings.IsDisposed Then
             FrmSettings = New SkyeClip.Settings()
+            FrmSettings.Show()
+        Else
+            FrmSettings.BringToFront()
+            FrmSettings.Focus()
         End If
-        FrmSettings.Show()
     End Sub
     Friend Sub HideSettings()
         If FrmSettings IsNot Nothing AndAlso Not FrmSettings.IsDisposed Then
@@ -217,24 +220,57 @@ Friend Module App
         End If
         FrmLog.BTNOK.Select()
     End Sub
-    Friend Sub ShowHelp()
+    Friend Sub HideLog()
+        If FrmLog IsNot Nothing AndAlso Not FrmLog.IsDisposed Then
+            FrmLog.Close()
+        End If
+    End Sub
+    Friend Sub ShowHelp(Optional scrollto As Integer = 0)
         If FrmHelp Is Nothing OrElse FrmHelp.IsDisposed Then
             FrmHelp = New Help()
+            FrmHelp.Show()
+            FrmHelp.RTxBxHelp.SelectionStart = scrollto
+            FrmHelp.RTxBxHelp.ScrollToCaret()
+            FrmHelp.RTxBxHelp.Invalidate()
+        Else
+            FrmHelp.BringToFront()
+            FrmHelp.Focus()
         End If
-        FrmHelp.Show()
+    End Sub
+    Friend Sub HideHelp()
+        If FrmHelp IsNot Nothing AndAlso Not FrmHelp.IsDisposed Then
+            FrmHelp.Close()
+        End If
     End Sub
     Friend Sub ShowAbout()
         If FrmAbout Is Nothing OrElse FrmAbout.IsDisposed Then
             FrmAbout = New About()
+            FrmAbout.Show()
+        Else
+            FrmAbout.BringToFront()
+            FrmAbout.Focus()
         End If
-        FrmAbout.Show()
+    End Sub
+    Friend Sub HideAbout()
+        If FrmAbout IsNot Nothing AndAlso Not FrmAbout.IsDisposed Then
+            FrmAbout.Close()
+        End If
     End Sub
     Friend Sub ShowChangeLog()
         If FrmChangeLog Is Nothing OrElse FrmChangeLog.IsDisposed Then
             FrmChangeLog = New ChangeLog()
+            FrmChangeLog.Show()
+        Else
+            FrmChangeLog.BringToFront()
+            FrmChangeLog.Focus()
         End If
-        FrmChangeLog.Show()
     End Sub
+    Friend Sub HideChangeLog()
+        If FrmChangeLog IsNot Nothing AndAlso Not FrmChangeLog.IsDisposed Then
+            FrmChangeLog.Close()
+        End If
+    End Sub
+
     Friend Sub ShowDevTools()
         If FrmDevTools Is Nothing OrElse FrmDevTools.IsDisposed Then
             FrmDevTools = New DevTools With {.WindowState = FormWindowState.Maximized}
