@@ -115,6 +115,7 @@ Friend Module App
     ' WinForms
     Friend Tray As TrayAppContext
     Friend CMTray As ContextMenuStrip
+    Private FrmClipExplorer As ClipExplorer
     Private FrmClipViewer As ClipViewer
     Friend FmrScratchPad As ScratchPad
     Private FrmAppView As AppView
@@ -126,6 +127,20 @@ Friend Module App
     Private FrmDevTools As DevTools
 
     ' FORMS
+    Friend Sub ShowClipExplorer()
+        If FrmClipExplorer Is Nothing OrElse FrmClipExplorer.IsDisposed Then
+            FrmClipExplorer = New ClipExplorer()
+            FrmClipExplorer.Show()
+        Else
+            FrmClipExplorer.BringToFront()
+            FrmClipExplorer.Focus()
+        End If
+    End Sub
+    Friend Sub HideClipExplorer()
+        If FrmClipExplorer IsNot Nothing AndAlso Not FrmClipExplorer.IsDisposed Then
+            FrmClipExplorer.Close()
+        End If
+    End Sub
     Friend Sub ShowClipViewer(clipID As Integer, menuBounds As Rectangle, hovered As ToolStripMenuItem, focus As Boolean)
         If FrmClipViewer Is Nothing OrElse FrmClipViewer.IsDisposed Then FrmClipViewer = New ClipViewer()
 
