@@ -20,6 +20,11 @@ Friend Class TrayAppContext
             .Image = My.Resources.imageScratchPad16
         },
         New CommonAction With {
+            .Text = "Clip Explorer",
+            .Handler = AddressOf OnClipExplorer_MouseDown,
+            .Image = My.Resources.ImageClipExplorer16
+        },
+        New CommonAction With {
             .Text = "App View",
             .Handler = AddressOf OnAppView_MouseDown,
             .Image = My.Resources.ImageSettings16
@@ -268,6 +273,13 @@ Friend Class TrayAppContext
         Select Case e.Button
             Case MouseButtons.Left
                 App.ShowScratchPad(-1)
+            Case MouseButtons.Right
+        End Select
+    End Sub
+    Private Sub OnClipExplorer_MouseDown(sender As Object, e As MouseEventArgs)
+        Select Case e.Button
+            Case MouseButtons.Left
+                App.ShowClipExplorer()
             Case MouseButtons.Right
         End Select
     End Sub

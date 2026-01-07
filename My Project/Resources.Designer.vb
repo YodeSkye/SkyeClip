@@ -113,6 +113,36 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property IconClipExplorer() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("IconClipExplorer", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property iconHelp() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("iconHelp", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property iconLog() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("iconLog", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
         Friend ReadOnly Property ImageAbout16() As System.Drawing.Bitmap
@@ -198,6 +228,16 @@ Namespace My.Resources
         Friend ReadOnly Property ImageClearRemoveDelete16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImageClearRemoveDelete16", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property ImageClipExplorer16() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("ImageClipExplorer16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
