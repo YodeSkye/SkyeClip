@@ -31,11 +31,20 @@ Friend Class ClipViewer
     Private Async Sub ClipViewer_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         ' Initialize WebView
-        Await WebView.EnsureCoreWebView2Async()
-        WebView.CoreWebView2.Settings.AreDefaultScriptDialogsEnabled = False
-        WebView.CoreWebView2.Settings.AreDevToolsEnabled = False
-        WebView.CoreWebView2.Settings.IsStatusBarEnabled = False
-        WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent
+        Try
+            Await WebView.EnsureCoreWebView2Async()
+            If WebView.CoreWebView2 IsNot Nothing Then
+                With WebView.CoreWebView2.Settings
+                    .AreDefaultScriptDialogsEnabled = False
+                    .AreDevToolsEnabled = False
+                    .IsStatusBarEnabled = False
+                End With
+                WebView.DefaultBackgroundColor = Color.Transparent
+            End If
+        Catch ex As Exception
+            ' Optional: log or ignore depending on your needs
+            ' Debug.WriteLine("WebView2 init failed: " & ex.Message)
+        End Try
 
         Dim emptyMenu As New ContextMenuStrip()
         TxtBox.ContextMenuStrip = emptyMenu
