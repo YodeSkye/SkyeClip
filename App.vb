@@ -1,11 +1,18 @@
 ﻿
 Imports System.IO
 Imports System.Reflection
+Imports System.Text.RegularExpressions
 Imports Microsoft.Win32
 
 Friend Module App
 
     ' DECLARATIONS
+    Friend Enum TextSearchMode
+        PlainText
+        RichText
+        HTMLText
+        AllText
+    End Enum
     Friend Class CommonAction
         Public Property Text As String
         Public Property Image As Image
@@ -476,6 +483,61 @@ Friend Module App
         If p.Contains("\windowsapps\") Then Return False
 
         Return True
+    End Function
+    Friend Function NormalizeRtf(rtf As String) As String
+        If String.IsNullOrWhiteSpace(rtf) Then
+            Return String.Empty
+        End If
+
+        Dim cleaned As String = rtf
+
+        ' Remove volatile RTF header metadata (generator, build, timestamps)
+        cleaned = Regex.Replace(cleaned,
+                            "\\\*?\\generator[^;]*;",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        cleaned = Regex.Replace(cleaned,
+                            "\\\*?\\creatim[^}]*}",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        cleaned = Regex.Replace(cleaned,
+                            "\\\*?\\revtim[^}]*}",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        ' Remove font table (not needed for search)
+        cleaned = Regex.Replace(cleaned,
+                            "{\\fonttbl[^}]*}",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        ' Remove color table (not needed for search)
+        cleaned = Regex.Replace(cleaned,
+                            "{\\colortbl[^}]*}",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        ' Remove stylesheet blocks
+        cleaned = Regex.Replace(cleaned,
+                            "{\\stylesheet[^}]*}",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        ' Remove picture data (huge blobs)
+        cleaned = Regex.Replace(cleaned,
+                            "{\\pict[^}]*}",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        ' Collapse excessive whitespace
+        cleaned = Regex.Replace(cleaned,
+                            "\s+",
+                            " ",
+                            RegexOptions.Multiline)
+
+        Return cleaned.Trim()
     End Function
     Friend Sub WriteToLog(message As String)
         If String.IsNullOrWhiteSpace(message) Then Exit Sub

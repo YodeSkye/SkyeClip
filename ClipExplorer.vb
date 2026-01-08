@@ -1,24 +1,39 @@
-﻿Public Class ClipExplorer
+﻿
+Imports System.IO
+Imports System.Text
+Imports SkyeClip.ClipRepository
+
+Public Class ClipExplorer
 
     ' Declarations
-    Private Enum TextSearchMode
-        PlainText
-        RichText
-        HTMLText
-        AllText
-    End Enum
     Private _searchText As String = String.Empty
     Private _searchFavoritesOnly As Boolean = False
     Private _searchDays As Integer = 0 ' 0 means all days
-    Private _searchMode As TextSearchMode
+    Private _searchMode As App.TextSearchMode
+    Private _searchCache As New Dictionary(Of Integer, String)
 
     ' Form Events
     Private Sub ClipExplorer_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = App.GetAppTitle() & " " & Text
         RadBtnPlainText.Checked = True
+        LoadClips()
     End Sub
 
     ' Control Events
+    Private Sub DGV_SelectionChanged(sender As Object, e As EventArgs) Handles DGV.SelectionChanged
+        If DGV.SelectedRows.Count = 0 Then
+            RTB.Text = String.Empty
+            Return
+        End If
+
+        Dim row = DGV.SelectedRows(0)
+        Dim clipId = CInt(row.Cells("Id").Value)
+
+        Dim formats = App.Tray.repo.GetClipFormats(clipId)
+        Dim preview = BuildPreviewText(formats)
+
+        RTB.Text = preview
+    End Sub
     Private Sub BtnClearSearch_Click(sender As Object, e As EventArgs) Handles BtnClearSearch.Click
         _searchText = String.Empty
         TxtBoxSearch.Text = String.Empty
@@ -27,6 +42,7 @@
         _searchDays = 0
         TxtBoxDays.Text = String.Empty
         RadBtnPlainText.Checked = True
+        LoadClips()
     End Sub
     Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxSearch.KeyDown, TxtBoxDays.KeyDown
         If e.KeyCode = Keys.Enter Then
@@ -43,25 +59,118 @@
     End Sub
     Private Sub TxtBoxSearch_Validated(sender As Object, e As EventArgs) Handles TxtBoxSearch.Validated
         _searchText = TxtBoxSearch.Text.Trim
+        LoadClips()
     End Sub
     Private Sub ChkBoxFavorites_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxFavorites.CheckedChanged
         _searchFavoritesOnly = ChkBoxFavorites.Checked
+        LoadClips()
     End Sub
     Private Sub TxtBoxDays_Validated(sender As Object, e As EventArgs) Handles TxtBoxDays.Validated
         TxtBoxDays.SelectAll()
         If Integer.TryParse(TxtBoxDays.Text.Trim, _searchDays) = False Then _searchDays = 0
+        LoadClips()
     End Sub
     Private Sub RadBtnText_CheckedChanged(sender As Object, e As EventArgs) Handles RadBtnPlainText.CheckedChanged, RadBtnRTF.CheckedChanged, RadBtnHTML.CheckedChanged, RadBtnAllText.CheckedChanged
         If RadBtnPlainText.Checked Then
-            _searchMode = TextSearchMode.PlainText
+            _searchMode = App.TextSearchMode.PlainText
         ElseIf RadBtnRTF.Checked Then
-            _searchMode = TextSearchMode.RichText
+            _searchMode = App.TextSearchMode.RichText
         ElseIf RadBtnHTML.Checked Then
-            _searchMode = TextSearchMode.HTMLText
+            _searchMode = App.TextSearchMode.HTMLText
         ElseIf RadBtnAllText.Checked Then
-            _searchMode = TextSearchMode.AllText
+            _searchMode = App.TextSearchMode.AllText
         End If
+        _searchCache.Clear()
+        LoadClips()
         Debug.WriteLine("Search Mode: " & _searchMode.ToString)
     End Sub
+
+    ' Methods
+    Private Sub LoadClips()
+        DGV.Rows.Clear()
+
+        Dim allClips = App.Tray.repo.GetAllClips()
+
+        Dim filtered = allClips
+
+        ' Apply favorites filter
+        If _searchFavoritesOnly Then
+            filtered = filtered.Where(Function(c) c.IsFavorite).ToList()
+        End If
+
+        ' Days filter
+        If _searchDays > 0 Then
+            Dim cutoff = DateTime.UtcNow.AddDays(-_searchDays)
+            filtered = filtered.Where(Function(c) c.CreatedAt >= cutoff).ToList()
+        End If
+
+        If _searchText <> "" Then
+            filtered = filtered.Where(Function(c)
+                                          Dim text = GetCachedSearchText(c.Id)
+                                          Return text.Contains(_searchText, StringComparison.OrdinalIgnoreCase)
+                                      End Function).ToList()
+        End If
+
+
+        For Each c In filtered
+            Dim iconImg As Image = Nothing
+            If c.SourceAppIcon IsNot Nothing AndAlso c.SourceAppIcon.Length > 0 Then
+                Using ms As New MemoryStream(c.SourceAppIcon)
+                    iconImg = Image.FromStream(ms)
+                End Using
+            End If
+
+            DGV.Rows.Add(
+                c.Id,
+                c.Preview,
+                c.CreatedAt.ToString("g"),
+                c.LastUsedAt.ToString("g"),
+                c.SourceAppName,
+                iconImg,
+                c.IsFavorite
+            )
+        Next
+
+        TSSLabelCount.Text = $"Showing {filtered.Count} of {allClips.Count} Clips"
+    End Sub
+    Private Function BuildPreviewText(formats As List(Of ClipData)) As String
+        ' 1) Unicode text
+        Dim uni = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_UNICODETEXT)
+        If uni IsNot Nothing Then
+            Return NormalizeUnicodeText(uni.DataBytes)
+        End If
+
+        ' 2) ANSI text
+        Dim ansi = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_TEXT)
+        If ansi IsNot Nothing Then
+            Return Encoding.Default.GetString(ansi.DataBytes)
+        End If
+
+        ' 3) RTF → plain text
+        Dim rtf = formats.FirstOrDefault(Function(f) f.FormatName.Contains("rtf", StringComparison.OrdinalIgnoreCase))
+        If rtf IsNot Nothing Then
+            Dim rtfString = Encoding.ASCII.GetString(rtf.DataBytes)
+            Return App.NormalizeRtf(rtfString)
+        End If
+
+        ' 4) HTML → fragment
+        Dim html = formats.FirstOrDefault(Function(f) f.FormatName.Contains("html", StringComparison.OrdinalIgnoreCase))
+        If html IsNot Nothing Then
+            Dim htmlString = Encoding.UTF8.GetString(html.DataBytes)
+            Return ClipRepository.ExtractHtmlFragment(htmlString)
+        End If
+
+        Return "(no text formats)"
+    End Function
+    Private Function GetCachedSearchText(clipId As Integer) As String
+        Dim cached As String = Nothing
+        If _searchCache.TryGetValue(clipId, cached) Then
+            Return cached
+        End If
+
+        Dim text = App.Tray.repo.GetSearchableText(clipId, _searchMode)
+        _searchCache(clipId) = text
+        Return text
+    End Function
 
 End Class

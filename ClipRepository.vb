@@ -8,11 +8,6 @@ Imports System.Text.RegularExpressions
 Friend Class ClipRepository
 
     ' Declarations
-    Friend Class ClipData
-        Public Property FormatId As UInteger
-        Public Property FormatName As String
-        Public Property DataBytes As Byte()
-    End Class
     Friend Class BasicClipInfo
         Public Property Id As Integer
         Public Property Preview As String
@@ -28,6 +23,21 @@ Friend Class ClipRepository
         Public Property SourceAppIcon As Byte()
         Public Property IsFavorite As Boolean
         Public Property LastUsedAt As DateTime
+    End Class
+    Friend Class ExplorerClipInfo
+        Public Property Id As Integer
+        Public Property Preview As String
+        Public Property CreatedAt As DateTime
+        Public Property LastUsedAt As DateTime
+        Public Property SourceAppName As String
+        Public Property SourceAppPath As String
+        Public Property SourceAppIcon As Byte()
+        Public Property IsFavorite As Boolean
+    End Class
+    Friend Class ClipData
+        Public Property FormatId As UInteger
+        Public Property FormatName As String
+        Public Property DataBytes As Byte()
     End Class
 
     ' Constructor
@@ -424,6 +434,152 @@ Friend Class ClipRepository
         Return clips
     End Function
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Friend Function GetAllClips() As List(Of ExplorerClipInfo)
+        Dim clips As New List(Of ExplorerClipInfo)
+
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+
+            Dim cmd As New SQLiteCommand("
+            SELECT Id, Preview, CreatedAt, LastUsedAt, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite
+            FROM Clips
+            ORDER BY LastUsedAt DESC", conn)
+
+            Using reader = cmd.ExecuteReader()
+                While reader.Read()
+                    Dim ci As New ExplorerClipInfo With {
+                    .Id = reader.GetInt32(0),
+                    .Preview = If(reader.IsDBNull(1), "", reader.GetString(1)),
+                    .CreatedAt = If(reader.IsDBNull(2), Date.MinValue, reader.GetDateTime(2)),
+                    .LastUsedAt = If(reader.IsDBNull(3), Date.MinValue, reader.GetDateTime(3)),
+                    .SourceAppName = If(reader.IsDBNull(4), "", reader.GetString(4)),
+                    .SourceAppPath = If(reader.IsDBNull(5), "", reader.GetString(5)),
+                    .IsFavorite = (Not reader.IsDBNull(7) AndAlso reader.GetInt32(7) = 1)
+                }
+
+                    ' Icon
+                    If Not reader.IsDBNull(6) Then
+                        Dim length As Integer = CInt(reader.GetBytes(6, 0, Nothing, 0, 0))
+                        Dim buffer(length - 1) As Byte
+                        reader.GetBytes(6, 0, buffer, 0, length)
+                        ci.SourceAppIcon = buffer
+                    End If
+
+                    clips.Add(ci)
+                End While
+            End Using
+        End Using
+
+        Return clips
+    End Function
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Friend Function GetClipFormats(entryId As Integer) As List(Of ClipData)
+        Dim list As New List(Of ClipData)
+
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+
+            Using cmd As New SQLiteCommand("
+            SELECT FormatId, IFNULL(FormatName,''), Data
+            FROM ClipFormats
+            WHERE EntryId=@id", conn)
+
+                cmd.Parameters.AddWithValue("@id", entryId)
+
+                Using r = cmd.ExecuteReader()
+                    While r.Read()
+                        list.Add(New ClipData With {
+                        .FormatId = CUInt(r.GetInt32(0)),
+                        .FormatName = r.GetString(1),
+                        .DataBytes = DirectCast(r("Data"), Byte())
+                    })
+                    End While
+                End Using
+            End Using
+        End Using
+
+        Return list
+    End Function
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Friend Function GetSearchableText(entryId As Integer, mode As App.TextSearchMode) As String
+        Dim sb As New StringBuilder()
+
+        ' Load formats for this clip
+        Dim formats As New List(Of ClipData)
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+            Using cmd As New SQLiteCommand("
+            SELECT FormatId, IFNULL(FormatName,''), Data
+            FROM ClipFormats
+            WHERE EntryId=@id", conn)
+
+                cmd.Parameters.AddWithValue("@id", entryId)
+
+                Using r = cmd.ExecuteReader()
+                    While r.Read()
+                        formats.Add(New ClipData With {
+                        .FormatId = CUInt(r.GetInt32(0)),
+                        .FormatName = r.GetString(1),
+                        .DataBytes = DirectCast(r("Data"), Byte())
+                    })
+                    End While
+                End Using
+            End Using
+        End Using
+
+        For Each f In formats
+            Select Case mode
+
+                Case App.TextSearchMode.PlainText
+                    If f.FormatId = Skye.WinAPI.CF_UNICODETEXT Then
+                        sb.AppendLine(NormalizeUnicodeText(f.DataBytes))
+                    ElseIf f.FormatId = Skye.WinAPI.CF_TEXT OrElse f.FormatId = Skye.WinAPI.CF_OEMTEXT Then
+                        sb.AppendLine(Encoding.Default.GetString(f.DataBytes))
+                    End If
+
+                Case App.TextSearchMode.RichText
+                    If f.FormatId = Skye.WinAPI.CF_RTF OrElse f.FormatName.Contains("rtf", StringComparison.OrdinalIgnoreCase) Then
+                        Dim rtf = Encoding.ASCII.GetString(f.DataBytes)
+                        sb.AppendLine(NormalizeRtf(rtf))
+                    End If
+
+                Case App.TextSearchMode.HTMLText
+                    If f.FormatId = Skye.WinAPI.CF_HTML OrElse f.FormatName.Contains("html", StringComparison.OrdinalIgnoreCase) Then
+                        Dim html = Encoding.UTF8.GetString(f.DataBytes)
+                        Dim plain = ExtractHtmlFragment(html)
+                        sb.AppendLine(plain)
+                    End If
+
+                Case App.TextSearchMode.AllText
+                    ' Unicode
+                    If f.FormatId = Skye.WinAPI.CF_UNICODETEXT Then
+                        sb.AppendLine(NormalizeUnicodeText(f.DataBytes))
+                    End If
+
+                    ' ANSI
+                    If f.FormatId = Skye.WinAPI.CF_TEXT OrElse f.FormatId = Skye.WinAPI.CF_OEMTEXT Then
+                        sb.AppendLine(Encoding.Default.GetString(f.DataBytes))
+                    End If
+
+                    ' RTF
+                    If f.FormatId = Skye.WinAPI.CF_RTF OrElse f.FormatName.Contains("rtf", StringComparison.OrdinalIgnoreCase) Then
+                        Dim rtf = Encoding.ASCII.GetString(f.DataBytes)
+                        sb.AppendLine(NormalizeRtf(rtf))
+                    End If
+
+                    ' HTML
+                    If f.FormatId = Skye.WinAPI.CF_HTML OrElse f.FormatName.Contains("html", StringComparison.OrdinalIgnoreCase) Then
+                        Dim html = Encoding.UTF8.GetString(f.DataBytes)
+                        Dim plain = ExtractHtmlFragment(html)
+                        sb.AppendLine(plain)
+                    End If
+
+            End Select
+        Next
+
+        Return sb.ToString().Trim()
+    End Function
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Sub DeleteClip(clipID As Integer)
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
@@ -616,6 +772,25 @@ Friend Class ClipRepository
         rtf = Regex.Replace(rtf, "\s+", " ")
 
         Return rtf.Trim()
+    End Function
+    Friend Shared Function ExtractHtmlFragment(rawHtml As String) As String
+        If String.IsNullOrEmpty(rawHtml) Then
+            Return String.Empty
+        End If
+
+        Const startTag As String = "<!--StartFragment-->"
+        Const endTag As String = "<!--EndFragment-->"
+
+        Dim startIndex As Integer = rawHtml.IndexOf(startTag, StringComparison.OrdinalIgnoreCase)
+        Dim endIndex As Integer = rawHtml.IndexOf(endTag, StringComparison.OrdinalIgnoreCase)
+
+        If startIndex >= 0 AndAlso endIndex > startIndex Then
+            startIndex += startTag.Length
+            Return rawHtml.Substring(startIndex, endIndex - startIndex)
+        End If
+
+        ' No markers → return whole HTML
+        Return rawHtml
     End Function
 
 End Class
