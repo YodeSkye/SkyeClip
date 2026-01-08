@@ -41,6 +41,12 @@ Partial Class ClipExplorer
         DGV = New DataGridView()
         RTB = New RichTextBox()
         TipClipExplorer = New Skye.UI.ToolTipEX(components)
+        Preview = New DataGridViewTextBoxColumn()
+        Created = New DataGridViewTextBoxColumn()
+        LastUsed = New DataGridViewTextBoxColumn()
+        SourceApp = New DataGridViewTextBoxColumn()
+        SourceAppImage = New DataGridViewImageColumn()
+        Favorite = New DataGridViewCheckBoxColumn()
         StatusStripCE.SuspendLayout()
         PanelCE.SuspendLayout()
         GrpBoxSearch.SuspendLayout()
@@ -239,6 +245,7 @@ Partial Class ClipExplorer
         ' 
         DGV.BorderStyle = BorderStyle.None
         DGV.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        DGV.Columns.AddRange(New DataGridViewColumn() {Preview, Created, LastUsed, SourceApp, SourceAppImage, Favorite})
         DGV.Dock = DockStyle.Fill
         TipClipExplorer.SetImage(DGV, Nothing)
         DGV.Location = New Point(0, 0)
@@ -262,6 +269,42 @@ Partial Class ClipExplorer
         ' TipClipExplorer
         ' 
         TipClipExplorer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        ' 
+        ' Preview
+        ' 
+        Preview.HeaderText = "Preview"
+        Preview.Name = "Preview"
+        Preview.ReadOnly = True
+        ' 
+        ' Created
+        ' 
+        Created.HeaderText = "Created"
+        Created.Name = "Created"
+        Created.ReadOnly = True
+        ' 
+        ' LastUsed
+        ' 
+        LastUsed.HeaderText = "Last Used"
+        LastUsed.Name = "LastUsed"
+        LastUsed.ReadOnly = True
+        ' 
+        ' SourceApp
+        ' 
+        SourceApp.HeaderText = "Source App"
+        SourceApp.Name = "SourceApp"
+        SourceApp.ReadOnly = True
+        ' 
+        ' SourceAppImage
+        ' 
+        SourceAppImage.HeaderText = "Icon"
+        SourceAppImage.Name = "SourceAppImage"
+        SourceAppImage.ReadOnly = True
+        ' 
+        ' Favorite
+        ' 
+        Favorite.HeaderText = "Fav"
+        Favorite.Name = "Favorite"
+        Favorite.ReadOnly = True
         ' 
         ' ClipExplorer
         ' 
@@ -310,4 +353,10 @@ Partial Class ClipExplorer
     Friend WithEvents DGV As DataGridView
     Friend WithEvents RTB As RichTextBox
     Friend WithEvents TSSLabelCount As ToolStripStatusLabel
+    Friend WithEvents Preview As DataGridViewTextBoxColumn
+    Friend WithEvents Created As DataGridViewTextBoxColumn
+    Friend WithEvents LastUsed As DataGridViewTextBoxColumn
+    Friend WithEvents SourceApp As DataGridViewTextBoxColumn
+    Friend WithEvents SourceAppImage As DataGridViewImageColumn
+    Friend WithEvents Favorite As DataGridViewCheckBoxColumn
 End Class
