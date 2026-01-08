@@ -25,13 +25,13 @@ Partial Class ClipViewer
         components = New ComponentModel.Container()
         TxtBox = New TextBox()
         PicBox = New PictureBox()
-        RTFBox = New RichTextBox()
         LVFileDrop = New ListView()
         FileIcon = New ColumnHeader()
         FileName = New ColumnHeader()
         FileSize = New ColumnHeader()
         ILFileDrop = New ImageList(components)
         WebView = New Microsoft.Web.WebView2.WinForms.WebView2()
+        RTFBox = New Skye.UI.RichTextBox()
         CType(PicBox, ComponentModel.ISupportInitialize).BeginInit()
         CType(WebView, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
@@ -56,17 +56,6 @@ Partial Class ClipViewer
         PicBox.SizeMode = PictureBoxSizeMode.Zoom
         PicBox.TabIndex = 1
         PicBox.TabStop = False
-        ' 
-        ' RTFBox
-        ' 
-        RTFBox.BorderStyle = BorderStyle.None
-        RTFBox.Dock = DockStyle.Fill
-        RTFBox.Location = New Point(0, 0)
-        RTFBox.Name = "RTFBox"
-        RTFBox.ReadOnly = True
-        RTFBox.Size = New Size(584, 284)
-        RTFBox.TabIndex = 2
-        RTFBox.Text = ""
         ' 
         ' LVFileDrop
         ' 
@@ -115,16 +104,27 @@ Partial Class ClipViewer
         WebView.TabIndex = 4
         WebView.ZoomFactor = 1R
         ' 
+        ' RTFBox
+        ' 
+        RTFBox.BorderStyle = BorderStyle.None
+        RTFBox.Dock = DockStyle.Fill
+        RTFBox.Location = New Point(0, 0)
+        RTFBox.Name = "RTFBox"
+        RTFBox.ReadOnly = True
+        RTFBox.Size = New Size(584, 284)
+        RTFBox.TabIndex = 5
+        RTFBox.Text = ""
+        ' 
         ' ClipViewer
         ' 
         AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(584, 284)
         ControlBox = False
+        Controls.Add(RTFBox)
+        Controls.Add(PicBox)
         Controls.Add(WebView)
         Controls.Add(LVFileDrop)
         Controls.Add(TxtBox)
-        Controls.Add(RTFBox)
-        Controls.Add(PicBox)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         KeyPreview = True
         Margin = New Padding(4)
@@ -140,11 +140,11 @@ Partial Class ClipViewer
 
     Friend WithEvents TxtBox As TextBox
     Friend WithEvents PicBox As PictureBox
-    Friend WithEvents RTFBox As RichTextBox
     Friend WithEvents LVFileDrop As ListView
     Friend WithEvents FileIcon As ColumnHeader
     Friend WithEvents FileName As ColumnHeader
     Friend WithEvents FileSize As ColumnHeader
     Friend WithEvents ILFileDrop As ImageList
     Friend WithEvents WebView As Microsoft.Web.WebView2.WinForms.WebView2
+    Friend WithEvents RTFBox As Skye.UI.RichTextBox
 End Class

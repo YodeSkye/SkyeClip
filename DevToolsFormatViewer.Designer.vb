@@ -22,12 +22,12 @@ Partial Class DevToolsFormatViewer
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        RTB = New RichTextBox()
+        RTB = New Skye.UI.RichTextBox()
         SuspendLayout()
         ' 
         ' RTB
         ' 
-        RTB.BorderStyle = BorderStyle.FixedSingle
+        RTB.BorderStyle = BorderStyle.None
         RTB.Dock = DockStyle.Fill
         RTB.Font = New Font("Consolas", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         RTB.Location = New Point(0, 0)
@@ -50,5 +50,5 @@ Partial Class DevToolsFormatViewer
         ResumeLayout(False)
     End Sub
 
-    Friend WithEvents RTB As RichTextBox
+    Friend WithEvents RTB As Skye.UI.RichTextBox
 End Class

@@ -39,14 +39,14 @@ Partial Class ClipExplorer
         TxtBoxSearch = New TextBox()
         SplitContainerCE = New SplitContainer()
         DGV = New DataGridView()
-        RTB = New RichTextBox()
-        TipClipExplorer = New Skye.UI.ToolTipEX(components)
         Preview = New DataGridViewTextBoxColumn()
         Created = New DataGridViewTextBoxColumn()
         LastUsed = New DataGridViewTextBoxColumn()
         SourceApp = New DataGridViewTextBoxColumn()
         SourceAppImage = New DataGridViewImageColumn()
         Favorite = New DataGridViewCheckBoxColumn()
+        TipClipExplorer = New Skye.UI.ToolTipEX(components)
+        RTB = New Skye.UI.RichTextBox()
         StatusStripCE.SuspendLayout()
         PanelCE.SuspendLayout()
         GrpBoxSearch.SuspendLayout()
@@ -254,22 +254,6 @@ Partial Class ClipExplorer
         DGV.TabIndex = 0
         TipClipExplorer.SetText(DGV, Nothing)
         ' 
-        ' RTB
-        ' 
-        RTB.BorderStyle = BorderStyle.None
-        RTB.Dock = DockStyle.Fill
-        TipClipExplorer.SetImage(RTB, Nothing)
-        RTB.Location = New Point(0, 0)
-        RTB.Name = "RTB"
-        RTB.Size = New Size(290, 373)
-        RTB.TabIndex = 0
-        RTB.Text = ""
-        TipClipExplorer.SetText(RTB, Nothing)
-        ' 
-        ' TipClipExplorer
-        ' 
-        TipClipExplorer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        ' 
         ' Preview
         ' 
         Preview.HeaderText = "Preview"
@@ -305,6 +289,24 @@ Partial Class ClipExplorer
         Favorite.HeaderText = "Fav"
         Favorite.Name = "Favorite"
         Favorite.ReadOnly = True
+        ' 
+        ' TipClipExplorer
+        ' 
+        TipClipExplorer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        ' 
+        ' RTB
+        ' 
+        RTB.BorderStyle = BorderStyle.None
+        RTB.Dock = DockStyle.Fill
+        RTB.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipClipExplorer.SetImage(RTB, Nothing)
+        RTB.Location = New Point(0, 0)
+        RTB.Name = "RTB"
+        RTB.ReadOnly = True
+        RTB.Size = New Size(290, 373)
+        RTB.TabIndex = 0
+        RTB.Text = ""
+        TipClipExplorer.SetText(RTB, Nothing)
         ' 
         ' ClipExplorer
         ' 
@@ -351,7 +353,6 @@ Partial Class ClipExplorer
     Friend WithEvents RadBtnPlainText As RadioButton
     Friend WithEvents CMTxtBox As Skye.UI.TextBoxContextMenu
     Friend WithEvents DGV As DataGridView
-    Friend WithEvents RTB As RichTextBox
     Friend WithEvents TSSLabelCount As ToolStripStatusLabel
     Friend WithEvents Preview As DataGridViewTextBoxColumn
     Friend WithEvents Created As DataGridViewTextBoxColumn
@@ -359,4 +360,5 @@ Partial Class ClipExplorer
     Friend WithEvents SourceApp As DataGridViewTextBoxColumn
     Friend WithEvents SourceAppImage As DataGridViewImageColumn
     Friend WithEvents Favorite As DataGridViewCheckBoxColumn
+    Friend WithEvents RTB As Skye.UI.RichTextBox
 End Class
