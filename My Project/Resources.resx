@@ -261,11 +261,17 @@ SkyeClip allows customization of:\par
  </value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="IconAbout" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>IconAbout.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="IconApp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>IconApp.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="IconAppNotify" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>IconAppNotify.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="IconChangeLog" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>IconChangeLog.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="IconClipExplorer" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>IconClipExplorer.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -275,6 +281,12 @@ SkyeClip allows customization of:\par
   </data>
   <data name="iconLog" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>iconLog.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iconScratchPad" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>iconScratchPad.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iconSettings" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>iconSettings.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageAbout16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageAbout16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

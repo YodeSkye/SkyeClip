@@ -95,6 +95,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         '''</summary>
+        Friend ReadOnly Property IconAbout() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("IconAbout", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
         Friend ReadOnly Property IconApp() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("IconApp", resourceCulture)
@@ -108,6 +118,16 @@ Namespace My.Resources
         Friend ReadOnly Property IconAppNotify() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("IconAppNotify", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property IconChangeLog() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("IconChangeLog", resourceCulture)
                 Return CType(obj,System.Drawing.Icon)
             End Get
         End Property
@@ -138,6 +158,26 @@ Namespace My.Resources
         Friend ReadOnly Property iconLog() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("iconLog", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property iconScratchPad() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("iconScratchPad", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property iconSettings() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("iconSettings", resourceCulture)
                 Return CType(obj,System.Drawing.Icon)
             End Get
         End Property
