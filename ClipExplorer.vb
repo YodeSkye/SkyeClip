@@ -91,6 +91,7 @@ Public Class ClipExplorer
         Dim clipId = CInt(row.Cells("Id").Value)
         App.Tray.repo.ToggleFavorite(clipId)
         LoadClips()
+        App.Tray.RefreshMenu()
     End Sub
     Private Sub CMICAClipViewer_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAClipViewer.MouseDown
         App.HideClipViewer()
@@ -106,10 +107,23 @@ Public Class ClipExplorer
         App.ShowScratchPad(clipId)
     End Sub
     Private Sub CMICAOpenSourceApp_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAOpenSourceApp.MouseDown
-
+        If DGV.SelectedRows.Count = 0 Then Return
+        Dim item = DirectCast(sender, ToolStripMenuItem)
+        Dim exePath = TryCast(item.Tag, String)
+        If String.IsNullOrWhiteSpace(exePath) Then Exit Sub
+        Try
+            Process.Start(exePath)
+        Catch
+            App.WriteToLog("Unable to Open the Source Application: " & exePath)
+        End Try
     End Sub
     Private Sub CMICADelete_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICADelete.MouseDown
-
+        If DGV.SelectedRows.Count = 0 Then Return
+        Dim row = DGV.SelectedRows(0)
+        Dim clipId = CInt(row.Cells("Id").Value)
+        App.Tray.repo.DeleteClip(clipId)
+        LoadClips()
+        App.Tray.RefreshMenu()
     End Sub
     Private Sub BtnClearSearch_Click(sender As Object, e As EventArgs) Handles BtnClearSearch.Click
         _searchText = String.Empty
