@@ -410,7 +410,7 @@ Partial Class ClipExplorer
         SizeGripStyle = SizeGripStyle.Show
         StartPosition = FormStartPosition.CenterScreen
         TipClipExplorer.SetText(Me, Nothing)
-        Text = "Clip Explorer"
+        Text = "Explorer"
         StatusStripCE.ResumeLayout(False)
         StatusStripCE.PerformLayout()
         PanelCE.ResumeLayout(False)
