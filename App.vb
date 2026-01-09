@@ -157,15 +157,25 @@ Friend Module App
         Dim vh = FrmClipViewer.Height
 
         ' Always place viewer to the LEFT of the main menu
-        Dim finalX As Integer = menuBounds.Left - vw
+        Dim finalX As Integer
+        If menuBounds = Nothing Then
+            finalX = Cursor.Position.X - vw
+        Else
+            finalX = menuBounds.Left - vw
+        End If
+        ' Clamp horizontally
         If finalX < screenBounds.Left Then
             finalX = screenBounds.Left
         End If
 
         ' Align vertically with the hovered item
-        Dim itemScreen = hovered.GetCurrentParent().PointToScreen(hovered.Bounds.Location)
-        Dim finalY As Integer = itemScreen.Y
-
+        Dim finalY As Integer
+        If hovered Is Nothing Then
+            finalY = Cursor.Position.Y
+        Else
+            Dim itemScreen = hovered.GetCurrentParent().PointToScreen(hovered.Bounds.Location)
+            finalY = itemScreen.Y
+        End If
         ' Clamp vertically
         If finalY + vh > screenBounds.Bottom Then finalY = screenBounds.Bottom - vh
         If finalY < screenBounds.Top Then finalY = screenBounds.Top

@@ -539,14 +539,16 @@ Friend Class ClipRepository
 
                 Case App.TextSearchMode.RichText
                     If f.FormatId = Skye.WinAPI.CF_RTF OrElse f.FormatName.Contains("rtf", StringComparison.OrdinalIgnoreCase) Then
-                        Dim rtf = Encoding.ASCII.GetString(f.DataBytes)
-                        sb.AppendLine(NormalizeRtf(rtf))
+                        Dim rtfString = Encoding.ASCII.GetString(f.DataBytes)
+                        Dim plain = Skye.Common.RTFToPlainText(rtfString)
+                        sb.AppendLine(plain)
                     End If
 
                 Case App.TextSearchMode.HTMLText
                     If f.FormatId = Skye.WinAPI.CF_HTML OrElse f.FormatName.Contains("html", StringComparison.OrdinalIgnoreCase) Then
-                        Dim html = Encoding.UTF8.GetString(f.DataBytes)
-                        Dim plain = ExtractHtmlFragment(html)
+                        Dim htmlString = Encoding.UTF8.GetString(f.DataBytes)
+                        Dim fragment = ClipRepository.ExtractHtmlFragment(htmlString)
+                        Dim plain = Skye.Common.HTMLToPlainText(fragment)
                         sb.AppendLine(plain)
                     End If
 
@@ -563,14 +565,16 @@ Friend Class ClipRepository
 
                     ' RTF
                     If f.FormatId = Skye.WinAPI.CF_RTF OrElse f.FormatName.Contains("rtf", StringComparison.OrdinalIgnoreCase) Then
-                        Dim rtf = Encoding.ASCII.GetString(f.DataBytes)
-                        sb.AppendLine(NormalizeRtf(rtf))
+                        Dim rtfString = Encoding.ASCII.GetString(f.DataBytes)
+                        Dim plain = Skye.Common.RTFToPlainText(rtfString)
+                        sb.AppendLine(plain)
                     End If
 
                     ' HTML
                     If f.FormatId = Skye.WinAPI.CF_HTML OrElse f.FormatName.Contains("html", StringComparison.OrdinalIgnoreCase) Then
-                        Dim html = Encoding.UTF8.GetString(f.DataBytes)
-                        Dim plain = ExtractHtmlFragment(html)
+                        Dim htmlString = Encoding.UTF8.GetString(f.DataBytes)
+                        Dim fragment = ClipRepository.ExtractHtmlFragment(htmlString)
+                        Dim plain = Skye.Common.HTMLToPlainText(fragment)
                         sb.AppendLine(plain)
                     End If
 

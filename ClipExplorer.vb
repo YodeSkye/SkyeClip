@@ -12,6 +12,11 @@ Public Class ClipExplorer
     Private _searchDays As Integer = 0 ' 0 means all days
     Private _searchMode As App.TextSearchMode
     Private _searchCache As New Dictionary(Of Integer, String)
+    Private Class ClipLoadResult
+        Public Property Rows As List(Of Object())
+        Public Property TotalCount As Integer
+        Public Property FilteredCount As Integer
+    End Class
 
     ' Form Events
     Private Sub ClipExplorer_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -88,10 +93,17 @@ Public Class ClipExplorer
         LoadClips()
     End Sub
     Private Sub CMICAClipViewer_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAClipViewer.MouseDown
-
+        App.HideClipViewer()
+        If DGV.SelectedRows.Count = 0 Then Return
+        Dim row = DGV.SelectedRows(0)
+        Dim clipId = CInt(row.Cells("Id").Value)
+        App.ShowClipViewer(clipId, Nothing, Nothing, True)
     End Sub
     Private Sub CMICAScratchPad_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAScratchPad.MouseDown
-
+        If DGV.SelectedRows.Count = 0 Then Return
+        Dim row = DGV.SelectedRows(0)
+        Dim clipId = CInt(row.Cells("Id").Value)
+        App.ShowScratchPad(clipId)
     End Sub
     Private Sub CMICAOpenSourceApp_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAOpenSourceApp.MouseDown
 
@@ -151,19 +163,34 @@ Public Class ClipExplorer
     End Sub
 
     ' Methods
-    Private Sub LoadClips()
+    Private Async Sub LoadClips()
+        TSSLabelStatus.Text = "Working..."
+        TSSLabelStatus.ForeColor = Color.Red
+        StatusStripCE.Refresh()
+
+        Dim result = Await Task.Run(Function() BuildClipList())
+
         DGV.Rows.Clear()
+        For Each r In result.Rows
+            DGV.Rows.Add(r)
+        Next
+
+        TSSLabelStatus.Text = $"Showing {result.FilteredCount} of {result.TotalCount} Clips"
+        TSSLabelStatus.ResetForeColor()
+    End Sub
+    Private Function BuildClipList() As ClipLoadResult
+        Dim result As New ClipLoadResult()
+        Dim rows As New List(Of Object())()
 
         Dim allClips = App.Tray.repo.GetAllClips()
+        result.TotalCount = allClips.Count
 
         Dim filtered = allClips
 
-        ' Apply favorites filter
         If _searchFavoritesOnly Then
             filtered = filtered.Where(Function(c) c.IsFavorite).ToList()
         End If
 
-        ' Days filter
         If _searchDays > 0 Then
             Dim cutoff = DateTime.UtcNow.AddDays(-_searchDays)
             filtered = filtered.Where(Function(c) c.CreatedAt >= cutoff).ToList()
@@ -176,7 +203,9 @@ Public Class ClipExplorer
                                       End Function).ToList()
         End If
 
+        result.FilteredCount = filtered.Count
 
+        ' Build rows
         For Each c In filtered
             Dim iconImg As Image = Nothing
             If c.SourceAppIcon IsNot Nothing AndAlso c.SourceAppIcon.Length > 0 Then
@@ -185,19 +214,20 @@ Public Class ClipExplorer
                 End Using
             End If
 
-            DGV.Rows.Add(
-                c.Id,
-                c.Preview,
-                c.CreatedAt.ToString("g"),
-                c.LastUsedAt.ToString("g"),
-                c.SourceAppName,
-                iconImg,
-                c.IsFavorite
-            )
+            rows.Add({
+            c.Id,
+            c.Preview,
+            c.CreatedAt.ToString("g"),
+            c.LastUsedAt.ToString("g"),
+            c.SourceAppName,
+            iconImg,
+            c.IsFavorite
+        })
         Next
 
-        TSSLabelCount.Text = $"Showing {filtered.Count} of {allClips.Count} Clips"
-    End Sub
+        result.Rows = rows
+        Return result
+    End Function
     Private Function BuildPreviewText(formats As List(Of ClipData)) As String
         ' 1) Unicode text
         Dim uni = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_UNICODETEXT)

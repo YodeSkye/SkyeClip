@@ -25,7 +25,7 @@ Partial Class ClipExplorer
         components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ClipExplorer))
         StatusStripCE = New StatusStrip()
-        TSSLabelCount = New ToolStripStatusLabel()
+        TSSLabelStatus = New ToolStripStatusLabel()
         PanelCE = New Panel()
         GrpBoxSearch = New GroupBox()
         RadBtnHTML = New RadioButton()
@@ -71,18 +71,18 @@ Partial Class ClipExplorer
         ' StatusStripCE
         ' 
         TipClipExplorer.SetImage(StatusStripCE, Nothing)
-        StatusStripCE.Items.AddRange(New ToolStripItem() {TSSLabelCount})
+        StatusStripCE.Items.AddRange(New ToolStripItem() {TSSLabelStatus})
         StatusStripCE.Location = New Point(0, 428)
         StatusStripCE.Name = "StatusStripCE"
         StatusStripCE.Size = New Size(800, 22)
         StatusStripCE.TabIndex = 0
         TipClipExplorer.SetText(StatusStripCE, Nothing)
         ' 
-        ' TSSLabelCount
+        ' TSSLabelStatus
         ' 
-        TSSLabelCount.Name = "TSSLabelCount"
-        TSSLabelCount.Size = New Size(113, 17)
-        TSSLabelCount.Text = "Showing x of y Clips"
+        TSSLabelStatus.Name = "TSSLabelStatus"
+        TSSLabelStatus.Size = New Size(113, 17)
+        TSSLabelStatus.Text = "Showing x of y Clips"
         ' 
         ' PanelCE
         ' 
@@ -126,7 +126,7 @@ Partial Class ClipExplorer
         RadBtnHTML.Size = New Size(69, 25)
         RadBtnHTML.TabIndex = 8
         RadBtnHTML.TabStop = True
-        TipClipExplorer.SetText(RadBtnHTML, Nothing)
+        TipClipExplorer.SetText(RadBtnHTML, "Search Only HTML Text.")
         RadBtnHTML.Text = "HTML"
         RadBtnHTML.UseVisualStyleBackColor = True
         ' 
@@ -139,7 +139,7 @@ Partial Class ClipExplorer
         RadBtnPlainText.Size = New Size(92, 25)
         RadBtnPlainText.TabIndex = 6
         RadBtnPlainText.TabStop = True
-        TipClipExplorer.SetText(RadBtnPlainText, Nothing)
+        TipClipExplorer.SetText(RadBtnPlainText, "Search Only Plain Text.")
         RadBtnPlainText.Text = "Plain Text"
         RadBtnPlainText.UseVisualStyleBackColor = True
         ' 
@@ -152,7 +152,7 @@ Partial Class ClipExplorer
         RadBtnAllText.Size = New Size(76, 25)
         RadBtnAllText.TabIndex = 9
         RadBtnAllText.TabStop = True
-        TipClipExplorer.SetText(RadBtnAllText, Nothing)
+        TipClipExplorer.SetText(RadBtnAllText, "Search All Text Formats.")
         RadBtnAllText.Text = "All Text"
         RadBtnAllText.UseVisualStyleBackColor = True
         ' 
@@ -165,7 +165,7 @@ Partial Class ClipExplorer
         RadBtnRTF.Size = New Size(53, 25)
         RadBtnRTF.TabIndex = 7
         RadBtnRTF.TabStop = True
-        TipClipExplorer.SetText(RadBtnRTF, Nothing)
+        TipClipExplorer.SetText(RadBtnRTF, "Search Only RTF Text.")
         RadBtnRTF.Text = "RTF"
         RadBtnRTF.UseVisualStyleBackColor = True
         ' 
@@ -254,8 +254,8 @@ Partial Class ClipExplorer
         ' 
         ' DGV
         ' 
-        DGV.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells
-        DGV.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
+        DGV.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells
+        DGV.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells
         DGV.BorderStyle = BorderStyle.None
         DGV.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
         DGV.Columns.AddRange(New DataGridViewColumn() {ID, Preview, CreatedDate, LastUsedDate, SourceApp, SourceAppImage, Favorite})
@@ -263,7 +263,9 @@ Partial Class ClipExplorer
         DGV.Dock = DockStyle.Fill
         TipClipExplorer.SetImage(DGV, Nothing)
         DGV.Location = New Point(0, 0)
+        DGV.MultiSelect = False
         DGV.Name = "DGV"
+        DGV.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         DGV.Size = New Size(506, 373)
         DGV.TabIndex = 0
         TipClipExplorer.SetText(DGV, Nothing)
@@ -440,7 +442,7 @@ Partial Class ClipExplorer
     Friend WithEvents RadBtnPlainText As RadioButton
     Friend WithEvents CMTxtBox As Skye.UI.TextBoxContextMenu
     Friend WithEvents DGV As DataGridView
-    Friend WithEvents TSSLabelCount As ToolStripStatusLabel
+    Friend WithEvents TSSLabelStatus As ToolStripStatusLabel
     Friend WithEvents RTB As Skye.UI.RichTextBox
     Friend WithEvents ID As DataGridViewTextBoxColumn
     Friend WithEvents Preview As DataGridViewTextBoxColumn
