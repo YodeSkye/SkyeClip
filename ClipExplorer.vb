@@ -1,4 +1,5 @@
 ﻿
+Imports System.ComponentModel
 Imports System.IO
 Imports System.Text
 Imports SkyeClip.ClipRepository
@@ -16,6 +17,7 @@ Public Class ClipExplorer
     Private Sub ClipExplorer_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = App.GetAppTitle() & " " & Text
         RadBtnPlainText.Checked = True
+        CMClipActions.Font = App.MenuFont
         LoadClips()
     End Sub
 
@@ -33,6 +35,69 @@ Public Class ClipExplorer
         Dim preview = BuildPreviewText(formats)
 
         RTB.Text = preview
+    End Sub
+    Private Sub DGV_CellMouseDown(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DGV.CellMouseDown
+        If e.Button = MouseButtons.Right AndAlso e.RowIndex >= 0 Then
+            DGV.ClearSelection()
+            DGV.Rows(e.RowIndex).Selected = True
+        End If
+    End Sub
+    Private Sub CMClipActions_Opening(sender As Object, e As CancelEventArgs) Handles CMClipActions.Opening
+        If DGV.SelectedRows.Count = 0 Then
+            e.Cancel = True
+            Return
+        End If
+
+        Dim row = DGV.SelectedRows(0)
+        Dim clipId = CInt(row.Cells("Id").Value)
+        Dim clip = App.Tray.repo.GetClipById(clipId)
+
+        ' --- Favorite toggle ---
+        CMICAFavorite.Checked = clip.IsFavorite
+        CMICAFavorite.Text = If(clip.IsFavorite, "Unfavorite", "Favorite")
+
+        ' --- Open Source App ---
+        If App.Settings.ShowOpenSourceApp Then
+            CMICAOpenSourceApp.Visible = True
+            If App.IsLegitimateSourceApp(clip.SourceAppPath) Then
+                CMICAOpenSourceApp.Enabled = True
+                Using ms As New MemoryStream(clip.SourceAppIcon)
+                    CMICAOpenSourceApp.Image = Image.FromStream(ms)
+                End Using
+                CMICAOpenSourceApp.Tag = clip.SourceAppPath
+            Else
+                CMICAOpenSourceApp.Enabled = False
+                CMICAOpenSourceApp.Image = Nothing
+            End If
+        Else
+            CMICAOpenSourceApp.Visible = False
+        End If
+    End Sub
+    Private Sub CMICAUseClip_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAUseClip.MouseDown
+        If DGV.SelectedRows.Count = 0 Then Return
+        Dim row = DGV.SelectedRows(0)
+        Dim clipId = CInt(row.Cells("Id").Value)
+        App.Tray.repo.RestoreClip(clipId)
+        LoadClips()
+    End Sub
+    Private Sub CMICAFavorite_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAFavorite.MouseDown
+        If DGV.SelectedRows.Count = 0 Then Return
+        Dim row = DGV.SelectedRows(0)
+        Dim clipId = CInt(row.Cells("Id").Value)
+        App.Tray.repo.ToggleFavorite(clipId)
+        LoadClips()
+    End Sub
+    Private Sub CMICAClipViewer_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAClipViewer.MouseDown
+
+    End Sub
+    Private Sub CMICAScratchPad_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAScratchPad.MouseDown
+
+    End Sub
+    Private Sub CMICAOpenSourceApp_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAOpenSourceApp.MouseDown
+
+    End Sub
+    Private Sub CMICADelete_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICADelete.MouseDown
+
     End Sub
     Private Sub BtnClearSearch_Click(sender As Object, e As EventArgs) Handles BtnClearSearch.Click
         _searchText = String.Empty

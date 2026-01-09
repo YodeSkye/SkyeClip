@@ -97,6 +97,7 @@ Friend Class TrayAppContext
         AddHandler blinkTimer.Tick, AddressOf BlinkTimer_Tick
 
         ' Clip Context Menu
+        ClipCM.Font = App.MenuFont
         Dim cmi As ToolStripMenuItem
         cmi = New ToolStripMenuItem("Preview", My.Resources.IconApp.ToBitmap, AddressOf OnClipCMPreviewClick) With {.Name = "Preview"}
         ClipCM.Items.Add(cmi)

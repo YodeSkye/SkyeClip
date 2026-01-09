@@ -2,7 +2,7 @@
 Public Class MenuBuilder
 
     Friend Shared Function BuildMenu(repo As ClipRepository, commonActions As List(Of App.CommonAction), clipClickHandler As MouseEventHandler, menuKeyHandler As KeyEventHandler) As ContextMenuStrip
-        Dim menu As New ContextMenuStrip With {.Font = New Font(SystemFonts.MenuFont.FontFamily, 10)}
+        Dim menu As New ContextMenuStrip With {.Font = App.MenuFont}
 
         ' ============================================================
         ' --- LIVE CLIPBOARD ITEM (always first) ---

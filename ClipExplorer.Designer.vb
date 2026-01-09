@@ -39,8 +39,6 @@ Partial Class ClipExplorer
         TxtBoxSearch = New TextBox()
         SplitContainerCE = New SplitContainer()
         DGV = New DataGridView()
-        RTB = New Skye.UI.RichTextBox()
-        TipClipExplorer = New Skye.UI.ToolTipEX(components)
         ID = New DataGridViewTextBoxColumn()
         Preview = New DataGridViewTextBoxColumn()
         CreatedDate = New DataGridViewTextBoxColumn()
@@ -48,6 +46,17 @@ Partial Class ClipExplorer
         SourceApp = New DataGridViewTextBoxColumn()
         SourceAppImage = New DataGridViewImageColumn()
         Favorite = New DataGridViewCheckBoxColumn()
+        CMClipActions = New ContextMenuStrip(components)
+        CMICAUseClip = New ToolStripMenuItem()
+        ToolStripSeparator1 = New ToolStripSeparator()
+        CMICAFavorite = New ToolStripMenuItem()
+        CMICAClipViewer = New ToolStripMenuItem()
+        CMICAScratchPad = New ToolStripMenuItem()
+        CMICAOpenSourceApp = New ToolStripMenuItem()
+        ToolStripSeparator2 = New ToolStripSeparator()
+        CMICADelete = New ToolStripMenuItem()
+        RTB = New Skye.UI.RichTextBox()
+        TipClipExplorer = New Skye.UI.ToolTipEX(components)
         StatusStripCE.SuspendLayout()
         PanelCE.SuspendLayout()
         GrpBoxSearch.SuspendLayout()
@@ -56,6 +65,7 @@ Partial Class ClipExplorer
         SplitContainerCE.Panel2.SuspendLayout()
         SplitContainerCE.SuspendLayout()
         CType(DGV, ComponentModel.ISupportInitialize).BeginInit()
+        CMClipActions.SuspendLayout()
         SuspendLayout()
         ' 
         ' StatusStripCE
@@ -175,10 +185,10 @@ Partial Class ClipExplorer
         ' 
         ' CMTxtBox
         ' 
-        CMTxtBox.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        CMTxtBox.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.SetImage(CMTxtBox, Nothing)
         CMTxtBox.Name = "CMTxtBox"
-        CMTxtBox.Size = New Size(165, 204)
+        CMTxtBox.Size = New Size(149, 176)
         TipClipExplorer.SetText(CMTxtBox, Nothing)
         ' 
         ' ChkBoxFavorites
@@ -249,6 +259,7 @@ Partial Class ClipExplorer
         DGV.BorderStyle = BorderStyle.None
         DGV.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
         DGV.Columns.AddRange(New DataGridViewColumn() {ID, Preview, CreatedDate, LastUsedDate, SourceApp, SourceAppImage, Favorite})
+        DGV.ContextMenuStrip = CMClipActions
         DGV.Dock = DockStyle.Fill
         TipClipExplorer.SetImage(DGV, Nothing)
         DGV.Location = New Point(0, 0)
@@ -256,24 +267,6 @@ Partial Class ClipExplorer
         DGV.Size = New Size(506, 373)
         DGV.TabIndex = 0
         TipClipExplorer.SetText(DGV, Nothing)
-        ' 
-        ' RTB
-        ' 
-        RTB.BorderStyle = BorderStyle.None
-        RTB.Dock = DockStyle.Fill
-        RTB.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipClipExplorer.SetImage(RTB, Nothing)
-        RTB.Location = New Point(0, 0)
-        RTB.Name = "RTB"
-        RTB.ReadOnly = True
-        RTB.Size = New Size(290, 373)
-        RTB.TabIndex = 0
-        RTB.Text = ""
-        TipClipExplorer.SetText(RTB, Nothing)
-        ' 
-        ' TipClipExplorer
-        ' 
-        TipClipExplorer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         ' 
         ' ID
         ' 
@@ -323,6 +316,84 @@ Partial Class ClipExplorer
         Favorite.ReadOnly = True
         Favorite.Width = 31
         ' 
+        ' CMClipActions
+        ' 
+        CMClipActions.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipClipExplorer.SetImage(CMClipActions, Nothing)
+        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
+        CMClipActions.Name = "CMClipActions"
+        CMClipActions.Size = New Size(196, 148)
+        TipClipExplorer.SetText(CMClipActions, Nothing)
+        ' 
+        ' CMICAUseClip
+        ' 
+        CMICAUseClip.Image = My.Resources.Resources.ImageApp16
+        CMICAUseClip.Name = "CMICAUseClip"
+        CMICAUseClip.Size = New Size(195, 22)
+        CMICAUseClip.Text = "Use Clip"
+        ' 
+        ' ToolStripSeparator1
+        ' 
+        ToolStripSeparator1.Name = "ToolStripSeparator1"
+        ToolStripSeparator1.Size = New Size(192, 6)
+        ' 
+        ' CMICAFavorite
+        ' 
+        CMICAFavorite.Image = My.Resources.Resources.ImageFavorites16
+        CMICAFavorite.Name = "CMICAFavorite"
+        CMICAFavorite.Size = New Size(195, 22)
+        CMICAFavorite.Text = "Favorite"
+        ' 
+        ' CMICAClipViewer
+        ' 
+        CMICAClipViewer.Image = My.Resources.Resources.imageClipViewer16
+        CMICAClipViewer.Name = "CMICAClipViewer"
+        CMICAClipViewer.Size = New Size(195, 22)
+        CMICAClipViewer.Text = "Clip Viewer"
+        ' 
+        ' CMICAScratchPad
+        ' 
+        CMICAScratchPad.Image = My.Resources.Resources.imageScratchPad16
+        CMICAScratchPad.Name = "CMICAScratchPad"
+        CMICAScratchPad.Size = New Size(195, 22)
+        CMICAScratchPad.Text = "Send To Scratch Pad"
+        ' 
+        ' CMICAOpenSourceApp
+        ' 
+        CMICAOpenSourceApp.Name = "CMICAOpenSourceApp"
+        CMICAOpenSourceApp.Size = New Size(195, 22)
+        CMICAOpenSourceApp.Text = "Open Source App"
+        ' 
+        ' ToolStripSeparator2
+        ' 
+        ToolStripSeparator2.Name = "ToolStripSeparator2"
+        ToolStripSeparator2.Size = New Size(192, 6)
+        ' 
+        ' CMICADelete
+        ' 
+        CMICADelete.Image = My.Resources.Resources.ImageClearRemoveDelete16
+        CMICADelete.Name = "CMICADelete"
+        CMICADelete.Size = New Size(195, 22)
+        CMICADelete.Text = "Delete"
+        ' 
+        ' RTB
+        ' 
+        RTB.BorderStyle = BorderStyle.None
+        RTB.Dock = DockStyle.Fill
+        RTB.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipClipExplorer.SetImage(RTB, Nothing)
+        RTB.Location = New Point(0, 0)
+        RTB.Name = "RTB"
+        RTB.ReadOnly = True
+        RTB.Size = New Size(290, 373)
+        RTB.TabIndex = 0
+        RTB.Text = ""
+        TipClipExplorer.SetText(RTB, Nothing)
+        ' 
+        ' TipClipExplorer
+        ' 
+        TipClipExplorer.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        ' 
         ' ClipExplorer
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
@@ -349,6 +420,7 @@ Partial Class ClipExplorer
         CType(SplitContainerCE, ComponentModel.ISupportInitialize).EndInit()
         SplitContainerCE.ResumeLayout(False)
         CType(DGV, ComponentModel.ISupportInitialize).EndInit()
+        CMClipActions.ResumeLayout(False)
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -377,4 +449,13 @@ Partial Class ClipExplorer
     Friend WithEvents SourceApp As DataGridViewTextBoxColumn
     Friend WithEvents SourceAppImage As DataGridViewImageColumn
     Friend WithEvents Favorite As DataGridViewCheckBoxColumn
+    Friend WithEvents CMClipActions As ContextMenuStrip
+    Friend WithEvents CMICAUseClip As ToolStripMenuItem
+    Friend WithEvents CMICAFavorite As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
+    Friend WithEvents CMICAClipViewer As ToolStripMenuItem
+    Friend WithEvents CMICAScratchPad As ToolStripMenuItem
+    Friend WithEvents CMICAOpenSourceApp As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
+    Friend WithEvents CMICADelete As ToolStripMenuItem
 End Class
