@@ -82,6 +82,7 @@ Public Class MenuBuilder
 
         Dim favDropDown As New ContextMenuStrip With {
             .Name = "FavoritesDropDown"}
+        favDropDown.Renderer = New Skye.UI.SkyeMenuRenderer
         AddHandler favDropDown.KeyDown, menuKeyHandler
 
         For Each fav In favorites

@@ -1,5 +1,6 @@
 ﻿
 Imports System.IO
+Imports Skye.UI
 
 Friend Class TrayAppContext
     Inherits ApplicationContext
@@ -337,10 +338,15 @@ Friend Class TrayAppContext
             StopBlink()
         End If
     End Sub
+    Friend Sub OnThemeChanged(sender As Object, e As EventArgs)
+        Skye.UI.ThemeManager.ApplyThemeToAllOpenForms()
+        'Skye.UI.ThemeManager.ApplyToMenu(App.CMTray)
+    End Sub
 
     ' Methods
     Private Sub BuildMenu()
         App.CMTray = MenuBuilder.BuildMenu(repo, commonActions, AddressOf OnClipSelected, AddressOf OnMenuKeyDown)
+        App.CMTray.Renderer = New Skye.UI.SkyeMenuRenderer
         NIClipboard.ContextMenuStrip = App.CMTray
         AddHandler NIClipboard.ContextMenuStrip.KeyDown, AddressOf OnMenuKeyDown
         AddHandler NIClipboard.ContextMenuStrip.Closing, AddressOf OnMenuClosing

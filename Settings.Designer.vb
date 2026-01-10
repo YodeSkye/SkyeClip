@@ -49,6 +49,9 @@ Partial Class Settings
         LblHotKeyShowScratchPad = New Label()
         ChkBoxPlaySoundWithNotify = New CheckBox()
         ChkBoxAutoStartWithWindows = New CheckBox()
+        CoBoxTheme = New ComboBox()
+        ChkBoxThemeAuto = New CheckBox()
+        LblTheme = New Label()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -119,7 +122,8 @@ Partial Class Settings
         ' 
         ' TipSettings
         ' 
-        TipSettings.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipSettings.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipSettings.ShadowThickness = 0
         ' 
         ' ChkBoxBlinkOnNewClip
         ' 
@@ -151,7 +155,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyToggleFavorite.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyToggleFavorite, My.Resources.Resources.ImageFavorites16)
-        TxtBoxHotKeyToggleFavorite.Location = New Point(171, 234)
+        TxtBoxHotKeyToggleFavorite.Location = New Point(12, 211)
         TxtBoxHotKeyToggleFavorite.Name = "TxtBoxHotKeyToggleFavorite"
         TxtBoxHotKeyToggleFavorite.ReadOnly = True
         TxtBoxHotKeyToggleFavorite.ShortcutsEnabled = False
@@ -163,7 +167,7 @@ Partial Class Settings
         ' LblHotKeyToggleFavorite
         ' 
         TipSettings.SetImage(LblHotKeyToggleFavorite, Nothing)
-        LblHotKeyToggleFavorite.Location = New Point(169, 213)
+        LblHotKeyToggleFavorite.Location = New Point(10, 190)
         LblHotKeyToggleFavorite.Name = "LblHotKeyToggleFavorite"
         LblHotKeyToggleFavorite.Size = New Size(146, 24)
         LblHotKeyToggleFavorite.TabIndex = 7
@@ -175,7 +179,7 @@ Partial Class Settings
         ' 
         LblHotKeys.Font = New Font("Segoe UI", 12F, FontStyle.Underline, GraphicsUnit.Point, CByte(0))
         TipSettings.SetImage(LblHotKeys, Nothing)
-        LblHotKeys.Location = New Point(171, 189)
+        LblHotKeys.Location = New Point(12, 166)
         LblHotKeys.Name = "LblHotKeys"
         LblHotKeys.Size = New Size(144, 24)
         LblHotKeys.TabIndex = 9
@@ -187,7 +191,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyShowViewer.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyShowViewer, My.Resources.Resources.imageClipViewer16)
-        TxtBoxHotKeyShowViewer.Location = New Point(171, 287)
+        TxtBoxHotKeyShowViewer.Location = New Point(12, 264)
         TxtBoxHotKeyShowViewer.Name = "TxtBoxHotKeyShowViewer"
         TxtBoxHotKeyShowViewer.ReadOnly = True
         TxtBoxHotKeyShowViewer.ShortcutsEnabled = False
@@ -199,7 +203,7 @@ Partial Class Settings
         ' LblHotKeyShowViewer
         ' 
         TipSettings.SetImage(LblHotKeyShowViewer, Nothing)
-        LblHotKeyShowViewer.Location = New Point(169, 266)
+        LblHotKeyShowViewer.Location = New Point(10, 243)
         LblHotKeyShowViewer.Name = "LblHotKeyShowViewer"
         LblHotKeyShowViewer.Size = New Size(146, 24)
         LblHotKeyShowViewer.TabIndex = 10
@@ -294,7 +298,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyShowScratchPad.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyShowScratchPad, My.Resources.Resources.imageScratchPad16)
-        TxtBoxHotKeyShowScratchPad.Location = New Point(171, 340)
+        TxtBoxHotKeyShowScratchPad.Location = New Point(12, 317)
         TxtBoxHotKeyShowScratchPad.Name = "TxtBoxHotKeyShowScratchPad"
         TxtBoxHotKeyShowScratchPad.ReadOnly = True
         TxtBoxHotKeyShowScratchPad.ShortcutsEnabled = False
@@ -306,7 +310,7 @@ Partial Class Settings
         ' LblHotKeyShowScratchPad
         ' 
         TipSettings.SetImage(LblHotKeyShowScratchPad, Nothing)
-        LblHotKeyShowScratchPad.Location = New Point(169, 319)
+        LblHotKeyShowScratchPad.Location = New Point(10, 296)
         LblHotKeyShowScratchPad.Name = "LblHotKeyShowScratchPad"
         LblHotKeyShowScratchPad.Size = New Size(146, 24)
         LblHotKeyShowScratchPad.TabIndex = 1101
@@ -340,11 +344,45 @@ Partial Class Settings
         ChkBoxAutoStartWithWindows.Text = "Auto-Start With Windows"
         ChkBoxAutoStartWithWindows.UseVisualStyleBackColor = True
         ' 
+        ' CoBoxTheme
+        ' 
+        CoBoxTheme.FormattingEnabled = True
+        TipSettings.SetImage(CoBoxTheme, Nothing)
+        CoBoxTheme.Location = New Point(256, 238)
+        CoBoxTheme.Name = "CoBoxTheme"
+        CoBoxTheme.Size = New Size(216, 29)
+        CoBoxTheme.TabIndex = 1102
+        TipSettings.SetText(CoBoxTheme, "Select a Theme.")
+        ' 
+        ' ChkBoxThemeAuto
+        ' 
+        ChkBoxThemeAuto.AutoSize = True
+        TipSettings.SetImage(ChkBoxThemeAuto, Nothing)
+        ChkBoxThemeAuto.Location = New Point(256, 265)
+        ChkBoxThemeAuto.Name = "ChkBoxThemeAuto"
+        ChkBoxThemeAuto.Size = New Size(205, 25)
+        ChkBoxThemeAuto.TabIndex = 1103
+        TipSettings.SetText(ChkBoxThemeAuto, "Automatically set the theme to match current windows settings.")
+        ChkBoxThemeAuto.Text = "Auto Sync With Windows"
+        ChkBoxThemeAuto.UseVisualStyleBackColor = True
+        ' 
+        ' LblTheme
+        ' 
+        LblTheme.AutoSize = True
+        TipSettings.SetImage(LblTheme, Nothing)
+        LblTheme.Location = New Point(256, 217)
+        LblTheme.Name = "LblTheme"
+        LblTheme.Size = New Size(57, 21)
+        LblTheme.TabIndex = 1104
+        LblTheme.Text = "Theme"
+        TipSettings.SetText(LblTheme, Nothing)
+        ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(484, 546)
+        Controls.Add(CoBoxTheme)
         Controls.Add(ChkBoxAutoStartWithWindows)
         Controls.Add(ChkBoxPlaySoundWithNotify)
         Controls.Add(TxtBoxHotKeyShowScratchPad)
@@ -368,6 +406,8 @@ Partial Class Settings
         Controls.Add(TxtBoxMaxClips)
         Controls.Add(BtnOK)
         Controls.Add(LblMaxClips)
+        Controls.Add(ChkBoxThemeAuto)
+        Controls.Add(LblTheme)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         FormBorderStyle = FormBorderStyle.FixedDialog
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
@@ -407,4 +447,7 @@ Partial Class Settings
     Friend WithEvents LblHotKeyShowScratchPad As Label
     Friend WithEvents ChkBoxPlaySoundWithNotify As CheckBox
     Friend WithEvents ChkBoxAutoStartWithWindows As CheckBox
+    Friend WithEvents CoBoxTheme As ComboBox
+    Friend WithEvents ChkBoxThemeAuto As CheckBox
+    Friend WithEvents LblTheme As Label
 End Class

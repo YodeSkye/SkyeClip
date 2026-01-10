@@ -1,4 +1,6 @@
 ﻿
+Imports Skye.UI
+
 Public Class Settings
 
     ' Declarations
@@ -7,9 +9,18 @@ Public Class Settings
 
     ' Form Events
     Private Sub Settings_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Skye.UI.ThemeManager.ApplyTheme(Me)
+        Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
+        AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
         Text = "Settings for " & GetAppTitle()
 
         'Settings
+        CoBoxTheme.Items.Clear()
+        For Each theme In SkyeThemes.AllThemes
+            CoBoxTheme.Items.Add(theme.Name)
+        Next
+        CoBoxTheme.SelectedItem = App.Settings.ThemeName
+        ChkBoxThemeAuto.Checked = App.Settings.ThemeAuto
         ChkBoxAutoStartWithWindows.Checked = App.Settings.AutoStartWithWindows
         TxtBoxMaxClips.Text = App.Settings.MaxClips.ToString
         TxtBoxMaxClipPreviewLength.Text = App.Settings.MaxClipPreviewLength.ToString
@@ -58,6 +69,11 @@ Public Class Settings
     End Sub
     Private Sub Settings_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyData = Keys.Escape Then Close()
+    End Sub
+
+    ' Handlers
+    Private Sub OnThemeChanged()
+        Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
     End Sub
 
     ' Control Events
@@ -215,4 +231,28 @@ Public Class Settings
         End If
     End Sub
 
+    Private Sub ChkBoxThemeAuto_Click(sender As Object, e As EventArgs) Handles ChkBoxThemeAuto.Click
+        'App.Settings.FollowWindowsTheme = chkFollowWindows.Checked
+        'App.Settings.Save()
+
+        'If chkFollowWindows.Checked Then
+        '    ' Immediately sync to Windows theme
+        '    Dim isDark = DetectWindowsDarkMode()
+        '    Dim themeName = If(isDark, "Dark", "Light")
+
+        '    App.Settings.ThemeName = themeName
+        '    App.Settings.Save()
+
+        '    ThemeManager.SetTheme(SkyeThemes.GetTheme(themeName))
+        'End If
+    End Sub
+
+    Private Sub CoBoxTheme_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxTheme.SelectedIndexChanged
+        Dim selected = CoBoxTheme.SelectedItem.ToString()
+        App.Settings.ThemeName = selected
+        If Not ChkBoxThemeAuto.Checked Then
+            Skye.UI.ThemeManager.SetTheme(SkyeThemes.GetTheme(selected))
+            Skye.UI.ThemeManager.ApplyThemeToAllOpenForms()
+        End If
+    End Sub
 End Class

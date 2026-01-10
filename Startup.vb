@@ -1,5 +1,6 @@
 ﻿
 Imports System.Threading
+Imports Skye.UI
 
 Module Startup
 
@@ -21,6 +22,9 @@ Module Startup
         ' Initialize the application
         App.WriteToLog(GetAssemblyName() & " Started...")
         App.Settings.Load()
+        ' Get Theme
+        App.Settings.ThemeName = "Dark" 'Temporary force Dark theme
+        Skye.UI.ThemeManager.CurrentTheme = Skye.UI.SkyeThemes.GetTheme(App.Settings.ThemeName)
         ' Check autostart setting
         Dim autostart As Boolean = App.IsAutoStartEnabled
         If autostart <> App.Settings.AutoStartWithWindows Then
@@ -38,6 +42,7 @@ Module Startup
         Application.EnableVisualStyles()
         Application.SetCompatibleTextRenderingDefault(False)
         App.Tray = New TrayAppContext()
+        AddHandler Skye.UI.ThemeManager.ThemeChanged, AddressOf App.Tray.OnThemeChanged
         Application.Run(App.Tray)
 
         ' Application is closing

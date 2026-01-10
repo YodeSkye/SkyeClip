@@ -49,6 +49,8 @@ Friend Module App
 
     ' Settings
     Friend Class Settings
+        Friend Shared ThemeName As String ' the name of the current theme
+        Friend Shared ThemeAuto As Boolean ' whether to auto-switch theme based on system settings
         Friend Shared AutoStartWithWindows As Boolean ' whether to auto-start with Windows
         Friend Shared MaxClips As Integer ' maximum number of clipboard entries to show
         Friend Shared MaxClipPreviewLength As Integer ' in characters
@@ -71,6 +73,8 @@ Friend Module App
 
         Friend Shared Sub Load()
             Dim starttime As TimeSpan = DateTime.Now.TimeOfDay
+            ThemeName = RegistryHelper.GetString("ThemeName", "Dark")
+            ThemeAuto = RegistryHelper.GetBool("ThemeAuto", False)
             ChangeLogLastVersionShown = RegistryHelper.GetString("ChangeLogLastVersionShown", String.Empty)
             AutoStartWithWindows = RegistryHelper.GetBool("AutoStartWithWindows", False)
             MaxClips = RegistryHelper.GetInt("MaxClips", 30)
@@ -96,6 +100,8 @@ Friend Module App
         End Sub
         Friend Shared Sub Save()
             Dim starttime As TimeSpan = DateTime.Now.TimeOfDay
+            RegistryHelper.SetString("ThemeName", ThemeName)
+            RegistryHelper.SetBool("ThemeAuto", ThemeAuto)
             RegistryHelper.SetString("ChangeLogLastVersionShown", ChangeLogLastVersionShown)
             RegistryHelper.SetBool("AutoStartWithWindows", AutoStartWithWindows)
             RegistryHelper.SetInt("MaxClips", MaxClips)
