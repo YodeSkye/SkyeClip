@@ -249,7 +249,7 @@ Partial Class ClipExplorer
         TipClipExplorer.SetImage(SplitContainerCE.Panel2, Nothing)
         TipClipExplorer.SetText(SplitContainerCE.Panel2, Nothing)
         SplitContainerCE.Size = New Size(800, 369)
-        SplitContainerCE.SplitterDistance = 506
+        SplitContainerCE.SplitterDistance = 556
         SplitContainerCE.TabIndex = 100
         TipClipExplorer.SetText(SplitContainerCE, Nothing)
         ' 
@@ -267,7 +267,7 @@ Partial Class ClipExplorer
         DGV.MultiSelect = False
         DGV.Name = "DGV"
         DGV.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-        DGV.Size = New Size(506, 369)
+        DGV.Size = New Size(556, 369)
         DGV.TabIndex = 0
         TipClipExplorer.SetText(DGV, Nothing)
         ' 
@@ -388,7 +388,7 @@ Partial Class ClipExplorer
         RTB.Location = New Point(0, 0)
         RTB.Name = "RTB"
         RTB.ReadOnly = True
-        RTB.Size = New Size(290, 369)
+        RTB.Size = New Size(240, 369)
         RTB.TabIndex = 0
         RTB.Text = ""
         TipClipExplorer.SetText(RTB, Nothing)
