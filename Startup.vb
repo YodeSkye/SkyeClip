@@ -23,7 +23,11 @@ Module Startup
         App.WriteToLog(GetAssemblyName() & " Started...")
         App.Settings.Load()
         ' Get Theme
-        Skye.UI.ThemeManager.CurrentTheme = Skye.UI.SkyeThemes.GetTheme(App.Settings.ThemeName)
+        If App.Settings.ThemeAuto Then
+            Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
+        Else
+            Skye.UI.ThemeManager.CurrentTheme = Skye.UI.SkyeThemes.GetTheme(App.Settings.ThemeName)
+        End If
         ' Check autostart setting
         Dim autostart As Boolean = App.IsAutoStartEnabled
         If autostart <> App.Settings.AutoStartWithWindows Then
