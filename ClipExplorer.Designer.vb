@@ -70,18 +70,19 @@ Partial Class ClipExplorer
         ' 
         ' StatusStripCE
         ' 
+        StatusStripCE.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.SetImage(StatusStripCE, Nothing)
         StatusStripCE.Items.AddRange(New ToolStripItem() {TSSLabelStatus})
-        StatusStripCE.Location = New Point(0, 428)
+        StatusStripCE.Location = New Point(0, 424)
         StatusStripCE.Name = "StatusStripCE"
-        StatusStripCE.Size = New Size(800, 22)
+        StatusStripCE.Size = New Size(800, 26)
         StatusStripCE.TabIndex = 0
         TipClipExplorer.SetText(StatusStripCE, Nothing)
         ' 
         ' TSSLabelStatus
         ' 
         TSSLabelStatus.Name = "TSSLabelStatus"
-        TSSLabelStatus.Size = New Size(113, 17)
+        TSSLabelStatus.Size = New Size(150, 21)
         TSSLabelStatus.Text = "Showing x of y Clips"
         ' 
         ' PanelCE
@@ -247,7 +248,7 @@ Partial Class ClipExplorer
         SplitContainerCE.Panel2.Controls.Add(RTB)
         TipClipExplorer.SetImage(SplitContainerCE.Panel2, Nothing)
         TipClipExplorer.SetText(SplitContainerCE.Panel2, Nothing)
-        SplitContainerCE.Size = New Size(800, 373)
+        SplitContainerCE.Size = New Size(800, 369)
         SplitContainerCE.SplitterDistance = 506
         SplitContainerCE.TabIndex = 100
         TipClipExplorer.SetText(SplitContainerCE, Nothing)
@@ -266,7 +267,7 @@ Partial Class ClipExplorer
         DGV.MultiSelect = False
         DGV.Name = "DGV"
         DGV.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-        DGV.Size = New Size(506, 373)
+        DGV.Size = New Size(506, 369)
         DGV.TabIndex = 0
         TipClipExplorer.SetText(DGV, Nothing)
         ' 
@@ -274,49 +275,49 @@ Partial Class ClipExplorer
         ' 
         ID.HeaderText = "ID"
         ID.Name = "ID"
-        ID.Width = 43
+        ID.Width = 50
         ' 
         ' Preview
         ' 
         Preview.HeaderText = "Preview"
         Preview.Name = "Preview"
         Preview.ReadOnly = True
-        Preview.Width = 73
+        Preview.Width = 90
         ' 
         ' CreatedDate
         ' 
         CreatedDate.HeaderText = "Created"
         CreatedDate.Name = "CreatedDate"
         CreatedDate.ReadOnly = True
-        CreatedDate.Width = 73
+        CreatedDate.Width = 89
         ' 
         ' LastUsedDate
         ' 
         LastUsedDate.HeaderText = "Last Used"
         LastUsedDate.Name = "LastUsedDate"
         LastUsedDate.ReadOnly = True
-        LastUsedDate.Width = 82
+        LastUsedDate.Width = 102
         ' 
         ' SourceApp
         ' 
         SourceApp.HeaderText = "Source App"
         SourceApp.Name = "SourceApp"
         SourceApp.ReadOnly = True
-        SourceApp.Width = 93
+        SourceApp.Width = 115
         ' 
         ' SourceAppImage
         ' 
         SourceAppImage.HeaderText = "Icon"
         SourceAppImage.Name = "SourceAppImage"
         SourceAppImage.ReadOnly = True
-        SourceAppImage.Width = 36
+        SourceAppImage.Width = 45
         ' 
         ' Favorite
         ' 
         Favorite.HeaderText = "Fav"
         Favorite.Name = "Favorite"
         Favorite.ReadOnly = True
-        Favorite.Width = 31
+        Favorite.Width = 39
         ' 
         ' CMClipActions
         ' 
@@ -387,7 +388,7 @@ Partial Class ClipExplorer
         RTB.Location = New Point(0, 0)
         RTB.Name = "RTB"
         RTB.ReadOnly = True
-        RTB.Size = New Size(290, 373)
+        RTB.Size = New Size(290, 369)
         RTB.TabIndex = 0
         RTB.Text = ""
         TipClipExplorer.SetText(RTB, Nothing)
@@ -395,15 +396,16 @@ Partial Class ClipExplorer
         ' TipClipExplorer
         ' 
         TipClipExplorer.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipClipExplorer.ShadowThickness = 0
         ' 
         ' ClipExplorer
         ' 
-        AutoScaleDimensions = New SizeF(7F, 15F)
-        AutoScaleMode = AutoScaleMode.Font
+        AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(800, 450)
         Controls.Add(SplitContainerCE)
         Controls.Add(PanelCE)
         Controls.Add(StatusStripCE)
+        Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         TipClipExplorer.SetImage(Me, Nothing)
         Name = "ClipExplorer"

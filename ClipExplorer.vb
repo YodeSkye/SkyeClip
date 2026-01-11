@@ -27,6 +27,7 @@ Public Class ClipExplorer
         Text = App.GetAppTitle() & " " & Text
         RadBtnPlainText.Checked = True
         CMClipActions.Font = App.MenuFont
+        CMTxtBox.Font = App.MenuFont
         LoadClips()
     End Sub
 
@@ -278,7 +279,7 @@ Public Class ClipExplorer
             Return ClipRepository.ExtractHtmlFragment(htmlString)
         End If
 
-        Return "(no text formats)"
+        Return "< No Text Formats >"
     End Function
     Private Function GetCachedSearchText(clipId As Integer) As String
         Dim cached As String = Nothing

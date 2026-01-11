@@ -340,7 +340,6 @@ Friend Class TrayAppContext
     End Sub
     Friend Sub OnThemeChanged(sender As Object, e As EventArgs)
         Skye.UI.ThemeManager.ApplyThemeToAllOpenForms()
-        'Skye.UI.ThemeManager.ApplyToMenu(App.CMTray)
     End Sub
 
     ' Methods

@@ -1,5 +1,6 @@
 ﻿
 Imports System.Reflection
+Imports Skye.UI
 
 Public Class About
 
@@ -9,6 +10,9 @@ Public Class About
 
     'Form Events
     Private Sub AboutLoad(sender As Object, e As EventArgs) Handles MyBase.Load
+        Skye.UI.ThemeManager.ApplyTheme(Me)
+        Skye.UI.ThemeManager.ApplyToTooltip(TipAbout)
+        AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
         Text = "About " + App.GetAppTitle
         LblAbout.Text = App.GetAppDescription
         Dim ver = Assembly.GetExecutingAssembly().GetName().Version
@@ -47,6 +51,11 @@ Public Class About
     End Sub
     Private Sub AboutKeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyData = Keys.Escape Then Me.Close()
+    End Sub
+
+    ' Handlers
+    Private Sub OnThemeChanged()
+        Skye.UI.ThemeManager.ApplyToTooltip(TipAbout)
     End Sub
 
     'Control Events

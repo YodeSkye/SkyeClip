@@ -108,9 +108,10 @@ Partial Class About
         ' 
         TipAbout.FadeInRate = 25
         TipAbout.FadeOutRate = 25
-        TipAbout.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipAbout.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.HideDelay = 1000
         TipAbout.ShadowAlpha = 200
+        TipAbout.ShadowThickness = 0
         TipAbout.ShowDelay = 1000
         ' 
         ' LLblSQLite

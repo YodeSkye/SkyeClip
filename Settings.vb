@@ -13,6 +13,7 @@ Public Class Settings
         Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
         AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
         Text = "Settings for " & GetAppTitle()
+        CMTxtBox.Font = App.MenuFont
 
         'Settings
         CoBoxTheme.Items.Clear()
@@ -21,6 +22,7 @@ Public Class Settings
         Next
         CoBoxTheme.SelectedItem = App.Settings.ThemeName
         ChkBoxThemeAuto.Checked = App.Settings.ThemeAuto
+        SetThemesList()
         ChkBoxAutoStartWithWindows.Checked = App.Settings.AutoStartWithWindows
         TxtBoxMaxClips.Text = App.Settings.MaxClips.ToString
         TxtBoxMaxClipPreviewLength.Text = App.Settings.MaxClipPreviewLength.ToString
@@ -179,6 +181,18 @@ Public Class Settings
             TxtBoxPurgeDays.SelectAll()
         End If
     End Sub
+    Private Sub CoBoxTheme_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxTheme.SelectedIndexChanged
+        Dim selected = CoBoxTheme.SelectedItem.ToString()
+        App.Settings.ThemeName = selected
+        If Not ChkBoxThemeAuto.Checked Then
+            Skye.UI.ThemeManager.SetTheme(SkyeThemes.GetTheme(selected))
+            Skye.UI.ThemeManager.ApplyThemeToAllOpenForms()
+        End If
+    End Sub
+    Private Sub ChkBoxThemeAuto_Click(sender As Object, e As EventArgs) Handles ChkBoxThemeAuto.Click
+        App.Settings.ThemeAuto = ChkBoxThemeAuto.Checked
+        SetThemesList
+    End Sub
     Private Sub ChkBoxAutoStartWithWindows_Click(sender As Object, e As EventArgs) Handles ChkBoxAutoStartWithWindows.Click
         App.Settings.AutoStartWithWindows = Not App.Settings.AutoStartWithWindows
         App.SetAutoStart()
@@ -215,6 +229,13 @@ Public Class Settings
 
         Return String.Join("+", parts)
     End Function
+    Private Sub SetThemesList()
+        If App.Settings.ThemeAuto Then
+            CoBoxTheme.Enabled = False
+        Else
+            CoBoxTheme.Enabled = True
+        End If
+    End Sub
     Private Sub CheckMove(ByRef location As Point)
         Dim wa As Rectangle = Screen.FromPoint(location).WorkingArea
         If location.X + Me.Width > wa.Right Then
@@ -231,28 +252,4 @@ Public Class Settings
         End If
     End Sub
 
-    Private Sub ChkBoxThemeAuto_Click(sender As Object, e As EventArgs) Handles ChkBoxThemeAuto.Click
-        'App.Settings.FollowWindowsTheme = chkFollowWindows.Checked
-        'App.Settings.Save()
-
-        'If chkFollowWindows.Checked Then
-        '    ' Immediately sync to Windows theme
-        '    Dim isDark = DetectWindowsDarkMode()
-        '    Dim themeName = If(isDark, "Dark", "Light")
-
-        '    App.Settings.ThemeName = themeName
-        '    App.Settings.Save()
-
-        '    ThemeManager.SetTheme(SkyeThemes.GetTheme(themeName))
-        'End If
-    End Sub
-
-    Private Sub CoBoxTheme_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxTheme.SelectedIndexChanged
-        Dim selected = CoBoxTheme.SelectedItem.ToString()
-        App.Settings.ThemeName = selected
-        If Not ChkBoxThemeAuto.Checked Then
-            Skye.UI.ThemeManager.SetTheme(SkyeThemes.GetTheme(selected))
-            Skye.UI.ThemeManager.ApplyThemeToAllOpenForms()
-        End If
-    End Sub
 End Class
