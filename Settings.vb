@@ -185,13 +185,20 @@ Public Class Settings
         Dim selected = CoBoxTheme.SelectedItem.ToString()
         App.Settings.ThemeName = selected
         If Not ChkBoxThemeAuto.Checked Then
-            Skye.UI.ThemeManager.SetTheme(SkyeThemes.GetTheme(selected))
+            Skye.UI.ThemeManager.SetTheme(Skye.UI.SkyeThemes.GetTheme(selected))
             Skye.UI.ThemeManager.ApplyThemeToAllOpenForms()
         End If
     End Sub
     Private Sub ChkBoxThemeAuto_Click(sender As Object, e As EventArgs) Handles ChkBoxThemeAuto.Click
         App.Settings.ThemeAuto = ChkBoxThemeAuto.Checked
-        SetThemesList
+        SetThemesList()
+        If App.Settings.ThemeAuto Then
+            ' Auto mode: sync to Windows immediately
+            Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
+        Else
+            ' Manual mode: apply whatever theme the user selected
+            Skye.UI.ThemeManager.SetTheme(Skye.UI.SkyeThemes.GetTheme(App.Settings.ThemeName))
+        End If
     End Sub
     Private Sub ChkBoxAutoStartWithWindows_Click(sender As Object, e As EventArgs) Handles ChkBoxAutoStartWithWindows.Click
         App.Settings.AutoStartWithWindows = Not App.Settings.AutoStartWithWindows

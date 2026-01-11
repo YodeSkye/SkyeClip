@@ -3,6 +3,7 @@ Imports System.IO
 Imports System.Reflection
 Imports System.Text.RegularExpressions
 Imports Microsoft.Win32
+Imports Skye.UI
 
 Friend Module App
 
@@ -615,6 +616,17 @@ Friend Module App
             RegistryHelper.DeleteValueInHKCU(runKey, "SkyeClip")
         End If
     End Sub
+    Friend Function DetectWindowsTheme() As SkyeTheme
+        Const keyPath As String = "Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+        Using key = Registry.CurrentUser.OpenSubKey(keyPath)
+            Dim light As Integer = CInt(key.GetValue("AppsUseLightTheme", 1))
+            If light = 1 Then
+                Return Skye.UI.SkyeThemes.Light
+            Else
+                Return Skye.UI.SkyeThemes.Dark
+            End If
+        End Using
+    End Function
 
     Private Class RegistryHelper
 #If DEBUG Then

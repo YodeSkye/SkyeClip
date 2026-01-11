@@ -1,11 +1,13 @@
 ﻿
 Imports System.IO
+Imports System.Runtime.InteropServices
 Imports Skye.UI
 
 Friend Class TrayAppContext
     Inherits ApplicationContext
 
     ' Declarations
+    Private ReadOnly winWatcher As MessageWindow
     Private ReadOnly NIClipboard As NotifyIcon
     Private ReadOnly Watcher As ClipboardWatcher
     Private ReadOnly clipboardTimer As System.Windows.Forms.Timer
@@ -53,6 +55,10 @@ Friend Class TrayAppContext
 
     ' Constructor
     Friend Sub New()
+
+        ' Hidden window to receive system messages
+        winWatcher = New MessageWindow()
+        Dim h = winWatcher.Handle ' ensures WndProc is active
 
         ' Show ChangeLog if new version
         If App.GetSimpleVersion() <> ChangeLogLastVersionShown Then
@@ -507,5 +513,31 @@ Friend Class TrayAppContext
         blinkTimer.Stop()
         NIClipboard.Icon = My.Resources.IconApp
     End Sub
+
+    Public Class MessageWindow
+        Inherits Form
+
+        Protected Overrides Sub WndProc(ByRef m As Message)
+            Const WM_SETTINGCHANGE As Integer = &H1A
+
+            If m.Msg = WM_SETTINGCHANGE Then
+                Dim param As String = Marshal.PtrToStringUni(m.LParam)
+                If param = "ImmersiveColorSet" Then
+                    If App.Settings.ThemeAuto Then
+                        Skye.UI.ThemeManager.SetTheme(App.DetectWindowsTheme())
+                    End If
+                End If
+            End If
+
+            MyBase.WndProc(m)
+        End Sub
+        Protected Overrides Sub OnLoad(e As EventArgs)
+            MyBase.OnLoad(e)
+            Me.Visible = False
+            Me.ShowInTaskbar = False
+            Me.Opacity = 0
+        End Sub
+
+    End Class
 
 End Class
