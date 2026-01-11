@@ -29,12 +29,12 @@ Partial Class DevTools
         LblClipFormats = New Label()
         DGVClipFormats = New DataGridView()
         PanelToolbox = New Panel()
+        BtnViewFormatData = New Button()
         BtnDeleteFormat = New Button()
         BtnDeleteClip = New Button()
         BtnSaveFormats = New Button()
         BtnSaveClips = New Button()
         BtnRefresh = New Button()
-        BtnViewFormatData = New Button()
         CType(SplitContainerClips, ComponentModel.ISupportInitialize).BeginInit()
         SplitContainerClips.Panel1.SuspendLayout()
         SplitContainerClips.Panel2.SuspendLayout()
@@ -69,7 +69,8 @@ Partial Class DevTools
         ' LblClips
         ' 
         LblClips.AutoSize = True
-        LblClips.Location = New Point(218, 5)
+        LblClips.BackColor = Color.Transparent
+        LblClips.Location = New Point(218, 3)
         LblClips.Margin = New Padding(4, 0, 4, 0)
         LblClips.Name = "LblClips"
         LblClips.Size = New Size(83, 21)
@@ -93,7 +94,7 @@ Partial Class DevTools
         ' 
         LblClipFormats.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         LblClipFormats.AutoSize = True
-        LblClipFormats.Location = New Point(4, 181)
+        LblClipFormats.Location = New Point(4, 175)
         LblClipFormats.Margin = New Padding(4, 0, 4, 0)
         LblClipFormats.Name = "LblClipFormats"
         LblClipFormats.Size = New Size(137, 21)
@@ -127,6 +128,15 @@ Partial Class DevTools
         PanelToolbox.Name = "PanelToolbox"
         PanelToolbox.Size = New Size(1029, 64)
         PanelToolbox.TabIndex = 2
+        ' 
+        ' BtnViewFormatData
+        ' 
+        BtnViewFormatData.Location = New Point(388, 17)
+        BtnViewFormatData.Name = "BtnViewFormatData"
+        BtnViewFormatData.Size = New Size(163, 32)
+        BtnViewFormatData.TabIndex = 5
+        BtnViewFormatData.Text = "View Format Data"
+        BtnViewFormatData.UseVisualStyleBackColor = True
         ' 
         ' BtnDeleteFormat
         ' 
@@ -179,15 +189,6 @@ Partial Class DevTools
         BtnRefresh.TabIndex = 0
         BtnRefresh.Text = "Refresh"
         BtnRefresh.UseVisualStyleBackColor = True
-        ' 
-        ' BtnViewFormatData
-        ' 
-        BtnViewFormatData.Location = New Point(388, 17)
-        BtnViewFormatData.Name = "BtnViewFormatData"
-        BtnViewFormatData.Size = New Size(163, 32)
-        BtnViewFormatData.TabIndex = 5
-        BtnViewFormatData.Text = "View Format Data"
-        BtnViewFormatData.UseVisualStyleBackColor = True
         ' 
         ' DevTools
         ' 

@@ -143,7 +143,7 @@ Partial Class Log
         RTBLog.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         RTBLog.BackColor = SystemColors.Control
         RTBLog.ContextMenuStrip = RTBCMLog
-        RTBLog.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        RTBLog.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAlert.SetImage(RTBLog, Nothing)
         TipLog.SetImage(RTBLog, Nothing)
         RTBLog.Location = New Point(12, 32)
@@ -159,17 +159,18 @@ Partial Class Log
         ' 
         ' TipLog
         ' 
-        TipLog.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipLog.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipLog.ShadowThickness = 0
         ' 
         ' TipAlert
         ' 
-        TipAlert.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipAlert.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAlert.HideDelay = 5000
+        TipAlert.ShadowThickness = 0
         ' 
         ' Log
         ' 
-        AutoScaleDimensions = New SizeF(7F, 15F)
-        AutoScaleMode = AutoScaleMode.Font
+        AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(800, 459)
         Controls.Add(RTBLog)
         Controls.Add(LblStatus)
@@ -178,6 +179,7 @@ Partial Class Log
         Controls.Add(BTNRefreshLog)
         Controls.Add(BTNDeleteLog)
         Controls.Add(BTNOK)
+        Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         TipAlert.SetImage(Me, Nothing)
         TipLog.SetImage(Me, Nothing)

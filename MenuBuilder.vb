@@ -77,11 +77,13 @@ Public Class MenuBuilder
 
         Dim favMenu As New ToolStripMenuItem("Favorites") With {
             .Name = "FavoritesMenu",
+            .Font = App.MenuFont,
             .Image = My.Resources.ImageFavorites16,
             .Checked = True}
 
         Dim favDropDown As New ContextMenuStrip With {
-            .Name = "FavoritesDropDown"}
+            .Name = "FavoritesDropDown",
+            .Font = App.MenuFont}
         favDropDown.Renderer = New Skye.UI.SkyeMenuRenderer
         AddHandler favDropDown.KeyDown, menuKeyHandler
 

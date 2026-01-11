@@ -29,6 +29,7 @@ Friend Class ClipViewer
 
     End Sub
     Private Async Sub ClipViewer_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Skye.UI.ThemeManager.ApplyTheme(Me)
 
         ' Initialize WebView
         Try
@@ -67,11 +68,6 @@ Friend Class ClipViewer
     End Sub
     Private Sub ClipViewer_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyCode = Keys.Escape Then StartFadeOut()
-    End Sub
-
-    'Control Events
-    Private Sub Browser_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs)
-        StartFadeOut()
     End Sub
 
     ' Handlers

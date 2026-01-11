@@ -23,7 +23,6 @@ Module Startup
         App.WriteToLog(GetAssemblyName() & " Started...")
         App.Settings.Load()
         ' Get Theme
-        App.Settings.ThemeName = "Dark" 'Temporary force Dark theme
         Skye.UI.ThemeManager.CurrentTheme = Skye.UI.SkyeThemes.GetTheme(App.Settings.ThemeName)
         ' Check autostart setting
         Dim autostart As Boolean = App.IsAutoStartEnabled

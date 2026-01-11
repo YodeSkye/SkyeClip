@@ -1,4 +1,6 @@
 ﻿
+Imports Skye.UI
+
 Public Class Log
 
     ' Declarations
@@ -10,7 +12,12 @@ Public Class Log
 
     ' Form Events
     Private Sub Log_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Skye.UI.ThemeManager.ApplyTheme(Me)
+        Skye.UI.ThemeManager.ApplyToTooltip(TipAlert)
+        Skye.UI.ThemeManager.ApplyToTooltip(TipLog)
+        AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
         Text = App.GetAppTitle + " Log"
+        RTBCMLog.Font = App.MenuFont
         LogSearchTitle = TxBxSearch.Text
         TimerDeleteLog.Interval = 5000
     End Sub
@@ -86,13 +93,13 @@ Public Class Log
     End Sub
     Private Sub TxBxSearch_Leave(sender As Object, e As EventArgs) Handles TxBxSearch.Leave
         TxBxSearch.Text = LogSearchTitle
-        TxBxSearch.ResetForeColor()
+        TxBxSearch.ForeColor = Skye.UI.ThemeManager.CurrentTheme.TextFore
     End Sub
     Private Sub TxBxSearch_TextChanged(sender As Object, e As EventArgs) Handles TxBxSearch.TextChanged
         If TxBxSearch.Text Is String.Empty Or RTBLog.Focused Then
             ResetRTBLogFind()
         ElseIf TxBxSearch.Text.Length <= 4 Then
-            TxBxSearch.ResetForeColor()
+            TxBxSearch.ForeColor = Skye.UI.ThemeManager.CurrentTheme.TextFore
             ResetRTBLogFind()
         ElseIf Not TxBxSearch.Text = LogSearchTitle AndAlso TxBxSearch.Text.Length > 4 AndAlso IsHandleCreated Then
             'Debug.Print("Searching Log...")
@@ -106,7 +113,7 @@ Public Class Log
             If foundindex < 0 Then
                 TxBxSearch.ForeColor = Color.Red
             Else
-                TxBxSearch.ResetForeColor()
+                TxBxSearch.ForeColor = Skye.UI.ThemeManager.CurrentTheme.TextFore
                 RTBLog.Select(foundindex, 0)
                 RTBLog.ScrollToCaret()
             End If
@@ -126,6 +133,10 @@ Public Class Log
     ' Handlers
     Private Sub TimerDeleteLog_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerDeleteLog.Tick
         SetDeleteLogConfirm()
+    End Sub
+    Private Sub OnThemeChanged()
+        Skye.UI.ThemeManager.ApplyToTooltip(TipAlert)
+        Skye.UI.ThemeManager.ApplyToTooltip(TipLog)
     End Sub
 
     ' Methods

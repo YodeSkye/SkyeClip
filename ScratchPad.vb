@@ -3,6 +3,7 @@ Imports System.Data.SQLite
 Imports System.IO
 Imports System.Text
 Imports System.Text.RegularExpressions
+Imports Skye.UI
 
 Friend Class ScratchPad
 
@@ -15,10 +16,14 @@ Friend Class ScratchPad
     ' Form Events
     Private Sub ScratchPad_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         App.HideSettings()
+        Skye.UI.ThemeManager.ApplyTheme(Me)
+        Skye.UI.ThemeManager.ApplyToTooltip(TipScratchPad)
+        AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
         Text = App.GetAppTitle & " " & Text
         OKText = TipScratchPad.GetText(BtnOK)
         If App.Settings.ScratchPadLocation.Y >= 0 Then Me.Location = App.Settings.ScratchPadLocation
         If App.Settings.ScratchPadSize.Height >= 0 Then Me.Size = App.Settings.ScratchPadSize
+        CMRTB.Font = App.MenuFont
         ChkBoxKeepText.Checked = App.Settings.ScratchPadKeepText
         SetOk()
         If Not String.IsNullOrWhiteSpace(App.ScratchPadText) Then
@@ -227,6 +232,11 @@ Friend Class ScratchPad
     End Sub
     Private Sub CMISelectAll_Click(sender As Object, e As EventArgs) Handles CMISelectAll.Click
         SelectAll()
+    End Sub
+
+    ' Handlers
+    Private Sub OnThemeChanged()
+        Skye.UI.ThemeManager.ApplyToTooltip(TipScratchPad)
     End Sub
 
     ' Methods

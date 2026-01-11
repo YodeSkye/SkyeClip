@@ -51,11 +51,11 @@ Partial Class ChangeLog
         ' 
         ' ChangeLog
         ' 
-        AutoScaleDimensions = New SizeF(7F, 15F)
-        AutoScaleMode = AutoScaleMode.Font
+        AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(800, 450)
         Controls.Add(RTBoxChangeLog)
         Controls.Add(BtnOK)
+        Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Name = "ChangeLog"
         StartPosition = FormStartPosition.CenterScreen

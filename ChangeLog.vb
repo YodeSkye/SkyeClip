@@ -1,4 +1,6 @@
 ﻿
+Imports Skye.UI
+
 Public Class ChangeLog
 
     'Declarations
@@ -9,6 +11,7 @@ Public Class ChangeLog
     Private Sub ChangeLog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Text = "What's New In " & App.GetAppTitle
         RTBoxChangeLog.Rtf = My.Resources.ChangeLogRT
+        If Skye.UI.ThemeManager.CurrentTheme IsNot Skye.UI.SkyeThemes.Light Then Skye.UI.ThemeManager.ApplyTheme(Me)
     End Sub
     Private Sub ChangeLog_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
         Dim cSender As Control

@@ -53,11 +53,6 @@ Public Class About
         If e.KeyData = Keys.Escape Then Me.Close()
     End Sub
 
-    ' Handlers
-    Private Sub OnThemeChanged()
-        Skye.UI.ThemeManager.ApplyToTooltip(TipAbout)
-    End Sub
-
     'Control Events
     Private Sub BtnOKClick(sender As Object, e As EventArgs) Handles BtnOK.Click
         Me.Close()
@@ -109,6 +104,11 @@ Public Class About
     End Sub
     Private Sub LLblSponsorPayPal_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblSponsorPayPal.MouseClick
         OpenLink(App.SponsorPayPal)
+    End Sub
+
+    ' Handlers
+    Private Sub OnThemeChanged()
+        Skye.UI.ThemeManager.ApplyToTooltip(TipAbout)
     End Sub
 
     'Procedures

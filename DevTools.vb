@@ -8,6 +8,7 @@ Public Class DevTools
 
     ' Form Events
     Private Sub DevTools_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Skye.UI.ThemeManager.ApplyTheme(Me)
         Text = GetAppTitle() & " " & Text
         LblClips.Text &= " (" & GetClipsCount.ToString & " records)"
         LblClipFormats.Text &= " (" & GetFormatsCount.ToString & " records)"

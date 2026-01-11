@@ -1,5 +1,10 @@
 ﻿Public Class DevToolsFormatViewer
 
+    ' Form Events
+    Private Sub DevToolsFormatViewer_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Skye.UI.ThemeManager.ApplyTheme(Me)
+    End Sub
+
     ' Methods
     Public Sub SetData(formatName As String, bytes As Byte())
         Text = "Format Data Viewer - " & formatName

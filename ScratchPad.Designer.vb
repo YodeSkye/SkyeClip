@@ -66,59 +66,59 @@ Partial Class ScratchPad
         TipScratchPad.SetImage(CMRTB, Nothing)
         CMRTB.Items.AddRange(New ToolStripItem() {CMIUndo, ToolStripSeparator1, CMICut, CMICopy, CMIPaste, CMIDelete, ToolStripSeparator2, CMISelectAll})
         CMRTB.Name = "CMRTB"
-        CMRTB.Size = New Size(142, 148)
+        CMRTB.Size = New Size(181, 170)
         TipScratchPad.SetText(CMRTB, Nothing)
         ' 
         ' CMIUndo
         ' 
         CMIUndo.Image = My.Resources.Resources.ImageEditUndo16
         CMIUndo.Name = "CMIUndo"
-        CMIUndo.Size = New Size(141, 22)
+        CMIUndo.Size = New Size(180, 22)
         CMIUndo.Text = "Undo / Redo"
         ' 
         ' ToolStripSeparator1
         ' 
         ToolStripSeparator1.Name = "ToolStripSeparator1"
-        ToolStripSeparator1.Size = New Size(138, 6)
+        ToolStripSeparator1.Size = New Size(177, 6)
         ' 
         ' CMICut
         ' 
         CMICut.Image = My.Resources.Resources.ImageEditCut16
         CMICut.Name = "CMICut"
-        CMICut.Size = New Size(141, 22)
+        CMICut.Size = New Size(180, 22)
         CMICut.Text = "Cut"
         ' 
         ' CMICopy
         ' 
         CMICopy.Image = My.Resources.Resources.ImageEditCopy16
         CMICopy.Name = "CMICopy"
-        CMICopy.Size = New Size(141, 22)
+        CMICopy.Size = New Size(180, 22)
         CMICopy.Text = "Copy"
         ' 
         ' CMIPaste
         ' 
         CMIPaste.Image = My.Resources.Resources.ImageEditPaste16
         CMIPaste.Name = "CMIPaste"
-        CMIPaste.Size = New Size(141, 22)
+        CMIPaste.Size = New Size(180, 22)
         CMIPaste.Text = "Paste"
         ' 
         ' CMIDelete
         ' 
         CMIDelete.Image = My.Resources.Resources.ImageEditDelete16
         CMIDelete.Name = "CMIDelete"
-        CMIDelete.Size = New Size(141, 22)
+        CMIDelete.Size = New Size(180, 22)
         CMIDelete.Text = "Delete"
         ' 
         ' ToolStripSeparator2
         ' 
         ToolStripSeparator2.Name = "ToolStripSeparator2"
-        ToolStripSeparator2.Size = New Size(138, 6)
+        ToolStripSeparator2.Size = New Size(177, 6)
         ' 
         ' CMISelectAll
         ' 
         CMISelectAll.Image = My.Resources.Resources.ImageEditSelectAll16
         CMISelectAll.Name = "CMISelectAll"
-        CMISelectAll.Size = New Size(141, 22)
+        CMISelectAll.Size = New Size(180, 22)
         CMISelectAll.Text = "Select All"
         ' 
         ' PanelBottom
@@ -186,7 +186,8 @@ Partial Class ScratchPad
         ' 
         ' TipScratchPad
         ' 
-        TipScratchPad.Font = New Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipScratchPad.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipScratchPad.ShadowThickness = 0
         ' 
         ' ScratchPad
         ' 
