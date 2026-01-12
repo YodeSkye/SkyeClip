@@ -21,8 +21,8 @@ Friend Class ScratchPad
         AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
         Text = App.GetAppTitle & " " & Text
         OKText = TipScratchPad.GetText(BtnOK)
-        If App.Settings.ScratchPadLocation.Y >= 0 Then Me.Location = App.Settings.ScratchPadLocation
         If App.Settings.ScratchPadSize.Height >= 0 Then Me.Size = App.Settings.ScratchPadSize
+        If App.Settings.ScratchPadLocation.Y >= 0 Then Me.Location = App.Settings.ScratchPadLocation
         CMRTB.Font = App.MenuFont
         ChkBoxKeepText.Checked = App.Settings.ScratchPadKeepText
         SetOk()
@@ -58,7 +58,7 @@ Friend Class ScratchPad
         App.FmrScratchPad?.Dispose()
         App.FmrScratchPad = Nothing
     End Sub
-    Private Sub ScratchPad_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
+    Private Sub ScratchPad_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PanelBottom.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
             mMove = True
@@ -70,7 +70,7 @@ Friend Class ScratchPad
             End If
         End If
     End Sub
-    Private Sub ScratchPad_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove
+    Private Sub ScratchPad_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PanelBottom.MouseMove
         If mMove Then
             mPosition = MousePosition
             mPosition.Offset(mOffset.X, mOffset.Y)
@@ -79,7 +79,7 @@ Friend Class ScratchPad
             App.Settings.ScratchPadLocation = Location
         End If
     End Sub
-    Private Sub ScratchPad_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp
+    Private Sub ScratchPad_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PanelBottom.MouseUp
         mMove = False
     End Sub
     Private Sub ScratchPad_Move(sender As Object, e As EventArgs) Handles MyBase.Move

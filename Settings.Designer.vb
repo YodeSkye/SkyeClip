@@ -346,6 +346,7 @@ Partial Class Settings
         ' 
         ' CoBoxTheme
         ' 
+        CoBoxTheme.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxTheme.FormattingEnabled = True
         TipSettings.SetImage(CoBoxTheme, Nothing)
         CoBoxTheme.Location = New Point(256, 238)

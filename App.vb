@@ -65,6 +65,8 @@ Friend Module App
         Friend Shared ScratchPadLocation As Point ' location of the ScratchPad window
         Friend Shared ScratchPadSize As Size ' size of the ScratchPad window
         Friend Shared ScratchPadKeepText As Boolean ' whether to keep text in the ScratchPad
+        Friend Shared ClipExplorerLocation As Point ' location of the Clip Explorer window
+        Friend Shared ClipExplorerSize As Size ' size of the Clip Explorer window
         Friend Class HotKeys
             Friend Shared ToggleFavorite As Keys
             Friend Shared ShowViewer As Keys
@@ -94,6 +96,12 @@ Friend Module App
             Dim h As Integer = RegistryHelper.GetInt("ScratchPadSizeH", -1)
             ScratchPadSize = New Size(w, h)
             ScratchPadKeepText = RegistryHelper.GetBool("ScratchPadKeepText", False)
+            x = RegistryHelper.GetInt("ClipExplorerLocationX", -AdjustScreenBoundsNormalWindow - 1)
+            y = RegistryHelper.GetInt("ClipExplorerLocationY", -1)
+            ClipExplorerLocation = New Point(x, y)
+            w = RegistryHelper.GetInt("ClipExplorerSizeW", -1)
+            h = RegistryHelper.GetInt("ClipExplorerSizeH", -1)
+            ClipExplorerSize = New Size(w, h)
             HotKeys.ToggleFavorite = CType(RegistryHelper.GetInt("HotKeyToggleFavorite", CInt(Keys.Space)), Keys)
             HotKeys.ShowViewer = CType(RegistryHelper.GetInt("HotKeyShowViewer", CInt(Keys.V)), Keys)
             HotKeys.ShowScratchPad = CType(RegistryHelper.GetInt("HotKeyShowScratchPad", CInt(Keys.S)), Keys)
@@ -119,6 +127,10 @@ Friend Module App
             RegistryHelper.SetInt("ScratchPadSizeW", ScratchPadSize.Width)
             RegistryHelper.SetInt("ScratchPadSizeH", ScratchPadSize.Height)
             RegistryHelper.SetBool("ScratchPadKeepText", ScratchPadKeepText)
+            RegistryHelper.SetInt("ClipExplorerLocationX", ClipExplorerLocation.X)
+            RegistryHelper.SetInt("ClipExplorerLocationY", ClipExplorerLocation.Y)
+            RegistryHelper.SetInt("ClipExplorerSizeW", ClipExplorerSize.Width)
+            RegistryHelper.SetInt("ClipExplorerSizeH", ClipExplorerSize.Height)
             RegistryHelper.SetInt("HotKeyToggleFavorite", CInt(HotKeys.ToggleFavorite))
             RegistryHelper.SetInt("HotKeyShowViewer", CInt(HotKeys.ShowViewer))
             RegistryHelper.SetInt("HotKeyShowScratchPad", CInt(HotKeys.ShowScratchPad))

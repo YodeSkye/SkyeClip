@@ -8,6 +8,8 @@ Imports SkyeClip.ClipRepository
 Public Class ClipExplorer
 
     ' Declarations
+    Private mMove As Boolean = False
+    Private mOffset, mPosition As Point
     Private _searchText As String = String.Empty
     Private _searchFavoritesOnly As Boolean = False
     Private _searchDays As Integer = 0 ' 0 means all days
@@ -28,7 +30,49 @@ Public Class ClipExplorer
         RadBtnPlainText.Checked = True
         CMClipActions.Font = App.MenuFont
         CMTxtBox.Font = App.MenuFont
+        If App.Settings.ClipExplorerSize.Height >= 0 Then Size = App.Settings.ClipExplorerSize
+        If App.Settings.ClipExplorerLocation.Y >= 0 Then Location = App.Settings.ClipExplorerLocation
         LoadClips()
+    End Sub
+    Private Sub ClipExplorer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        App.Settings.Save()
+    End Sub
+    Private Sub ClipExplorer_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PanelCE.MouseDown, StatusStripCE.MouseDown
+        Dim cSender As Control
+        If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
+            mMove = True
+            cSender = CType(sender, Control)
+            If cSender Is Me Then
+                mOffset = New Point(-e.X - SystemInformation.FrameBorderSize.Width - 4, -e.Y - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
+            ElseIf cSender Is PanelCE Then
+                mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 5, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 5)
+            Else
+                mOffset = New Point(-e.X - cSender.Left - SystemInformation.FrameBorderSize.Width - 4, -e.Y - cSender.Top - SystemInformation.FrameBorderSize.Height - SystemInformation.CaptionHeight - 4)
+            End If
+        End If
+    End Sub
+    Private Sub ClipExplorer_MouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseMove, PanelCE.MouseMove, StatusStripCE.MouseMove
+        If mMove Then
+            mPosition = MousePosition
+            mPosition.Offset(mOffset.X, mOffset.Y)
+            CheckMove(mPosition)
+            Location = mPosition
+            App.Settings.ClipExplorerLocation = Location
+        End If
+    End Sub
+    Private Sub ClipExplorer_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseUp, PanelCE.MouseUp, StatusStripCE.MouseUp
+        mMove = False
+    End Sub
+    Private Sub ClipExplorer_Move(sender As Object, e As EventArgs) Handles MyBase.Move
+        If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then
+            CheckMove(Location)
+            App.Settings.ClipExplorerLocation = Location
+        End If
+    End Sub
+    Private Sub ClipExplorer_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
+        If Visible AndAlso WindowState = FormWindowState.Normal Then
+            App.Settings.ClipExplorerSize = Size
+        End If
     End Sub
 
     ' Handlers
@@ -291,5 +335,11 @@ Public Class ClipExplorer
         _searchCache(clipId) = text
         Return text
     End Function
+    Private Sub CheckMove(ByRef location As Point)
+        If location.X + Me.Width > Screen.PrimaryScreen.WorkingArea.Right Then location.X = Screen.PrimaryScreen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsNormalWindow
+        If location.Y + Me.Height > Screen.PrimaryScreen.WorkingArea.Bottom Then location.Y = Screen.PrimaryScreen.WorkingArea.Bottom - Me.Height + App.AdjustScreenBoundsNormalWindow
+        If location.X < Screen.PrimaryScreen.WorkingArea.Left Then location.X = Screen.PrimaryScreen.WorkingArea.Left - App.AdjustScreenBoundsNormalWindow
+        If location.Y < App.AdjustScreenBoundsNormalWindow Then location.Y = Screen.PrimaryScreen.WorkingArea.Top
+    End Sub
 
 End Class
