@@ -25,6 +25,16 @@ SkyeClip keeps track of everything you copy, lets you favorite important items, 
 - View full content of any clip  
 - Works from both History and Favorites  
 
+### 🖼️ Scratch Pad
+- Temporary space to store clips you’re working with, or even add clips together
+- Edit the text directly in the Scratch Pad
+- Cut, copy, and paste plain text between the Scratch Pad and other apps
+
+### 🔍 Clip Explorer
+- Browse and search your entire clipboard history in a dedicated window
+- Filter by type: Text, RTF, or HTML
+- Sort by text, date, favorites, or last used date
+
 ### 🧹 Auto‑Purge & Cleanup
 - Automatically remove old clips after X days  
 - Manual purge option for instant cleanup  
@@ -41,11 +51,21 @@ SkyeClip keeps track of everything you copy, lets you favorite important items, 
 ## 🚀 HotKeys
 SkyeClip supports customizable HotKeys for:
 
-- Opening the main history menu  
-- Opening Favorites  
-- Opening the Viewer for the current clip  
+- Favorites / Unfavorite the current clip
+- Opening the Viewer for the current clip
+- Opening the Scratch Pad and pasting the current clip into it
 
 (HotKeys can be configured in Settings.)
+
+---
+
+💡 Why SkyeClip?
+Most clipboard managers are either too heavy, too limited, or too intrusive.
+SkyeClip focuses on:
+- Fidelity — preserves original clipboard formats
+- Speed — instant capture and restore
+- Simplicity — no clutter, no bloat
+- Reliability — predictable behavior, clean UI
 
 ---
 
@@ -55,14 +75,14 @@ No additional dependencies required.
 
 ---
 
-## 📝 What’s New (v1.0)
-- Added toast notifications  
-- Added tray icon  
-- Added core clipboard history  
-- Improved filtering of incoming clips  
-- Favorites HotKey no longer closes the menu  
-- Viewer HotKey now works in Favorites  
-- Fixed duplicate text clips caused by Windows Explorer  
+## 📝 What’s New (v1.1)
+- Improved clipboard format handling
+- More reliable duplicate detection
+- Cleaner previews for text, HTML, and RTF
+- Better stability when capturing images and file drops
+- General performance and reliability improvements
+- Clip Explorer
+- Themes: Light, Dark, and System Default
 
 Full changelog available in app.
 

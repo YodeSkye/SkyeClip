@@ -16,12 +16,12 @@ Public Class Settings
         CMTxtBox.Font = App.MenuFont
 
         'Settings
+        ChkBoxThemeAuto.Checked = App.Settings.ThemeAuto
         CoBoxTheme.Items.Clear()
         For Each theme In SkyeThemes.AllThemes
             CoBoxTheme.Items.Add(theme.Name)
         Next
         CoBoxTheme.SelectedItem = App.Settings.ThemeName
-        ChkBoxThemeAuto.Checked = App.Settings.ThemeAuto
         SetThemesList()
         ChkBoxAutoStartWithWindows.Checked = App.Settings.AutoStartWithWindows
         TxtBoxMaxClips.Text = App.Settings.MaxClips.ToString
@@ -184,7 +184,7 @@ Public Class Settings
     Private Sub CoBoxTheme_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxTheme.SelectedIndexChanged
         Dim selected = CoBoxTheme.SelectedItem.ToString()
         App.Settings.ThemeName = selected
-        If Not ChkBoxThemeAuto.Checked Then
+        If Not App.Settings.ThemeAuto Then
             Skye.UI.ThemeManager.SetTheme(Skye.UI.SkyeThemes.GetTheme(selected))
             Skye.UI.ThemeManager.ApplyThemeToAllOpenForms()
         End If

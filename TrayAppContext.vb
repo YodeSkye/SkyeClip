@@ -518,9 +518,8 @@ Friend Class TrayAppContext
         Inherits Form
 
         Protected Overrides Sub WndProc(ByRef m As Message)
-            Const WM_SETTINGCHANGE As Integer = &H1A
 
-            If m.Msg = WM_SETTINGCHANGE Then
+            If m.Msg = Skye.WinAPI.WM_SETTINGCHANGE Then
                 Dim param As String = Marshal.PtrToStringUni(m.LParam)
                 If param = "ImmersiveColorSet" Then
                     If App.Settings.ThemeAuto Then

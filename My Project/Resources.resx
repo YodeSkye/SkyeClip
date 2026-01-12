@@ -118,25 +118,29 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ChangeLogRT" xml:space="preserve">
-    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil Segoe UI;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}}
+    <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset0 SimSun;}{\f3\fnil Segoe UI;}{\f4\fnil\fcharset1 Segoe UI Symbol;}{\f5\fnil\fcharset0 Segoe UI Symbol;}{\f6\fnil Segoe UI Symbol;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}\viewkind4\uc1 
 \pard\cf1\b\f0\fs28\lang9 SkyeClip v1.1 What's New\par
-\cf0\fs24 Released ?? 2026\par
+\cf0\fs24 Released January 2026\par
 \par
 \cf2 New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f0  Added Scratch Pad, a lightweight built\f2\_\f0 in editor for quick notes and temporary text. Supports rich text and plain text, import/export, full editing shortcuts, a dedicated context menu with Shift\f2\_\f0 modified actions and optional persistence via Keep Text.\f1\par
-\'a3\'ab\f0  Open Source App. Added a new action to the clip context menu that lets you reopen the application a clip originated from. Includes safe, path\f2\_\f0 based legitimacy filtering to avoid system or background processes.\par
-\f1\'a3\'ab\f0  Source App Metadata. SkyeClip now stores the originating app\f2\rquote\f0 s name, executable path, and icon for each new clip, enabling richer app\f2\_\f0 aware actions.\par
-\f1\'a3\'ab\f0  Clip Action Context Menu. Introduced a dedicated right\f2\_\f0 click menu for individual clips featuring Set Clip, Favorite / Unfavorite, View Clip, and Delete. This focused interaction avoids keeping the tray menu open and significantly improves mouse\f2\_\f0 driven workflows.\par
+\cf0\b0\f1\lang1033\'a3\'ab\f2  \f0 New Theming System. SkyeClip now includes a unified Light/Dark theme engine that optionally stays in sync with Windows, updating instantly when your system theme changes.\f1\par
+\'a3\'ab\f0  Clip Explorer, your fast and lightweight window into everything you\rquote ve copied. It gives you a clean, organized view of your clipboard history with clear previews, helpful details, and quick actions. Clip Explorer makes it easy to find and reuse your content.\f1\par
+\'a3\'ab\f0  Added Auto-Start With Windows Feature in Settings.\f1\par
+\'a3\'ab\f0  Added Scratch Pad, a lightweight built\f3\_\f0 in editor for quick notes and temporary text. Supports rich text and plain text, import/export, full editing shortcuts, a dedicated context menu with Shift\f3\_\f0 modified actions and optional persistence via Keep Text.\f1\par
+\'a3\'ab\f0  Open Source App. Added a new action to the clip context menu that lets you reopen the application a clip originated from. Includes safe, path\f3\_\f0 based legitimacy filtering to avoid system or background processes.\par
+\f1\'a3\'ab\f0  Source App Metadata. SkyeClip now stores the originating app\f3\rquote\f0 s name, executable path, and icon for each new clip, enabling richer app\f3\_\f0 aware actions.\par
+\f1\'a3\'ab\f0  Clip Action Context Menu. Introduced a dedicated right\f3\_\f0 click menu for individual clips featuring Set Clip, Favorite / Unfavorite, View Clip, and Delete. This focused interaction avoids keeping the tray menu open and significantly improves mouse\f3\_\f0 driven workflows.\par
 \cf1\b\lang9\par
 \cf2 Improvements\par
-\cf0\b0\f3\u10003?\f4\lang1033  Added "&lt;RTF&gt;" or "&lt;HTML&gt;" the the clip previews, depending on the type.\f5\lang9\par
-\f3\u10003? \f4\lang1033 Migrated the HTML preview subsystem from IE to WebView2 for modern, accurate rendering\par
-\f3\lang9\u10003?\f4\lang1033  Enhanced stability and performance of the preview window\f5\lang9\par
+\cf0\b0\f4\u10003?\f5\lang1033  Added "&lt;RTF&gt;" or "&lt;HTML&gt;" the the clip previews, depending on the type.\f6\lang9\par
+\f4\u10003? \f5\lang1033 Migrated the HTML preview subsystem from IE to WebView2 for modern, accurate rendering\par
+\f4\lang9\u10003?\f5\lang1033  Enhanced stability and performance of the preview window\f6\lang9\par
 \cf2\b\f0\par
 Fixes\par
-\cf0\b0\f3\u10005? \par
+\cf0\b0\f4\u10005? \f5\lang1033 Fixed issues with inconsistent moving of forms.\f6\lang9\par
+\f4\u10005? \f5\lang1033 Fixed a bug with WebView2 in Clip Viewer that was preventing a clean load.\f6\lang9\par
 \cf1\b\f0\fs28\par
 \fs24 SkyeClip v1.0\fs28\par
 \cf0\fs24 Released January 2026\cf1\par
@@ -147,14 +151,14 @@ Fixes\par
 \'a3\'ab\f0  Core clipboard history with Favorites and Viewer support\cf1\b\lang9\par
 \par
 \cf2 Improvements\par
-\cf0\b0\f3\u10003? Smarter filtering of incoming clipboard content\par
+\cf0\b0\f4\u10003? Smarter filtering of incoming clipboard content\par
 \u10003? Favorites HotKey now keeps the menu open for smoother workflow\par
 \u10003? Viewer HotKey now works consistently in the Favorites menu\par
 \u10003? General performance and responsiveness improvements\par
 \cf2\b\f0\par
 Fixes\par
-\cf0\b0\f3\u10005? Resolved an issue where Windows Explorer produced duplicate text clips\par
-\u10005? Various stability fixes across clipboard capture and menu refres\f4\lang1033 h\cf2\b\f0\lang9\par
+\cf0\b0\f4\u10005? Resolved an issue where Windows Explorer produced duplicate text clips\par
+\u10005? Various stability fixes across clipboard capture and menu refres\f5\lang1033 h\cf2\b\f0\lang9\par
 \cf1\par
 \fs28 Thank you for using SkyeClip!\cf0\b0\fs24\par
 }
@@ -238,6 +242,26 @@ You can export your Scratch Pad content at any time. Scratch Pad supports\f1\lan
 \i Importing Content\f1\lang1033\par
 \i0\f2\lang9 You can import\f1\lang1033  Rich Text (\f2\lang9 .rtf\f1\lang1033 )\f2\lang9  files\f1\lang1033  \f2\lang9 with formatting\f1\lang1033 , as well as Plain Text (\f2\lang9 .txt\f1\lang1033 )\f2\lang9  files\f1\lang1033 . \f2\lang9 Imported content replaces whatever is currently in Scratch Pad.\par
 \f1\par
+\cf2\b Clip Explorer\par
+\cf0\b0\par
+Clip Explorer provides a fast, organized view of your clipboard history. It\rquote s designed as a simple browser for past clips, letting you quickly find, preview, and reuse anything you\rquote ve copied.\par
+\i\par
+What Clip Explorer Shows\i0\par
+A list of your recent clips\par
+A preview of the text for each item\par
+Helpful details like when the clip was created and whether it\rquote s a favorite\par
+\par
+\i What You Can Do\i0\par
+Browse your clipboard history in a clean, scrollable list\par
+Preview clips without opening the viewer\par
+Use Clip to restore an item back to the clipboard\par
+Open in Viewer for a detailed look\par
+Favorite important clips for quick access\par
+Filter by favorites, age, or text type\par
+\par
+\i When to Use Clip Explorer\i0\par
+Use Clip Explorer when you want a quick overview of your clipboard history without digging through menus. It\rquote s ideal for finding something you copied earlier today, comparing similar clips, or jumping back to a favorite you saved some time earlier.\par
+\par
 \cf2\b App View\cf0\b0\par
 \par
 The App View is a compact control panel that provides quick access to SkyeClip\rquote s core features. It appears as a small window with buttons for common tasks, making it easy to navigate without opening a full application.\par
