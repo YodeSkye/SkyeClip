@@ -238,6 +238,9 @@ Public Class ClipExplorer
 
         Dim result = Await Task.Run(Function() BuildClipList())
 
+        ' Form might be closing — bail out safely
+        If Me.IsDisposed OrElse DGV.IsDisposed OrElse DGV.Columns.Count = 0 Then Return
+
         DGV.Rows.Clear()
         For Each r In result.Rows
             DGV.Rows.Add(r)
