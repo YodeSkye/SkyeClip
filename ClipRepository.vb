@@ -141,7 +141,6 @@ Friend Class ClipRepository
         End If
 
         ' 3) Insert or update entry
-        'Dim aggHash As String = ComputeAggregateHash(formats)
         Dim formatsForHash = FilterFormatsForHash(formats)
         Dim aggHash As String = ComputeAggregateHash(formatsForHash)
         Dim nowVal As DateTime = DateTime.UtcNow
@@ -679,9 +678,9 @@ Friend Class ClipRepository
     Private Shared Function ComputeAggregateHash(formats As List(Of ClipData)) As String
 
         'Debug.Print("Hashing formats:")
-        For Each f In formats
-            'Debug.Print("  " & f.FormatId & " - " & f.FormatName & " (" & f.DataBytes.Length & " bytes)")
-        Next
+        'For Each f In formats
+        'Debug.Print("  " & f.FormatId & " - " & f.FormatName & " (" & f.DataBytes.Length & " bytes)")
+        'Next
 
         Dim allBytes As New List(Of Byte)
         For Each f In formats

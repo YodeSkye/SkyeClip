@@ -346,6 +346,7 @@ Friend Module App
 
     ' METHODS
     Friend Function BuildLiveClipboardPreview() As String
+
         Dim data = Clipboard.GetDataObject()
         If data Is Nothing OrElse data.GetFormats().Length = 0 Then
             Return CBEmptyString
@@ -401,7 +402,7 @@ Friend Module App
         If count = 0 Then
             Return "< Empty File Drop >"
         ElseIf count = 1 Then
-            Return "< 1 File >"
+            Return $"< 1 File >"
         Else
             Return $"< {count} Files >"
         End If
