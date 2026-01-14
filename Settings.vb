@@ -182,11 +182,11 @@ Public Class Settings
         End If
     End Sub
     Private Sub CoBoxTheme_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxTheme.SelectedIndexChanged
-        Dim selected = CoBoxTheme.SelectedItem.ToString()
+        Dim selected = CoBoxTheme.SelectedItem.ToString
         App.Settings.ThemeName = selected
         If Not App.Settings.ThemeAuto Then
-            Skye.UI.ThemeManager.SetTheme(Skye.UI.SkyeThemes.GetTheme(selected))
-            Skye.UI.ThemeManager.ApplyThemeToAllOpenForms()
+            SetTheme(GetTheme(selected))
+            ApplyThemeToAllOpenForms
         End If
     End Sub
     Private Sub ChkBoxThemeAuto_Click(sender As Object, e As EventArgs) Handles ChkBoxThemeAuto.Click

@@ -49,9 +49,9 @@ Partial Class Settings
         LblHotKeyShowScratchPad = New Label()
         ChkBoxPlaySoundWithNotify = New CheckBox()
         ChkBoxAutoStartWithWindows = New CheckBox()
-        CoBoxTheme = New ComboBox()
         ChkBoxThemeAuto = New CheckBox()
         LblTheme = New Label()
+        CoBoxTheme = New Skye.UI.ComboBox()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -344,17 +344,6 @@ Partial Class Settings
         ChkBoxAutoStartWithWindows.Text = "Auto-Start With Windows"
         ChkBoxAutoStartWithWindows.UseVisualStyleBackColor = True
         ' 
-        ' CoBoxTheme
-        ' 
-        CoBoxTheme.DropDownStyle = ComboBoxStyle.DropDownList
-        CoBoxTheme.FormattingEnabled = True
-        TipSettings.SetImage(CoBoxTheme, Nothing)
-        CoBoxTheme.Location = New Point(256, 238)
-        CoBoxTheme.Name = "CoBoxTheme"
-        CoBoxTheme.Size = New Size(216, 29)
-        CoBoxTheme.TabIndex = 1102
-        TipSettings.SetText(CoBoxTheme, "Select a Theme.")
-        ' 
         ' ChkBoxThemeAuto
         ' 
         ChkBoxThemeAuto.AutoSize = True
@@ -377,6 +366,18 @@ Partial Class Settings
         LblTheme.TabIndex = 1104
         LblTheme.Text = "Theme"
         TipSettings.SetText(LblTheme, Nothing)
+        ' 
+        ' CoBoxTheme
+        ' 
+        CoBoxTheme.DrawMode = DrawMode.OwnerDrawFixed
+        CoBoxTheme.DropDownStyle = ComboBoxStyle.DropDownList
+        CoBoxTheme.FormattingEnabled = True
+        TipSettings.SetImage(CoBoxTheme, Nothing)
+        CoBoxTheme.Location = New Point(256, 238)
+        CoBoxTheme.Name = "CoBoxTheme"
+        CoBoxTheme.Size = New Size(216, 30)
+        CoBoxTheme.TabIndex = 1105
+        TipSettings.SetText(CoBoxTheme, "Select a Theme.")
         ' 
         ' Settings
         ' 
@@ -448,7 +449,7 @@ Partial Class Settings
     Friend WithEvents LblHotKeyShowScratchPad As Label
     Friend WithEvents ChkBoxPlaySoundWithNotify As CheckBox
     Friend WithEvents ChkBoxAutoStartWithWindows As CheckBox
-    Friend WithEvents CoBoxTheme As ComboBox
     Friend WithEvents ChkBoxThemeAuto As CheckBox
     Friend WithEvents LblTheme As Label
+    Friend WithEvents CoBoxTheme As Skye.UI.ComboBox
 End Class
