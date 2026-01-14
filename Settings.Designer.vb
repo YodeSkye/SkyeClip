@@ -240,7 +240,7 @@ Partial Class Settings
         TxtBoxPurgeDays.Location = New Point(176, 392)
         TxtBoxPurgeDays.Name = "TxtBoxPurgeDays"
         TxtBoxPurgeDays.Size = New Size(58, 29)
-        TxtBoxPurgeDays.TabIndex = 70
+        TxtBoxPurgeDays.TabIndex = 150
         TipSettings.SetText(TxtBoxPurgeDays, "Purge Clips Older than x Days")
         TxtBoxPurgeDays.TextAlign = HorizontalAlignment.Center
         ' 
@@ -251,7 +251,7 @@ Partial Class Settings
         ChkBoxAutoPurge.Location = New Point(325, 396)
         ChkBoxAutoPurge.Name = "ChkBoxAutoPurge"
         ChkBoxAutoPurge.Size = New Size(109, 25)
-        ChkBoxAutoPurge.TabIndex = 80
+        ChkBoxAutoPurge.TabIndex = 170
         TipSettings.SetText(ChkBoxAutoPurge, "Auto-Purge Clips Once Each Day on Startup.")
         ChkBoxAutoPurge.Text = "Auto-Purge"
         ChkBoxAutoPurge.UseVisualStyleBackColor = True
@@ -262,7 +262,7 @@ Partial Class Settings
         BtnPurgeNow.Location = New Point(155, 424)
         BtnPurgeNow.Name = "BtnPurgeNow"
         BtnPurgeNow.Size = New Size(99, 32)
-        BtnPurgeNow.TabIndex = 1000
+        BtnPurgeNow.TabIndex = 160
         BtnPurgeNow.TabStop = False
         TipSettings.SetText(BtnPurgeNow, "Purge Clips Now")
         BtnPurgeNow.Text = "Purge Now"
@@ -348,10 +348,10 @@ Partial Class Settings
         ' 
         ChkBoxThemeAuto.AutoSize = True
         TipSettings.SetImage(ChkBoxThemeAuto, Nothing)
-        ChkBoxThemeAuto.Location = New Point(256, 265)
+        ChkBoxThemeAuto.Location = New Point(256, 290)
         ChkBoxThemeAuto.Name = "ChkBoxThemeAuto"
         ChkBoxThemeAuto.Size = New Size(205, 25)
-        ChkBoxThemeAuto.TabIndex = 1103
+        ChkBoxThemeAuto.TabIndex = 110
         TipSettings.SetText(ChkBoxThemeAuto, "Automatically set the theme to match current windows settings.")
         ChkBoxThemeAuto.Text = "Auto Sync With Windows"
         ChkBoxThemeAuto.UseVisualStyleBackColor = True
@@ -360,7 +360,7 @@ Partial Class Settings
         ' 
         LblTheme.AutoSize = True
         TipSettings.SetImage(LblTheme, Nothing)
-        LblTheme.Location = New Point(256, 217)
+        LblTheme.Location = New Point(256, 242)
         LblTheme.Name = "LblTheme"
         LblTheme.Size = New Size(57, 21)
         LblTheme.TabIndex = 1104
@@ -373,10 +373,10 @@ Partial Class Settings
         CoBoxTheme.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxTheme.FormattingEnabled = True
         TipSettings.SetImage(CoBoxTheme, Nothing)
-        CoBoxTheme.Location = New Point(256, 238)
+        CoBoxTheme.Location = New Point(256, 263)
         CoBoxTheme.Name = "CoBoxTheme"
         CoBoxTheme.Size = New Size(216, 30)
-        CoBoxTheme.TabIndex = 1105
+        CoBoxTheme.TabIndex = 100
         TipSettings.SetText(CoBoxTheme, "Select a Theme.")
         ' 
         ' Settings
