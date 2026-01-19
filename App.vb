@@ -102,7 +102,7 @@ Friend Module App
             w = Skye.Common.RegistryHelper.GetInt("ClipExplorerSizeW", -1)
             h = Skye.Common.RegistryHelper.GetInt("ClipExplorerSizeH", -1)
             ClipExplorerSize = New Size(w, h)
-            HotKeys.ToggleFavorite = CType(Skye.Common.RegistryHelper.GetInt("HotKeyToggleFavorite", CInt(Keys.Space)), Keys)
+            HotKeys.ToggleFavorite = CType(Skye.Common.RegistryHelper.GetInt("HotKeyToggleFavorite", CInt(Keys.F)), Keys)
             HotKeys.ShowViewer = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowViewer", CInt(Keys.V)), Keys)
             HotKeys.ShowScratchPad = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowScratchPad", CInt(Keys.S)), Keys)
             WriteToLog("Settings Loaded (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
