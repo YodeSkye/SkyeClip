@@ -21,6 +21,11 @@ Module Startup
 
         ' Initialize the application
         App.WriteToLog(GetAssemblyName() & " Started...")
+#If DEBUG Then
+        Skye.Common.RegistryHelper.BaseKey = "Software\" + App.GetAssemblyName + "DEV" 'Use separate registry key for debug builds
+#Else
+        Skye.Common.RegistryHelper.BaseKey = "Software\" + App.GetAssemblyName 'Use standard registry key for release builds
+#End If
         App.Settings.Load()
         ' Get Theme
         If App.Settings.ThemeAuto Then

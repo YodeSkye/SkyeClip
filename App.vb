@@ -76,64 +76,64 @@ Friend Module App
 
         Friend Shared Sub Load()
             Dim starttime As TimeSpan = DateTime.Now.TimeOfDay
-            ThemeName = RegistryHelper.GetString("ThemeName", "Dark")
-            ThemeAuto = RegistryHelper.GetBool("ThemeAuto", False)
-            ChangeLogLastVersionShown = RegistryHelper.GetString("ChangeLogLastVersionShown", String.Empty)
-            AutoStartWithWindows = RegistryHelper.GetBool("AutoStartWithWindows", False)
-            MaxClips = RegistryHelper.GetInt("MaxClips", 30)
-            MaxClipPreviewLength = RegistryHelper.GetInt("MaxClipPreviewLength", 60)
-            BlinkOnNewClip = RegistryHelper.GetBool("BlinkOnNewClip", True)
-            NotifyOnNewClip = RegistryHelper.GetBool("NotifyOnNewClip", True)
-            PlaySoundWithNotify = RegistryHelper.GetBool("PlaySoundWithNotify", False)
-            AutoPurge = RegistryHelper.GetBool("AutoPurge", False)
-            LastPurgeDate = RegistryHelper.GetDateTime("LastPurgeDate", DateTime.MinValue)
-            PurgeDays = RegistryHelper.GetInt("PurgeDays", 30)
-            ShowOpenSourceApp = RegistryHelper.GetBool("ShowOpenSourceApp", False)
-            Dim x As Integer = RegistryHelper.GetInt("ScratchPadLocationX", -AdjustScreenBoundsNormalWindow - 1)
-            Dim y As Integer = RegistryHelper.GetInt("ScratchPadLocationY", -1)
+            ThemeName = Skye.Common.RegistryHelper.GetString("ThemeName", "Dark")
+            ThemeAuto = Skye.Common.RegistryHelper.GetBool("ThemeAuto", False)
+            ChangeLogLastVersionShown = Skye.Common.RegistryHelper.GetString("ChangeLogLastVersionShown", String.Empty)
+            AutoStartWithWindows = Skye.Common.RegistryHelper.GetBool("AutoStartWithWindows", False)
+            MaxClips = Skye.Common.RegistryHelper.GetInt("MaxClips", 30)
+            MaxClipPreviewLength = Skye.Common.RegistryHelper.GetInt("MaxClipPreviewLength", 60)
+            BlinkOnNewClip = Skye.Common.RegistryHelper.GetBool("BlinkOnNewClip", True)
+            NotifyOnNewClip = Skye.Common.RegistryHelper.GetBool("NotifyOnNewClip", True)
+            PlaySoundWithNotify = Skye.Common.RegistryHelper.GetBool("PlaySoundWithNotify", False)
+            AutoPurge = Skye.Common.RegistryHelper.GetBool("AutoPurge", False)
+            LastPurgeDate = Skye.Common.RegistryHelper.GetDateTime("LastPurgeDate", DateTime.MinValue)
+            PurgeDays = Skye.Common.RegistryHelper.GetInt("PurgeDays", 30)
+            ShowOpenSourceApp = Skye.Common.RegistryHelper.GetBool("ShowOpenSourceApp", False)
+            Dim x As Integer = Skye.Common.RegistryHelper.GetInt("ScratchPadLocationX", -AdjustScreenBoundsNormalWindow - 1)
+            Dim y As Integer = Skye.Common.RegistryHelper.GetInt("ScratchPadLocationY", -1)
             ScratchPadLocation = New Point(x, y)
-            Dim w As Integer = RegistryHelper.GetInt("ScratchPadSizeW", -1)
-            Dim h As Integer = RegistryHelper.GetInt("ScratchPadSizeH", -1)
+            Dim w As Integer = Skye.Common.RegistryHelper.GetInt("ScratchPadSizeW", -1)
+            Dim h As Integer = Skye.Common.RegistryHelper.GetInt("ScratchPadSizeH", -1)
             ScratchPadSize = New Size(w, h)
-            ScratchPadKeepText = RegistryHelper.GetBool("ScratchPadKeepText", False)
-            x = RegistryHelper.GetInt("ClipExplorerLocationX", -AdjustScreenBoundsNormalWindow - 1)
-            y = RegistryHelper.GetInt("ClipExplorerLocationY", -1)
+            ScratchPadKeepText = Skye.Common.RegistryHelper.GetBool("ScratchPadKeepText", False)
+            x = Skye.Common.RegistryHelper.GetInt("ClipExplorerLocationX", -AdjustScreenBoundsNormalWindow - 1)
+            y = Skye.Common.RegistryHelper.GetInt("ClipExplorerLocationY", -1)
             ClipExplorerLocation = New Point(x, y)
-            w = RegistryHelper.GetInt("ClipExplorerSizeW", -1)
-            h = RegistryHelper.GetInt("ClipExplorerSizeH", -1)
+            w = Skye.Common.RegistryHelper.GetInt("ClipExplorerSizeW", -1)
+            h = Skye.Common.RegistryHelper.GetInt("ClipExplorerSizeH", -1)
             ClipExplorerSize = New Size(w, h)
-            HotKeys.ToggleFavorite = CType(RegistryHelper.GetInt("HotKeyToggleFavorite", CInt(Keys.Space)), Keys)
-            HotKeys.ShowViewer = CType(RegistryHelper.GetInt("HotKeyShowViewer", CInt(Keys.V)), Keys)
-            HotKeys.ShowScratchPad = CType(RegistryHelper.GetInt("HotKeyShowScratchPad", CInt(Keys.S)), Keys)
+            HotKeys.ToggleFavorite = CType(Skye.Common.RegistryHelper.GetInt("HotKeyToggleFavorite", CInt(Keys.Space)), Keys)
+            HotKeys.ShowViewer = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowViewer", CInt(Keys.V)), Keys)
+            HotKeys.ShowScratchPad = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowScratchPad", CInt(Keys.S)), Keys)
             WriteToLog("Settings Loaded (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
         End Sub
         Friend Shared Sub Save()
             Dim starttime As TimeSpan = DateTime.Now.TimeOfDay
-            RegistryHelper.SetString("ThemeName", ThemeName)
-            RegistryHelper.SetBool("ThemeAuto", ThemeAuto)
-            RegistryHelper.SetString("ChangeLogLastVersionShown", ChangeLogLastVersionShown)
-            RegistryHelper.SetBool("AutoStartWithWindows", AutoStartWithWindows)
-            RegistryHelper.SetInt("MaxClips", MaxClips)
-            RegistryHelper.SetInt("MaxClipPreviewLength", MaxClipPreviewLength)
-            RegistryHelper.SetBool("BlinkOnNewClip", BlinkOnNewClip)
-            RegistryHelper.SetBool("NotifyOnNewClip", NotifyOnNewClip)
-            RegistryHelper.SetBool("PlaySoundWithNotify", PlaySoundWithNotify)
-            RegistryHelper.SetBool("AutoPurge", AutoPurge)
-            RegistryHelper.SetDateTime("LastPurgeDate", LastPurgeDate)
-            RegistryHelper.SetInt("PurgeDays", PurgeDays)
-            RegistryHelper.SetBool("ShowOpenSourceApp", ShowOpenSourceApp)
-            RegistryHelper.SetInt("ScratchPadLocationX", ScratchPadLocation.X)
-            RegistryHelper.SetInt("ScratchPadLocationY", ScratchPadLocation.Y)
-            RegistryHelper.SetInt("ScratchPadSizeW", ScratchPadSize.Width)
-            RegistryHelper.SetInt("ScratchPadSizeH", ScratchPadSize.Height)
-            RegistryHelper.SetBool("ScratchPadKeepText", ScratchPadKeepText)
-            RegistryHelper.SetInt("ClipExplorerLocationX", ClipExplorerLocation.X)
-            RegistryHelper.SetInt("ClipExplorerLocationY", ClipExplorerLocation.Y)
-            RegistryHelper.SetInt("ClipExplorerSizeW", ClipExplorerSize.Width)
-            RegistryHelper.SetInt("ClipExplorerSizeH", ClipExplorerSize.Height)
-            RegistryHelper.SetInt("HotKeyToggleFavorite", CInt(HotKeys.ToggleFavorite))
-            RegistryHelper.SetInt("HotKeyShowViewer", CInt(HotKeys.ShowViewer))
-            RegistryHelper.SetInt("HotKeyShowScratchPad", CInt(HotKeys.ShowScratchPad))
+            Skye.Common.RegistryHelper.SetString("ThemeName", ThemeName)
+            Skye.Common.RegistryHelper.SetBool("ThemeAuto", ThemeAuto)
+            Skye.Common.RegistryHelper.SetString("ChangeLogLastVersionShown", ChangeLogLastVersionShown)
+            Skye.Common.RegistryHelper.SetBool("AutoStartWithWindows", AutoStartWithWindows)
+            Skye.Common.RegistryHelper.SetInt("MaxClips", MaxClips)
+            Skye.Common.RegistryHelper.SetInt("MaxClipPreviewLength", MaxClipPreviewLength)
+            Skye.Common.RegistryHelper.SetBool("BlinkOnNewClip", BlinkOnNewClip)
+            Skye.Common.RegistryHelper.SetBool("NotifyOnNewClip", NotifyOnNewClip)
+            Skye.Common.RegistryHelper.SetBool("PlaySoundWithNotify", PlaySoundWithNotify)
+            Skye.Common.RegistryHelper.SetBool("AutoPurge", AutoPurge)
+            Skye.Common.RegistryHelper.SetDateTime("LastPurgeDate", LastPurgeDate)
+            Skye.Common.RegistryHelper.SetInt("PurgeDays", PurgeDays)
+            Skye.Common.RegistryHelper.SetBool("ShowOpenSourceApp", ShowOpenSourceApp)
+            Skye.Common.RegistryHelper.SetInt("ScratchPadLocationX", ScratchPadLocation.X)
+            Skye.Common.RegistryHelper.SetInt("ScratchPadLocationY", ScratchPadLocation.Y)
+            Skye.Common.RegistryHelper.SetInt("ScratchPadSizeW", ScratchPadSize.Width)
+            Skye.Common.RegistryHelper.SetInt("ScratchPadSizeH", ScratchPadSize.Height)
+            Skye.Common.RegistryHelper.SetBool("ScratchPadKeepText", ScratchPadKeepText)
+            Skye.Common.RegistryHelper.SetInt("ClipExplorerLocationX", ClipExplorerLocation.X)
+            Skye.Common.RegistryHelper.SetInt("ClipExplorerLocationY", ClipExplorerLocation.Y)
+            Skye.Common.RegistryHelper.SetInt("ClipExplorerSizeW", ClipExplorerSize.Width)
+            Skye.Common.RegistryHelper.SetInt("ClipExplorerSizeH", ClipExplorerSize.Height)
+            Skye.Common.RegistryHelper.SetInt("HotKeyToggleFavorite", CInt(HotKeys.ToggleFavorite))
+            Skye.Common.RegistryHelper.SetInt("HotKeyShowViewer", CInt(HotKeys.ShowViewer))
+            Skye.Common.RegistryHelper.SetInt("HotKeyShowScratchPad", CInt(HotKeys.ShowScratchPad))
             WriteToLog("Settings Saved (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
         End Sub
 
@@ -616,17 +616,17 @@ Friend Module App
     End Function
     Friend Function IsAutoStartEnabled() As Boolean
         Dim runKey As String = "Software\Microsoft\Windows\CurrentVersion\Run"
-        Dim value As String = RegistryHelper.GetStringFromHKCU(runKey, "SkyeClip", String.Empty)
+        Dim value As String = Skye.Common.RegistryHelper.GetStringFromHKCU(runKey, "SkyeClip", String.Empty)
         Return Not String.IsNullOrEmpty(value)
     End Function
     Friend Sub SetAutoStart()
         If Settings.AutoStartWithWindows Then
             Dim runKey As String = "Software\Microsoft\Windows\CurrentVersion\Run"
             Dim exePath As String = """" & Application.ExecutablePath & """"
-            RegistryHelper.SetStringInHKCU(runKey, "SkyeClip", exePath)
+            Skye.Common.RegistryHelper.SetStringInHKCU(runKey, "SkyeClip", exePath)
         Else
             Dim runKey As String = "Software\Microsoft\Windows\CurrentVersion\Run"
-            RegistryHelper.DeleteValueInHKCU(runKey, "SkyeClip")
+            Skye.Common.RegistryHelper.DeleteValueInHKCU(runKey, "SkyeClip")
         End If
     End Sub
     Friend Function DetectWindowsTheme() As SkyeTheme
@@ -640,124 +640,5 @@ Friend Module App
             End If
         End Using
     End Function
-
-    Private Class RegistryHelper
-#If DEBUG Then
-        Private Shared ReadOnly BaseKey As String = "Software\" & GetAssemblyName() & "DEV"
-#Else
-        Private Shared ReadOnly BaseKey As String = "Software\" & GetAssemblyName()
-#End If
-
-        Public Shared Function GetInt(name As String, defaultValue As Integer) As Integer
-            Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
-                Return CInt(key.GetValue(name, defaultValue))
-            End Using
-        End Function
-        Public Shared Sub SetInt(name As String, value As Integer)
-            Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
-                key.SetValue(name, value, RegistryValueKind.DWord)
-            End Using
-        End Sub
-
-        Public Shared Function GetBool(name As String, defaultValue As Boolean) As Boolean
-            Return GetInt(name, If(defaultValue, 1, 0)) = 1
-        End Function
-        Public Shared Sub SetBool(name As String, value As Boolean)
-            SetInt(name, If(value, 1, 0))
-        End Sub
-
-        Public Shared Function GetString(name As String, defaultValue As String) As String
-            Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
-                Return CStr(key.GetValue(name, defaultValue))
-            End Using
-        End Function
-        Public Shared Sub SetString(name As String, value As String)
-            Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
-                key.SetValue(name, value, RegistryValueKind.String)
-            End Using
-        End Sub
-
-        Public Shared Function GetDateTime(name As String, defaultValue As DateTime) As DateTime
-            Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
-                Dim obj = key.GetValue(name, Nothing)
-
-                If TypeOf obj Is Long Then
-                    Return New DateTime(CType(obj, Long))
-                End If
-
-                Return defaultValue
-            End Using
-        End Function
-        Public Shared Sub SetDateTime(name As String, value As DateTime)
-            Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
-                key.SetValue(name, value.Ticks, RegistryValueKind.QWord)
-            End Using
-        End Sub
-
-        Public Shared Function GetBytes(name As String) As Byte()
-            Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
-                Dim obj = key.GetValue(name)
-                If TypeOf obj Is Byte() Then
-                    Return CType(obj, Byte())
-                End If
-                Return Nothing
-            End Using
-        End Function
-        Public Shared Sub SetBytes(name As String, data As Byte())
-            Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
-                key.SetValue(name, data, RegistryValueKind.Binary)
-            End Using
-        End Sub
-
-        Public Shared Function GetLong(name As String, defaultValue As Long) As Long
-            Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
-                Dim obj = key.GetValue(name, Nothing)
-                If TypeOf obj Is Long Then
-                    Return CType(obj, Long)
-                End If
-                Return defaultValue
-            End Using
-        End Function
-        Public Shared Sub SetLong(name As String, value As Long)
-            Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
-                key.SetValue(name, value, RegistryValueKind.QWord)
-            End Using
-        End Sub
-
-        Public Shared Function GetStringArray(name As String, defaultValue As String()) As String()
-            Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
-                Dim obj = key.GetValue(name, Nothing)
-                If TypeOf obj Is String() Then
-                    Return CType(obj, String())
-                End If
-                Return defaultValue
-            End Using
-        End Function
-        Public Shared Sub SetStringArray(name As String, values As String())
-            Using key = Registry.CurrentUser.CreateSubKey(BaseKey)
-                key.SetValue(name, values, RegistryValueKind.MultiString)
-            End Using
-        End Sub
-
-        Public Shared Function GetStringFromHKCU(subKey As String, valueName As String, defaultValue As String) As String
-            Using key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(subKey, writable:=False)
-                If key Is Nothing Then Return defaultValue
-                Dim v = key.GetValue(valueName)
-                If v Is Nothing Then Return defaultValue
-                Return CStr(v)
-            End Using
-        End Function
-        Public Shared Sub SetStringInHKCU(subKey As String, valueName As String, valueData As String)
-            Using key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(subKey)
-                key.SetValue(valueName, valueData, Microsoft.Win32.RegistryValueKind.String)
-            End Using
-        End Sub
-        Public Shared Sub DeleteValueInHKCU(subKey As String, valueName As String)
-            Using key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(subKey, writable:=True)
-                key?.DeleteValue(valueName, throwOnMissingValue:=False)
-            End Using
-        End Sub
-
-    End Class
 
 End Module
