@@ -183,66 +183,33 @@ Friend Class ClipViewer
         ' If no markers found, return the whole HTML
         Return rawHtml
     End Function
-    Private Function DecodeFileDrop(bytes As Byte()) As String()
-        ' Convert raw bytes to UTF-16 string
-        Dim txt As String = System.Text.Encoding.Unicode.GetString(bytes)
-
-        ' Remove trailing nulls (there can be MANY)
-        txt = txt.TrimEnd(ControlChars.NullChar)
-
-        ' Split on single null
-        Dim parts = txt.Split(ControlChars.NullChar)
-
-        ' Filter out garbage entries
-        Dim files = parts.
-        Where(Function(p) Not String.IsNullOrWhiteSpace(p)).
-        Where(Function(p) p.IndexOfAny(Path.GetInvalidPathChars()) = -1).
-        ToArray()
-
-        Return files
-    End Function
-    Private Function GetFolderIcon(path As String) As Icon
-        Dim shinfo As New Skye.WinAPI.SHFILEINFO()
-        Dim hImg = Skye.WinAPI.SHGetFileInfo(path, 0, shinfo, Marshal.SizeOf(shinfo), SHGFI_ICON Or SHGFI_SMALLICON)
-        If hImg <> IntPtr.Zero AndAlso shinfo.hIcon <> IntPtr.Zero Then
-            Return Icon.FromHandle(shinfo.hIcon)
-        End If
-        Return Nothing
-    End Function
     Private Sub ShowFileDrop(bytes As Byte())
-        Dim files = DecodeFileDrop(bytes)
+        Dim entries = App.ParseFileDrop(bytes)
 
         LVFileDrop.Items.Clear()
         ILFileDrop.Images.Clear()
 
-        For Each path In files
+        ' Compute totals
+        Dim count = entries.Count
+        Dim totalBytes As Long = entries.Where(Function(e) File.Exists(e.FullPath)).Sum(Function(e) New FileInfo(e.FullPath).Length)
+        Dim totalSizeText = Skye.Common.FormatFileSize(totalBytes, Skye.Common.FormatFileSizeUnits.Auto)
+
+        ' Update column headers
+        LVFileDrop.Columns(1).Text = $"Name ({count})"
+        LVFileDrop.Columns(2).Text = $"Size ({totalSizeText})"
+
+        For Each e In entries
             Dim iconIndex As Integer = -1
-
-            Try
-                Dim icon As Icon = Nothing
-                If Directory.Exists(path) Then
-                    icon = GetFolderIcon(path)
-                ElseIf File.Exists(path) Then
-                    icon = Icon.ExtractAssociatedIcon(path)
-                End If
-                If icon IsNot Nothing Then
-                    ILFileDrop.Images.Add(icon)
-                    iconIndex = ILFileDrop.Images.Count - 1
-                End If
-            Catch
-            End Try
-
-            Dim item As New ListViewItem("", iconIndex)
-            item.SubItems.Add(IO.Path.GetFileName(path))
-
-            If File.Exists(path) Then
-                Dim size = New FileInfo(path).Length
-                item.SubItems.Add(Skye.Common.FormatFileSize(size, Skye.Common.FormatFileSizeUnits.Auto))
-            Else
-                item.SubItems.Add("")
+            If e.Icon IsNot Nothing Then
+                ILFileDrop.Images.Add(e.Icon)
+                iconIndex = ILFileDrop.Images.Count - 1
             End If
 
-            item.Tag = path
+            Dim item As New ListViewItem("", iconIndex)
+            item.SubItems.Add(e.FileName)
+            item.SubItems.Add(e.SizeText)
+            item.Tag = e.FullPath
+
             LVFileDrop.Items.Add(item)
         Next
 

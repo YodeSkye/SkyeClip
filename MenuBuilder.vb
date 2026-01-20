@@ -9,7 +9,7 @@ Public Class MenuBuilder
         ' ============================================================
         Dim liveItem As New ToolStripMenuItem(App.CBLivePreview) With {
             .Tag = Nothing,
-            .Font = New Font(SystemFonts.MenuFont, FontStyle.Bold),
+            .Font = New Font(App.MenuFont, FontStyle.Bold),
             .Image = My.Resources.IconApp.ToBitmap}
         menu.Items.Add(liveItem)
         menu.Items.Add(New ToolStripSeparator())
@@ -18,7 +18,9 @@ Public Class MenuBuilder
         ' --- Recents ---
         Dim clips = repo.GetRecentClips(App.Settings.MaxClips)
         If clips Is Nothing OrElse clips.Count = 0 Then
-            Dim none As New ToolStripMenuItem("< No Saved Clips >") With {.Enabled = False}
+            Dim none As New ToolStripMenuItem("< No Saved Clips >") With {
+                .Enabled = False,
+                .Font = App.MenuFont}
             menu.Items.Add(none)
         Else
             For Each clip In clips
@@ -30,7 +32,8 @@ Public Class MenuBuilder
 
                 Dim item As New ToolStripMenuItem(preview) With {
                     .Tag = clip.Id,
-                    .Checked = clip.IsFavorite
+                    .Checked = clip.IsFavorite,
+                    .Font = App.MenuFont
                 }
 
                 If Not String.Equals(preview, rawText, StringComparison.Ordinal) Then
@@ -51,7 +54,9 @@ Public Class MenuBuilder
         ' --- Favorites submenu ---
         Dim favMenu = BuildFavoritesMenu(repo, clipClickHandler, menuKeyHandler)
         If favMenu IsNot Nothing Then
-            Dim favSeparator As New ToolStripSeparator() With {.Name = "FavoritesSeparator"}
+            Dim favSeparator As New ToolStripSeparator() With {
+                .Name = "FavoritesSeparator",
+                .Font = App.MenuFont}
             menu.Items.Add(favSeparator)
             menu.Items.Add(favMenu)
         End If
@@ -61,7 +66,7 @@ Public Class MenuBuilder
             Dim commonSeparator As New ToolStripSeparator() With {.Name = "CommonActionsSeparator"}
             menu.Items.Add(commonSeparator)
             For Each action In commonActions
-                Dim cmi As New ToolStripMenuItem(action.Text, action.Image)
+                Dim cmi As New ToolStripMenuItem(action.Text, action.Image) With {.Font = App.MenuFont}
                 AddHandler cmi.MouseDown, action.Handler
                 menu.Items.Add(cmi)
             Next

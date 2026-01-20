@@ -29,6 +29,20 @@ Module ClipboardWin32
         _cache(name) = id
         Return id
     End Function
+    Friend Function CaptureFormatsFromClipboard() As List(Of ClipData)
+        Dim all As New List(Of ClipData)
+
+        ' Text formats (Unicode, ANSI, OEM, RTF, HTML, CSV)
+        all.AddRange(CaptureTextFormats())
+
+        ' File drop (CF_HDROP)
+        all.AddRange(CaptureFileDrop())
+
+        ' Image formats (CF_DIB, CF_DIBV5)
+        all.AddRange(CaptureImageFormats())
+
+        Return all
+    End Function
     Public Function CaptureTextFormats() As List(Of ClipData)
         Dim list As New List(Of ClipData)
 

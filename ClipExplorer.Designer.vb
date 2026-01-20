@@ -55,6 +55,11 @@ Partial Class ClipExplorer
         CMICAOpenSourceApp = New ToolStripMenuItem()
         ToolStripSeparator2 = New ToolStripSeparator()
         CMICADelete = New ToolStripMenuItem()
+        LVFileDrop = New ListView()
+        FileIcon = New ColumnHeader()
+        FileName = New ColumnHeader()
+        FileSize = New ColumnHeader()
+        ILFileDrop = New ImageList(components)
         RTB = New Skye.UI.RichTextBox()
         TipClipExplorer = New Skye.UI.ToolTipEX(components)
         StatusStripCE.SuspendLayout()
@@ -245,6 +250,7 @@ Partial Class ClipExplorer
         ' 
         ' SplitContainerCE.Panel2
         ' 
+        SplitContainerCE.Panel2.Controls.Add(LVFileDrop)
         SplitContainerCE.Panel2.Controls.Add(RTB)
         TipClipExplorer.SetImage(SplitContainerCE.Panel2, Nothing)
         TipClipExplorer.SetText(SplitContainerCE.Panel2, Nothing)
@@ -264,7 +270,6 @@ Partial Class ClipExplorer
         DGV.Dock = DockStyle.Fill
         TipClipExplorer.SetImage(DGV, Nothing)
         DGV.Location = New Point(0, 0)
-        DGV.MultiSelect = False
         DGV.Name = "DGV"
         DGV.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         DGV.Size = New Size(556, 369)
@@ -379,6 +384,43 @@ Partial Class ClipExplorer
         CMICADelete.Size = New Size(195, 22)
         CMICADelete.Text = "Delete"
         ' 
+        ' LVFileDrop
+        ' 
+        LVFileDrop.BorderStyle = BorderStyle.None
+        LVFileDrop.Columns.AddRange(New ColumnHeader() {FileIcon, FileName, FileSize})
+        LVFileDrop.Dock = DockStyle.Fill
+        LVFileDrop.HeaderStyle = ColumnHeaderStyle.Nonclickable
+        TipClipExplorer.SetImage(LVFileDrop, Nothing)
+        LVFileDrop.Location = New Point(0, 0)
+        LVFileDrop.Name = "LVFileDrop"
+        LVFileDrop.Size = New Size(240, 369)
+        LVFileDrop.SmallImageList = ILFileDrop
+        LVFileDrop.TabIndex = 31
+        TipClipExplorer.SetText(LVFileDrop, Nothing)
+        LVFileDrop.UseCompatibleStateImageBehavior = False
+        LVFileDrop.View = View.Details
+        ' 
+        ' FileIcon
+        ' 
+        FileIcon.Text = ""
+        FileIcon.Width = 24
+        ' 
+        ' FileName
+        ' 
+        FileName.Text = "File Name"
+        FileName.Width = 360
+        ' 
+        ' FileSize
+        ' 
+        FileSize.Text = "Size"
+        FileSize.Width = 140
+        ' 
+        ' ILFileDrop
+        ' 
+        ILFileDrop.ColorDepth = ColorDepth.Depth32Bit
+        ILFileDrop.ImageSize = New Size(16, 16)
+        ILFileDrop.TransparentColor = Color.Transparent
+        ' 
         ' RTB
         ' 
         RTB.BorderStyle = BorderStyle.None
@@ -462,4 +504,9 @@ Partial Class ClipExplorer
     Friend WithEvents CMICAOpenSourceApp As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
     Friend WithEvents CMICADelete As ToolStripMenuItem
+    Friend WithEvents LVFileDrop As ListView
+    Friend WithEvents ILFileDrop As ImageList
+    Friend WithEvents FileIcon As ColumnHeader
+    Friend WithEvents FileName As ColumnHeader
+    Friend WithEvents FileSize As ColumnHeader
 End Class

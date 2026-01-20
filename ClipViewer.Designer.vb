@@ -84,7 +84,7 @@ Partial Class ClipViewer
         ' FileSize
         ' 
         FileSize.Text = "Size"
-        FileSize.Width = 100
+        FileSize.Width = 140
         ' 
         ' ILFileDrop
         ' 

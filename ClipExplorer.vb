@@ -15,6 +15,7 @@ Public Class ClipExplorer
     Private _searchDays As Integer = 0 ' 0 means all days
     Private _searchMode As App.TextSearchMode
     Private _searchCache As New Dictionary(Of Integer, String)
+    Private _primaryRowIndex As Integer = -1
     Private Class ClipLoadResult
         Public Property Rows As List(Of Object())
         Public Property TotalCount As Integer
@@ -84,22 +85,28 @@ Public Class ClipExplorer
     Private Sub DGV_SelectionChanged(sender As Object, e As EventArgs) Handles DGV.SelectionChanged
         If DGV.SelectedRows.Count = 0 Then
             RTB.Text = String.Empty
+            RTB.BringToFront()
             Return
         End If
 
         Dim row = DGV.SelectedRows(0)
         Dim clipId = CInt(row.Cells("Id").Value)
-
         Dim formats = App.Tray.repo.GetClipFormats(clipId)
-        Dim preview = BuildPreviewText(formats)
 
-        RTB.Text = preview
-    End Sub
-    Private Sub DGV_CellMouseDown(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DGV.CellMouseDown
-        If e.Button = MouseButtons.Right AndAlso e.RowIndex >= 0 Then
-            DGV.ClearSelection()
-            DGV.Rows(e.RowIndex).Selected = True
+        ' Detect FileDrop
+        Dim fileDrop = formats.FirstOrDefault(Function(f) f.FormatName = "FileDrop")
+        If fileDrop IsNot Nothing Then
+            ' Show FileDrop preview
+            Dim entries = App.ParseFileDrop(fileDrop.DataBytes)
+            ShowFileDrop(entries)
+            LVFileDrop.BringToFront()
+            Return
         End If
+
+        ' Otherwise show text/HTML/RTF preview
+        Dim preview = BuildPreviewText(formats)
+        RTB.Text = preview
+        RTB.BringToFront()
     End Sub
     Private Sub CMClipActions_Opening(sender As Object, e As CancelEventArgs) Handles CMClipActions.Opening
         If DGV.SelectedRows.Count = 0 Then
@@ -107,7 +114,20 @@ Public Class ClipExplorer
             Return
         End If
 
-        Dim row = DGV.SelectedRows(0)
+        Dim pt = DGV.PointToClient(Cursor.Position)
+        Dim hit = DGV.HitTest(pt.X, pt.Y)
+        If hit.RowIndex < 0 Then
+            e.Cancel = True
+            Return
+        End If
+        _primaryRowIndex = hit.RowIndex
+
+        ' Ensure primary row is selected (but don't break multiselect)
+        If Not DGV.Rows(_primaryRowIndex).Selected Then
+            DGV.Rows(_primaryRowIndex).Selected = True
+        End If
+
+        Dim row = DGV.Rows(_primaryRowIndex)
         Dim clipId = CInt(row.Cells("Id").Value)
         Dim clip = App.Tray.repo.GetClipById(clipId)
 
@@ -134,34 +154,56 @@ Public Class ClipExplorer
     End Sub
     Private Sub CMICAUseClip_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAUseClip.MouseDown
         If DGV.SelectedRows.Count = 0 Then Return
-        Dim row = DGV.SelectedRows(0)
+        If _primaryRowIndex < 0 Then Return
+        If _primaryRowIndex >= DGV.Rows.Count Then Return
+
+        Dim row = DGV.Rows(_primaryRowIndex)
         Dim clipId = CInt(row.Cells("Id").Value)
+
         App.Tray.repo.RestoreClip(clipId)
         LoadClips()
+
     End Sub
     Private Sub CMICAFavorite_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAFavorite.MouseDown
         If DGV.SelectedRows.Count = 0 Then Return
-        Dim row = DGV.SelectedRows(0)
-        Dim clipId = CInt(row.Cells("Id").Value)
-        App.Tray.repo.ToggleFavorite(clipId)
+
+        ' Determine the intended action based on menu text
+        Dim doFavorite As Boolean = (CMICAFavorite.Text = "Favorite")
+
+        ' Apply to ALL selected clips
+        For Each row As DataGridViewRow In DGV.SelectedRows
+            Dim clipId = CInt(row.Cells("Id").Value)
+            App.Tray.repo.SetFavorite(clipId, doFavorite)
+        Next
+
         LoadClips()
         App.Tray.RefreshMenu()
+
     End Sub
     Private Sub CMICAClipViewer_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAClipViewer.MouseDown
         App.HideClipViewer()
         If DGV.SelectedRows.Count = 0 Then Return
-        Dim row = DGV.SelectedRows(0)
+        If _primaryRowIndex < 0 Then Return
+        If _primaryRowIndex >= DGV.Rows.Count Then Return
+
+        Dim row = DGV.Rows(_primaryRowIndex)
         Dim clipId = CInt(row.Cells("Id").Value)
         App.ShowClipViewer(clipId, Nothing, Nothing, True)
+
     End Sub
     Private Sub CMICAScratchPad_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAScratchPad.MouseDown
         If DGV.SelectedRows.Count = 0 Then Return
-        Dim row = DGV.SelectedRows(0)
+        If _primaryRowIndex < 0 Then Return
+        If _primaryRowIndex >= DGV.Rows.Count Then Return
+
+        Dim row = DGV.Rows(_primaryRowIndex)
         Dim clipId = CInt(row.Cells("Id").Value)
         App.ShowScratchPad(clipId)
+
     End Sub
     Private Sub CMICAOpenSourceApp_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAOpenSourceApp.MouseDown
         If DGV.SelectedRows.Count = 0 Then Return
+
         Dim item = DirectCast(sender, ToolStripMenuItem)
         Dim exePath = TryCast(item.Tag, String)
         If String.IsNullOrWhiteSpace(exePath) Then Exit Sub
@@ -170,14 +212,19 @@ Public Class ClipExplorer
         Catch
             App.WriteToLog("Unable to Open the Source Application: " & exePath)
         End Try
+
     End Sub
     Private Sub CMICADelete_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICADelete.MouseDown
         If DGV.SelectedRows.Count = 0 Then Return
-        Dim row = DGV.SelectedRows(0)
-        Dim clipId = CInt(row.Cells("Id").Value)
-        App.Tray.repo.DeleteClip(clipId)
+
+        For Each row As DataGridViewRow In DGV.SelectedRows
+            Dim clipId = CInt(row.Cells("Id").Value)
+            App.Tray.repo.DeleteClip(clipId)
+        Next
+
         LoadClips()
         App.Tray.RefreshMenu()
+
     End Sub
     Private Sub BtnClearSearch_Click(sender As Object, e As EventArgs) Handles BtnClearSearch.Click
         _searchText = String.Empty
@@ -328,6 +375,43 @@ Public Class ClipExplorer
 
         Return "< No Text Formats >"
     End Function
+    Private Sub ShowFileDrop(entries As List(Of FileDropEntry))
+        ' Clear old UI content
+        LVFileDrop.Items.Clear()
+        ILFileDrop.Images.Clear()
+
+        ' Compute totals
+        Dim count = entries.Count
+        Dim totalBytes As Long = entries.
+        Where(Function(e) File.Exists(e.FullPath)).Sum(Function(e) New FileInfo(e.FullPath).Length)
+        Dim totalSizeText = Skye.Common.FormatFileSize(totalBytes, Skye.Common.FormatFileSizeUnits.Auto)
+
+        ' Update column headers
+        LVFileDrop.Columns(1).Text = $"Name ({count})"
+        LVFileDrop.Columns(2).Text = $"Size ({totalSizeText})"
+
+        For Each e In entries
+            Dim iconIndex As Integer = -1
+
+            ' Add icon if available
+            If e.Icon IsNot Nothing Then
+                ILFileDrop.Images.Add(e.Icon)
+                iconIndex = ILFileDrop.Images.Count - 1
+            End If
+
+            ' Build ListView item
+            Dim item As New ListViewItem("", iconIndex)
+            item.SubItems.Add(e.FileName)
+            item.SubItems.Add(e.SizeText)
+            item.Tag = e.FullPath
+
+            LVFileDrop.Items.Add(item)
+        Next
+
+        ' Show the ListView preview
+        LVFileDrop.Visible = True
+        LVFileDrop.BringToFront()
+    End Sub
     Private Function GetCachedSearchText(clipId As Integer) As String
         Dim cached As String = Nothing
         If _searchCache.TryGetValue(clipId, cached) Then

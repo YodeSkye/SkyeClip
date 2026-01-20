@@ -103,42 +103,43 @@ Friend Class ClipRepository
         If formats Is Nothing OrElse formats.Count = 0 Then Exit Sub
 
         ' 2) Build preview
-        Dim preview As String = "< No Preview >"
-        Dim uni = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_UNICODETEXT)
+        Dim preview As String = BuildPreviewFromFormats(formats)
+        'Dim preview As String = "< No Preview >"
+        'Dim uni = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_UNICODETEXT)
 
-        If uni IsNot Nothing Then
-            Dim s = Encoding.Unicode.GetString(uni.DataBytes)
-            Dim escaped = String.Join(" ", s.Select(Function(c) AscW(c).ToString("X4")))
-            'Debug.Print("RAW UNICODE CODEPOINTS: " & escaped)
-        End If
+        'If uni IsNot Nothing Then
+        '    Dim s = Encoding.Unicode.GetString(uni.DataBytes)
+        '    Dim escaped = String.Join(" ", s.Select(Function(c) AscW(c).ToString("X4")))
+        '    'Debug.Print("RAW UNICODE CODEPOINTS: " & escaped)
+        'End If
 
-        Dim filedrop = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_HDROP)
-        Dim dib = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_DIB OrElse f.FormatId = Skye.WinAPI.CF_DIBV5)
-        If uni IsNot Nothing Then
-            Dim s = Encoding.Unicode.GetString(Skye.Common.TrimUnicodeNull(uni.DataBytes))
-            s = s.Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ")
-            s = System.Text.RegularExpressions.Regex.Replace(s, "\s+", " ").Trim()
+        'Dim filedrop = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_HDROP)
+        'Dim dib = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_DIB OrElse f.FormatId = Skye.WinAPI.CF_DIBV5)
+        'If uni IsNot Nothing Then
+        '    Dim s = Encoding.Unicode.GetString(Skye.Common.TrimUnicodeNull(uni.DataBytes))
+        '    s = s.Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ")
+        '    s = System.Text.RegularExpressions.Regex.Replace(s, "\s+", " ").Trim()
 
-            If String.IsNullOrWhiteSpace(s) Then
-                preview = "< No Preview >"
-            Else
-                preview = Skye.Common.Trunc(s, App.Settings.MaxClipPreviewLength)
-                Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").ToLower().Contains("rtf", StringComparison.OrdinalIgnoreCase))
-                Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").ToLower().Contains("html", StringComparison.OrdinalIgnoreCase))
-                If hasRtf Then preview &= App.CBRTFSuffix
-                If hasHtml Then preview &= App.CBHTMLSuffix
-            End If
+        '    If String.IsNullOrWhiteSpace(s) Then
+        '        preview = "< No Preview >"
+        '    Else
+        '        preview = Skye.Common.Trunc(s, App.Settings.MaxClipPreviewLength)
+        '        Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").ToLower().Contains("rtf", StringComparison.OrdinalIgnoreCase))
+        '        Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").ToLower().Contains("html", StringComparison.OrdinalIgnoreCase))
+        '        If hasRtf Then preview &= App.CBRTFSuffix
+        '        If hasHtml Then preview &= App.CBHTMLSuffix
+        '    End If
 
-        ElseIf filedrop IsNot Nothing Then
-            preview = App.BuildFileDropPreview
+        'ElseIf filedrop IsNot Nothing Then
+        '    preview = App.BuildFileDropPreview
 
-        ElseIf dib IsNot Nothing Then
-            preview = "< Image >"
+        'ElseIf dib IsNot Nothing Then
+        '    preview = "< Image >"
 
-        Else
-            Dim f0 = formats.First()
-            preview = If(String.IsNullOrWhiteSpace(f0.FormatName), $"Format {f0.FormatId}", f0.FormatName)
-        End If
+        'Else
+        '    Dim f0 = formats.First()
+        '    preview = If(String.IsNullOrWhiteSpace(f0.FormatName), $"Format {f0.FormatId}", f0.FormatName)
+        'End If
 
         ' 3) Insert or update entry
         Dim formatsForHash = FilterFormatsForHash(formats)
@@ -198,6 +199,16 @@ Friend Class ClipRepository
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
             Using cmd As New SQLiteCommand("UPDATE Clips SET IsFavorite = CASE IsFavorite WHEN 1 THEN 0 ELSE 1 END WHERE Id=@id", conn)
+                cmd.Parameters.AddWithValue("@id", clipID)
+                cmd.ExecuteNonQuery()
+            End Using
+        End Using
+    End Sub
+    Friend Sub SetFavorite(clipID As Integer, isFavorite As Boolean)
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+            Using cmd As New SQLiteCommand("UPDATE Clips SET IsFavorite = @fav WHERE Id=@id", conn)
+                cmd.Parameters.AddWithValue("@fav", If(isFavorite, 1, 0))
                 cmd.Parameters.AddWithValue("@id", clipID)
                 cmd.ExecuteNonQuery()
             End Using
