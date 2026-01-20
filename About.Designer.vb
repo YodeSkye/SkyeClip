@@ -35,6 +35,7 @@ Partial Class About
         LLblSponsorPayPal = New LinkLabel()
         LblSponsorMe = New Label()
         LLblIcons8 = New LinkLabel()
+        LblUpdateAvailable = New Skye.UI.Label()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -187,6 +188,19 @@ Partial Class About
         TipAbout.SetText(LLblIcons8, Nothing)
         LLblIcons8.TextAlign = ContentAlignment.TopRight
         ' 
+        ' LblUpdateAvailable
+        ' 
+        LblUpdateAvailable.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipAbout.SetImage(LblUpdateAvailable, Nothing)
+        LblUpdateAvailable.Location = New Point(12, 385)
+        LblUpdateAvailable.Name = "LblUpdateAvailable"
+        LblUpdateAvailable.Size = New Size(360, 23)
+        LblUpdateAvailable.TabIndex = 109
+        LblUpdateAvailable.Text = "Update Available"
+        TipAbout.SetText(LblUpdateAvailable, Nothing)
+        LblUpdateAvailable.TextAlign = ContentAlignment.MiddleCenter
+        LblUpdateAvailable.Visible = False
+        ' 
         ' About
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
@@ -202,6 +216,7 @@ Partial Class About
         Controls.Add(LLblMicrosoft)
         Controls.Add(LblAbout)
         Controls.Add(BtnOK)
+        Controls.Add(LblUpdateAvailable)
         FormBorderStyle = FormBorderStyle.Fixed3D
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         TipAbout.SetImage(Me, Nothing)
@@ -224,4 +239,5 @@ Partial Class About
     Friend WithEvents LLblSponsorPayPal As LinkLabel
     Friend WithEvents LblSponsorMe As Label
     Friend WithEvents LLblIcons8 As LinkLabel
+    Friend WithEvents LblUpdateAvailable As Skye.UI.Label
 End Class

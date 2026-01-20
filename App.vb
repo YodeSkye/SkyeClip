@@ -78,6 +78,8 @@ Friend Module App
         Friend Shared ScratchPadKeepText As Boolean ' whether to keep text in the ScratchPad
         Friend Shared ClipExplorerLocation As Point ' location of the Clip Explorer window
         Friend Shared ClipExplorerSize As Size ' size of the Clip Explorer window
+        Friend Shared LastUpdateCheck As DateTime ' the last date when update check was performed
+        Friend Shared LatestKnownVersion As String ' the latest known version
         Friend Class HotKeys
             Friend Shared ToggleFavorite As Keys
             Friend Shared ShowViewer As Keys
@@ -113,6 +115,8 @@ Friend Module App
             w = Skye.Common.RegistryHelper.GetInt("ClipExplorerSizeW", -1)
             h = Skye.Common.RegistryHelper.GetInt("ClipExplorerSizeH", -1)
             ClipExplorerSize = New Size(w, h)
+            LastUpdateCheck = Skye.Common.RegistryHelper.GetDateTime("LastUpdateCheck", DateTime.MinValue)
+            LatestKnownVersion = Skye.Common.RegistryHelper.GetString("LatestKnownVersion", String.Empty)
             HotKeys.ToggleFavorite = CType(Skye.Common.RegistryHelper.GetInt("HotKeyToggleFavorite", CInt(Keys.F)), Keys)
             HotKeys.ShowViewer = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowViewer", CInt(Keys.V)), Keys)
             HotKeys.ShowScratchPad = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowScratchPad", CInt(Keys.S)), Keys)
@@ -142,6 +146,8 @@ Friend Module App
             Skye.Common.RegistryHelper.SetInt("ClipExplorerLocationY", ClipExplorerLocation.Y)
             Skye.Common.RegistryHelper.SetInt("ClipExplorerSizeW", ClipExplorerSize.Width)
             Skye.Common.RegistryHelper.SetInt("ClipExplorerSizeH", ClipExplorerSize.Height)
+            Skye.Common.RegistryHelper.SetDateTime("LastUpdateCheck", LastUpdateCheck)
+            Skye.Common.RegistryHelper.SetString("LatestKnownVersion", LatestKnownVersion)
             Skye.Common.RegistryHelper.SetInt("HotKeyToggleFavorite", CInt(HotKeys.ToggleFavorite))
             Skye.Common.RegistryHelper.SetInt("HotKeyShowViewer", CInt(HotKeys.ShowViewer))
             Skye.Common.RegistryHelper.SetInt("HotKeyShowScratchPad", CInt(HotKeys.ShowScratchPad))
@@ -633,6 +639,10 @@ Friend Module App
         Dim ver = Assembly.GetExecutingAssembly().GetName().Version
         GetSimpleVersion = ver.Major.ToString & "." & ver.Minor.ToString
     End Function
+    Friend Function GetFullVersion() As String
+        Dim ver = Assembly.GetExecutingAssembly().GetName().Version
+        GetFullVersion = ver.Major.ToString & "." & ver.Minor.ToString & "." & ver.Build.ToString
+    End Function
     Friend Function IsLegitimateSourceApp(path As String) As Boolean
         If String.IsNullOrWhiteSpace(path) Then Return False
         If Not File.Exists(path) Then Return False
@@ -776,6 +786,46 @@ Friend Module App
                 Return Skye.UI.SkyeThemes.Dark
             End If
         End Using
+    End Function
+    Friend Sub CheckForUpdatesIfNeeded()
+        Dim last = App.Settings.LastUpdateCheck.Date
+        Dim today = Date.Today
+
+        If last = today Then
+            ' Already checked today — use cached version
+            Exit Sub
+        End If
+
+        ' Not checked today — fetch fresh version
+        Dim latest = FetchLatestVersion()
+        If latest IsNot Nothing Then
+            App.Settings.LatestKnownVersion = latest
+            App.Settings.LastUpdateCheck = DateTime.Now
+            App.Settings.Save()
+        End If
+
+    End Sub
+    Private Function FetchLatestVersion() As String
+        Try
+            Using client As New Net.Http.HttpClient()
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeClip")
+                Dim versionText As String = client.GetStringAsync("https://raw.githubusercontent.com/yodeskye/SkyeClip/master/publishedversion.txt").Result
+                Debug.Print("Fetched Latest Version: " & versionText.Trim())
+                Return versionText.Trim()
+            End Using
+        Catch
+            Return Nothing
+        End Try
+    End Function
+    Friend Function IsNewerVersion(latest As String) As Boolean
+        Try
+            Dim vCurrent As New Version(GetFullVersion())
+            Dim vLatest As New Version(latest)
+            Debug.Print("Comparing Versions: Current=" & vCurrent.ToString() & " Latest=" & vLatest.ToString())
+            Return vLatest > vCurrent
+        Catch
+            Return False
+        End Try
     End Function
 
 End Module

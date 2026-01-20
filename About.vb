@@ -19,6 +19,8 @@ Public Class About
         LblVersion.Text = $"v{ver.Major}.{ver.Minor}.{ver.Build}"
         LLblSponsorGitHub.Image = App.ResizeImage(My.Resources.ImageAttributionGitHub, 32)
         LLblSponsorPayPal.Image = App.ResizeImage(My.Resources.ImageAttributionPayPal, 32)
+        App.CheckForUpdatesIfNeeded()
+        ShowUpdateLabelIfNeeded(App.Settings.LatestKnownVersion)
         BtnOK.Select()
     End Sub
     Private Sub About_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, LblAbout.MouseDown, LblVersion.MouseDown
@@ -121,6 +123,18 @@ Public Class About
         Catch ex As Exception
             WriteToLog("Cannot Open " & target & vbCr & ex.Message)
         End Try
+    End Sub
+    Private Sub ShowUpdateLabelIfNeeded(latest As String)
+        If String.IsNullOrEmpty(latest) Then
+            LblUpdateAvailable.Visible = False
+            Exit Sub
+        End If
+        If IsNewerVersion(latest) Then
+            LblUpdateAvailable.Text = $"Update Available: v{latest}"
+            LblUpdateAvailable.Visible = True
+        Else
+            LblUpdateAvailable.Visible = False
+        End If
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         If location.X + Me.Width > Screen.PrimaryScreen.WorkingArea.Right Then location.X = Screen.PrimaryScreen.WorkingArea.Right - Me.Width + App.AdjustScreenBoundsDialogWindow
