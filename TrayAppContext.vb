@@ -122,6 +122,12 @@ Friend Class TrayAppContext
 
     ' Handlers
     Private Sub OnClipboardChanged()
+        'Debug.Print(App.SuppressNextClipboardEvent.ToString)
+        If App.SuppressNextClipboardEvent Then
+            App.SuppressNextClipboardEvent = False
+            UpdateUI()
+            Return
+        End If
 
         'Debug.Print("=== CLIPBOARD EVENT === " & DateTime.Now.ToString("HH:mm:ss.fff"))
         'Dim data = Clipboard.GetDataObject()
@@ -148,31 +154,9 @@ Friend Class TrayAppContext
         If ShouldIgnoreClip(signatureBytes, now) Then Return
 
         ' Database
-        App.CBLivePreview = App.BuildLiveClipboardPreview()
         repo.SaveClip()
 
-        ' Menu
-        BuildMenu()
-
-        ' Notifications
-        If App.Settings.BlinkOnNewClip Then StartBlink()
-        If App.Settings.NotifyOnNewClip Then
-            Dim now2 = DateTime.Now
-            If (now2 - lastToastTime).TotalMilliseconds > toastCooldownMs Then 'Toast cooldown to prevent real clip toast spam
-                lastToastTime = now2
-                Dim toast As New Skye.UI.ToastOptions With {
-                .Title = App.GetAppTitle,
-                .Message = App.CBLivePreview,
-                .Icon = My.Resources.IconApp,
-                .BackColor = Skye.UI.ThemeManager.CurrentTheme.BackColor,
-                .BorderColor = Skye.UI.ThemeManager.CurrentTheme.BorderColor,
-                .ForeColor = Skye.UI.ThemeManager.CurrentTheme.ForeColor,
-                .Duration = 4000,
-                .PlaySound = App.Settings.PlaySoundWithNotify}
-                Skye.UI.Toast.ShowToast(toast)
-            End If
-        End If
-        NIClipboard.Text = App.GetAppTitle & vbCrLf & App.CBLivePreview
+        UpdateUI()
 
     End Sub
     Private Sub OnClipSelected(sender As Object, e As MouseEventArgs)
@@ -361,6 +345,38 @@ Friend Class TrayAppContext
     End Sub
     Friend Sub RefreshMenu()
         BuildMenu()
+    End Sub
+    Private Sub UpdateUI()
+
+        ' Build preview
+        App.CBLivePreview = App.BuildLiveClipboardPreview()
+
+        ' Menu
+        BuildMenu()
+
+        ' Notifications
+        If App.Settings.BlinkOnNewClip Then StartBlink()
+        If App.Settings.NotifyOnNewClip Then
+            Dim now2 = DateTime.Now
+            If (now2 - lastToastTime).TotalMilliseconds > toastCooldownMs Then
+                lastToastTime = now2
+                Dim toast As New Skye.UI.ToastOptions With {
+                .Title = App.GetAppTitle,
+                .Message = App.CBLivePreview,
+                .Icon = My.Resources.IconApp,
+                .BackColor = Skye.UI.ThemeManager.CurrentTheme.BackColor,
+                .BorderColor = Skye.UI.ThemeManager.CurrentTheme.BorderColor,
+                .ForeColor = Skye.UI.ThemeManager.CurrentTheme.ForeColor,
+                .Duration = 4000,
+                .PlaySound = App.Settings.PlaySoundWithNotify
+            }
+                Skye.UI.Toast.ShowToast(toast)
+            End If
+        End If
+
+        ' Tray text
+        NIClipboard.Text = App.GetAppTitle & vbCrLf & App.CBLivePreview
+
     End Sub
     Friend Shared Sub RefreshFavoritesMenu(menu As ContextMenuStrip, repo As ClipRepository, clickHandler As MouseEventHandler, keyHandler As KeyEventHandler)
         Dim favorites = repo.GetFavoriteClips(App.Settings.MaxClips)

@@ -48,7 +48,7 @@ Friend Class ClipRepository
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
 
-            ' Create Clips table if missing
+            ' Clips
             Dim createClipsCmd As New SQLiteCommand("
             CREATE TABLE IF NOT EXISTS Clips (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,6 +56,7 @@ Friend Class ClipRepository
                 CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
                 LastUsedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
                 AggregateHash TEXT NOT NULL,
+                HashVersion INTEGER NOT NULL DEFAULT 1,
                 SourceAppName TEXT,
                 SourceAppPath TEXT,
                 SourceAppIcon BLOB,
@@ -63,7 +64,7 @@ Friend Class ClipRepository
             )", conn)
             createClipsCmd.ExecuteNonQuery()
 
-            ' Create ClipFormats table if missing
+            ' ClipFormats
             Dim createFormatsCmd As New SQLiteCommand("
             CREATE TABLE IF NOT EXISTS ClipFormats (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,28 +75,41 @@ Friend Class ClipRepository
             )", conn)
             createFormatsCmd.ExecuteNonQuery()
 
-            ' Run migrations
+            ' Meta table
+            Dim createMetaCmd As New SQLiteCommand("
+            CREATE TABLE IF NOT EXISTS Meta (
+                [Key] TEXT PRIMARY KEY,
+                [Value] TEXT NOT NULL
+            )", conn)
+            createMetaCmd.ExecuteNonQuery()
+
+            ' Run migrations (adds HashVersion if old DB, etc.)
             RunMigrations(conn)
 
-            ' Indexes (safe to re-run)
+            ' Indexes
             Dim idxCreatedCmd As New SQLiteCommand("CREATE INDEX IF NOT EXISTS idx_clips_created ON Clips(CreatedAt)", conn)
             idxCreatedCmd.ExecuteNonQuery()
 
             Dim idxLastUsedCmd As New SQLiteCommand("CREATE INDEX IF NOT EXISTS idx_clips_lastused ON Clips(LastUsedAt)", conn)
             idxLastUsedCmd.ExecuteNonQuery()
 
-            Dim idxHashCmd As New SQLiteCommand("CREATE UNIQUE INDEX IF NOT EXISTS idx_clips_hash ON Clips(AggregateHash)", conn)
+            ' Drop old unique index if it exists (release DBs only)
+            Dim dropOldIdx As New SQLiteCommand("DROP INDEX IF EXISTS idx_clips_hash", conn)
+            dropOldIdx.ExecuteNonQuery()
+
+            ' Composite unique index on (AggregateHash, HashVersion)
+            Dim idxHashCmd As New SQLiteCommand("CREATE UNIQUE INDEX IF NOT EXISTS idx_clips_hash ON Clips(AggregateHash, HashVersion)", conn)
             idxHashCmd.ExecuteNonQuery()
 
-            Dim indexCmd As New SQLiteCommand("CREATE INDEX IF NOT EXISTS idx_ClipFormats_EntryId ON ClipFormats(EntryId);", conn)
+            Dim indexCmd As New SQLiteCommand("CREATE INDEX IF NOT EXISTS idx_ClipFormats_EntryId ON ClipFormats(EntryId)", conn)
             indexCmd.ExecuteNonQuery()
-
         End Using
     End Sub
 
     ' Database Functions
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Sub SaveClip()
+
         ' 1) Capture formats
         Dim formats = CaptureTextFormats()
         formats.AddRange(CaptureFileDrop())
@@ -104,83 +118,59 @@ Friend Class ClipRepository
 
         ' 2) Build preview
         Dim preview As String = BuildPreviewFromFormats(formats)
-        'Dim preview As String = "< No Preview >"
-        'Dim uni = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_UNICODETEXT)
 
-        'If uni IsNot Nothing Then
-        '    Dim s = Encoding.Unicode.GetString(uni.DataBytes)
-        '    Dim escaped = String.Join(" ", s.Select(Function(c) AscW(c).ToString("X4")))
-        '    'Debug.Print("RAW UNICODE CODEPOINTS: " & escaped)
-        'End If
-
-        'Dim filedrop = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_HDROP)
-        'Dim dib = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_DIB OrElse f.FormatId = Skye.WinAPI.CF_DIBV5)
-        'If uni IsNot Nothing Then
-        '    Dim s = Encoding.Unicode.GetString(Skye.Common.TrimUnicodeNull(uni.DataBytes))
-        '    s = s.Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ")
-        '    s = System.Text.RegularExpressions.Regex.Replace(s, "\s+", " ").Trim()
-
-        '    If String.IsNullOrWhiteSpace(s) Then
-        '        preview = "< No Preview >"
-        '    Else
-        '        preview = Skye.Common.Trunc(s, App.Settings.MaxClipPreviewLength)
-        '        Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").ToLower().Contains("rtf", StringComparison.OrdinalIgnoreCase))
-        '        Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").ToLower().Contains("html", StringComparison.OrdinalIgnoreCase))
-        '        If hasRtf Then preview &= App.CBRTFSuffix
-        '        If hasHtml Then preview &= App.CBHTMLSuffix
-        '    End If
-
-        'ElseIf filedrop IsNot Nothing Then
-        '    preview = App.BuildFileDropPreview
-
-        'ElseIf dib IsNot Nothing Then
-        '    preview = "< Image >"
-
-        'Else
-        '    Dim f0 = formats.First()
-        '    preview = If(String.IsNullOrWhiteSpace(f0.FormatName), $"Format {f0.FormatId}", f0.FormatName)
-        'End If
-
-        ' 3) Insert or update entry
+        ' 3) Hash
         Dim formatsForHash = FilterFormatsForHash(formats)
         Dim aggHash As String = ComputeAggregateHash(formatsForHash)
         Dim nowVal As DateTime = DateTime.UtcNow
+        Dim hashVersion As Integer = App.Hash.CurrentHashVersion
 
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
 
-            ' Check for existing clip
-            Dim checkCmd As New SQLiteCommand("SELECT Id FROM Clips WHERE AggregateHash=@hash", conn)
+            ' Check for existing clip in SAME hash version
+            Dim checkCmd As New SQLiteCommand("
+            SELECT Id FROM Clips
+            WHERE AggregateHash=@hash AND HashVersion=@hv", conn)
             checkCmd.Parameters.AddWithValue("@hash", aggHash)
+            checkCmd.Parameters.AddWithValue("@hv", hashVersion)
             Dim existingIdObj = checkCmd.ExecuteScalar()
 
             Dim entryId As Integer
 
             If existingIdObj IsNot Nothing AndAlso Not DBNull.Value.Equals(existingIdObj) Then
-                ' Duplicate found → update LastUsedAt
+                ' Duplicate → promote
                 entryId = Convert.ToInt32(existingIdObj)
-                Dim updCmd As New SQLiteCommand("UPDATE Clips SET LastUsedAt=@now WHERE Id=@id", conn)
+                Dim updCmd As New SQLiteCommand("
+                UPDATE Clips SET LastUsedAt=@now WHERE Id=@id", conn)
                 updCmd.Parameters.AddWithValue("@now", nowVal)
                 updCmd.Parameters.AddWithValue("@id", entryId)
                 updCmd.ExecuteNonQuery()
             Else
-                ' New clip → insert metadata
+                ' New clip
                 Dim sourceInfo = GetSourceAppInfo()
                 Dim insertEntry As New SQLiteCommand("
-                    INSERT INTO Clips (Preview, CreatedAt, LastUsedAt, AggregateHash, SourceAppName, SourceAppPath, SourceAppIcon)
-                    VALUES (@p, @c, @l, @hash, @app, @apppath, @icon);
-                    SELECT last_insert_rowid();", conn)
+                INSERT INTO Clips
+                    (Preview, CreatedAt, LastUsedAt, AggregateHash, HashVersion,
+                     SourceAppName, SourceAppPath, SourceAppIcon)
+                VALUES
+                    (@p, @c, @l, @hash, @hv, @app, @apppath, @icon);
+                SELECT last_insert_rowid();", conn)
+
                 insertEntry.Parameters.AddWithValue("@p", preview)
                 insertEntry.Parameters.AddWithValue("@c", nowVal)
                 insertEntry.Parameters.AddWithValue("@l", nowVal)
                 insertEntry.Parameters.AddWithValue("@hash", aggHash)
+                insertEntry.Parameters.AddWithValue("@hv", hashVersion)
                 insertEntry.Parameters.AddWithValue("@app", sourceInfo.AppName)
                 insertEntry.Parameters.AddWithValue("@apppath", sourceInfo.ExePath)
-                insertEntry.Parameters.Add("@icon", DbType.Binary).Value = If(sourceInfo.IconBytes IsNot Nothing, CType(sourceInfo.IconBytes, Object), DBNull.Value)
+                insertEntry.Parameters.Add("@icon", DbType.Binary).Value =
+                If(sourceInfo.IconBytes IsNot Nothing, CType(sourceInfo.IconBytes, Object), DBNull.Value)
+
                 entryId = Convert.ToInt32(insertEntry.ExecuteScalar())
                 App.WriteToLog("New Clip Saved: ID=" & entryId & " """ & preview & """")
 
-                ' Insert formats only for new clips
+                ' Formats
                 For Each cd In formats
                     Dim insertFmt As New SQLiteCommand("
                     INSERT INTO ClipFormats (EntryId, FormatId, FormatName, Data)
@@ -204,6 +194,7 @@ Friend Class ClipRepository
             End Using
         End Using
     End Sub
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Sub SetFavorite(clipID As Integer, isFavorite As Boolean)
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
@@ -216,31 +207,45 @@ Friend Class ClipRepository
     End Sub
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Sub RestoreClip(entryId As Integer)
-        ' Load stored formats for this entry
+
+        ' ---------------------------------------------------------
+        ' 1. Mark Suppress var ON for the next clipboard event
+        ' ---------------------------------------------------------
+        App.SuppressNextClipboardEvent = True
+        'Debug.Print("setting App.IsRestoring to True")
+
+        ' ---------------------------------------------------------
+        ' 2. Load stored formats for this entry
+        ' ---------------------------------------------------------
         Dim formats As New List(Of ClipData)
+
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
-            Using cmd As New SQLiteCommand("SELECT FormatId, IFNULL(FormatName,''), Data FROM ClipFormats WHERE EntryId=@id", conn)
+
+            Using cmd As New SQLiteCommand("
+                SELECT FormatId, IFNULL(FormatName,''), Data
+                FROM ClipFormats
+                WHERE EntryId=@id", conn)
+
                 cmd.Parameters.AddWithValue("@id", entryId)
+
                 Using r = cmd.ExecuteReader()
                     While r.Read()
                         formats.Add(New ClipData With {
-                        .FormatId = CUInt(r.GetInt32(0)),
-                        .FormatName = r.GetString(1),
-                        .DataBytes = DirectCast(r("Data"), Byte())
-                    })
+                            .FormatId = CUInt(r.GetInt32(0)),
+                            .FormatName = r.GetString(1),
+                            .DataBytes = DirectCast(r("Data"), Byte())
+                        })
                     End While
                 End Using
             End Using
         End Using
 
-        If formats.Count = 0 Then
-            'Debug.Print($"RestoreClip: No formats found for entry {entryId}")
-            Exit Sub
-        End If
-        'Debug.Print($"RestoreClip: Loaded {formats.Count} formats for entry {entryId}")
+        If formats.Count = 0 Then Exit Sub
 
-        ' Defensive fixups for text formats only
+        ' ---------------------------------------------------------
+        ' 3. Defensive fixups for text formats
+        ' ---------------------------------------------------------
         For Each cd In formats
             If cd.FormatId = Skye.WinAPI.CF_UNICODETEXT Then
                 cd.DataBytes = EnsureUnicodeNull(cd.DataBytes)
@@ -249,18 +254,19 @@ Friend Class ClipRepository
             End If
         Next
 
-        ' Replay
-        If Not Skye.WinAPI.OpenClipboard(App.AppHandle) Then
-            'Debug.Print("RestoreClip: OpenClipboard failed")
-            Exit Sub
-        End If
+        ' ---------------------------------------------------------
+        ' 4. Open clipboard and replay formats
+        ' ---------------------------------------------------------
+        If Not Skye.WinAPI.OpenClipboard(App.AppHandle) Then Exit Sub
 
         Try
             Skye.WinAPI.EmptyClipboard()
 
             Dim restoredCount As Integer = 0
 
+            ' Replay in ranked order
             For Each cd In formats.OrderBy(Function(f) OrderRank(f))
+
                 Try
                     Dim dataLen As Integer = If(cd.DataBytes?.Length, 0)
                     If dataLen <= 0 OrElse cd.FormatId = Skye.WinAPI.CF_BITMAP Then Continue For
@@ -281,7 +287,7 @@ Friend Class ClipRepository
                         Skye.WinAPI.GlobalUnlock(hMem)
                     End Try
 
-                    ' Resolve format id
+                    ' Resolve format ID
                     Dim fmtId As UInteger = cd.FormatId
                     If fmtId = 0UI AndAlso cd.FormatName.Length > 0 Then
                         fmtId = Skye.WinAPI.RegisterClipboardFormat(cd.FormatName)
@@ -298,15 +304,34 @@ Friend Class ClipRepository
                     Else
                         restoredCount += 1
                     End If
+
                 Catch
                     ' Skip this format on any error
                 End Try
+
             Next
 
-            'Debug.Print($"RestoreClip: Restored {restoredCount} formats for entry {entryId}")
         Finally
             Skye.WinAPI.CloseClipboard()
         End Try
+
+        ' ---------------------------------------------------------
+        ' 5. Promote clip (update LastUsedAt)
+        ' ---------------------------------------------------------
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+
+            Using cmd As New SQLiteCommand("
+                UPDATE Clips
+                SET LastUsedAt = @now
+                WHERE Id = @id", conn)
+
+                cmd.Parameters.AddWithValue("@now", DateTime.UtcNow)
+                cmd.Parameters.AddWithValue("@id", entryId)
+                cmd.ExecuteNonQuery()
+            End Using
+        End Using
+
     End Sub
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Function GetClipById(clipID As Integer) As FullClipInfo
@@ -662,13 +687,25 @@ Friend Class ClipRepository
 
     ' Methods
     Private Shared Sub RunMigrations(conn As SQLiteConnection)
-
-        ' Clips Table
+        ' Existing migration
         EnsureColumn(conn, "Clips", "SourceAppPath", "TEXT")
 
-        ' ClipFormats Table
-        ' (Add future columns here)
+        ' New: HashVersion on Clips
+        EnsureColumn(conn, "Clips", "HashVersion", "INTEGER NOT NULL DEFAULT 0")
 
+        ' Ensure Meta rows
+        EnsureMeta(conn, "DatabaseVersion", "1")
+        EnsureMeta(conn, "HashVersion", "1")
+    End Sub
+    Private Shared Sub EnsureMeta(conn As SQLiteConnection, key As String, defaultValue As String)
+        Using cmd As New SQLiteCommand("
+        INSERT INTO Meta([Key],[Value])
+        SELECT @k, @v
+        WHERE NOT EXISTS (SELECT 1 FROM Meta WHERE [Key] = @k);", conn)
+            cmd.Parameters.AddWithValue("@k", key)
+            cmd.Parameters.AddWithValue("@v", defaultValue)
+            cmd.ExecuteNonQuery()
+        End Using
     End Sub
     Private Shared Sub EnsureColumn(conn As SQLiteConnection, table As String, column As String, definition As String)
         ' Check if column exists
@@ -686,7 +723,11 @@ Friend Class ClipRepository
             alter.ExecuteNonQuery()
         End Using
     End Sub
-    Private Shared Function ComputeAggregateHash(formats As List(Of ClipData)) As String
+    Friend Shared Function ComputeAggregateHash(formats As List(Of ClipData)) As String
+        ' For now, V1 is the only pipeline
+        Return ComputeAggregateHashV1(formats)
+    End Function
+    Private Shared Function ComputeAggregateHashV1(formats As List(Of ClipData)) As String
 
         'Debug.Print("Hashing formats:")
         'For Each f In formats

@@ -28,6 +28,10 @@ Friend Module App
         Public Property SizeText As String
         Public Property Icon As Icon
     End Class
+    Friend Class Hash
+        Public Const CurrentHashVersion As Integer = 1
+    End Class
+    Friend SuppressNextClipboardEvent As Boolean = False
     Friend ReadOnly AdjustScreenBoundsNormalWindow As Byte = 8 'AdjustScreenBoundsNormalWindow is the number of pixels to adjust the screen bounds for normal windows.
     Friend ReadOnly AdjustScreenBoundsDialogWindow As Byte = 10 'AdjustScreenBoundsDialogWindow is the number of pixels to adjust the screen bounds for dialog windows.
     Friend ReadOnly CBEmptyString As String = "< Clipboard Empty >"

@@ -6,9 +6,11 @@ Public Class ClipboardWatcher
     Private ReadOnly hiddenForm As Form
 
     Protected Overrides Sub WndProc(ByRef m As Message)
+
         If m.Msg = Skye.WinAPI.WM_CLIPBOARDUPDATE Then
             RaiseEvent ClipboardChanged()
         End If
+
         MyBase.WndProc(m)
     End Sub
     Public Sub New()
