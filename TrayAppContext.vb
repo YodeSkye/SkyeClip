@@ -35,6 +35,7 @@ Friend Class TrayAppContext
     Friend ReadOnly repo As ClipRepository
     Private ReadOnly ClipCM As New ContextMenuStrip()
     Private ClipCMCurrentClipId As Integer
+    Private ReadOnly uiInvoker As New Control ' for cross-thread invokes
 
     ' Blink Notification
     Private ReadOnly blinkTimer As Timer
@@ -55,6 +56,8 @@ Friend Class TrayAppContext
 
     ' Constructor
     Friend Sub New()
+
+        Dim ih = uiInvoker.Handle ' force handle creation for cross-thread invokes
 
         ' Hidden window to receive system messages
         winWatcher = New MessageWindow()
@@ -80,28 +83,27 @@ Friend Class TrayAppContext
             End If
         End If
 
-        ' Set initial live clipboard preview
-        App.CBLivePreview = App.BuildLiveClipboardPreview()
-
         ' Tray icon setup
         NIClipboard = New NotifyIcon With {
             .Icon = My.Resources.IconApp,
             .Visible = True,
             .Text = App.GetAppTitle}
-        BuildMenu()
 
-        ' Clipboard watcher
-        Watcher = New ClipboardWatcher()
-        App.AppHandle = Watcher.Handle
-        AddHandler Watcher.ClipboardChanged, AddressOf OnClipboardChanged
+        ' Blink Timer for Notifications
+        blinkTimer = New Timer With {.Interval = 250} ' milliseconds per toggle
+        AddHandler blinkTimer.Tick, AddressOf BlinkTimer_Tick
+
+        ' Initial UI Update (LiveClipboardPreview, menu build, but no notifications)
+        UpdateUI(False)
 
         ' Clipboard debounce & stabilization timer
         clipboardTimer = New Timer With {.Interval = 30}
         AddHandler clipboardTimer.Tick, AddressOf OnClipboardStabilized
 
-        ' Blink Timer for Notifications
-        blinkTimer = New Timer With {.Interval = 250} ' milliseconds per toggle
-        AddHandler blinkTimer.Tick, AddressOf BlinkTimer_Tick
+        ' Clipboard watcher
+        Watcher = New ClipboardWatcher()
+        App.AppHandle = Watcher.Handle
+        AddHandler Watcher.ClipboardChanged, AddressOf OnClipboardChanged
 
         ' Clip Context Menu
         ClipCM.Font = App.MenuFont
@@ -113,11 +115,21 @@ Friend Class TrayAppContext
         ClipCM.Items.Add(cmi)
         ClipCM.Items.Add("View Clip", My.Resources.imageClipViewer16, AddressOf OnClipCMViewClip)
         ClipCM.Items.Add("Send To Scratch Pad", My.Resources.imageScratchPad16, AddressOf OnCLipCMScratchPad)
+        ClipCM.Items.Add("Export To File", My.Resources.ImageExport16, AddressOf OnCLipCMExport)
         cmi = New ToolStripMenuItem("Open Source App", Nothing, AddressOf OnCLipCMOpenSourceApp) With {.Name = "OpenSourceApp"}
         ClipCM.Items.Add(cmi)
         ClipCM.Items.Add(New ToolStripSeparator())
         ClipCM.Items.Add("Delete", My.Resources.ImageClearRemoveDelete16, AddressOf OnClipCMDelete)
 
+    End Sub
+    Friend Sub RunOnUI(action As Action)
+        If uiInvoker.IsHandleCreated Then
+            uiInvoker.BeginInvoke(action)
+        Else
+            ' Fallback: force handle and then invoke
+            uiInvoker.CreateControl()
+            uiInvoker.BeginInvoke(action)
+        End If
     End Sub
 
     ' Handlers
@@ -303,6 +315,9 @@ Friend Class TrayAppContext
     Private Sub OnCLipCMScratchPad(sender As Object, e As EventArgs)
         App.ShowScratchPad(ClipCMCurrentClipId)
     End Sub
+    Private Sub OnCLipCMExport(sender As Object, e As EventArgs)
+        App.ExportClipToFile(ClipCMCurrentClipId)
+    End Sub
     Private Sub OnCLipCMOpenSourceApp(sender As Object, e As EventArgs)
         Dim item = DirectCast(sender, ToolStripMenuItem)
         Dim exePath = TryCast(item.Tag, String)
@@ -346,7 +361,7 @@ Friend Class TrayAppContext
     Friend Sub RefreshMenu()
         BuildMenu()
     End Sub
-    Private Sub UpdateUI()
+    Private Sub UpdateUI(Optional notify As Boolean = True)
 
         ' Build preview
         App.CBLivePreview = App.BuildLiveClipboardPreview()
@@ -355,22 +370,24 @@ Friend Class TrayAppContext
         BuildMenu()
 
         ' Notifications
-        If App.Settings.BlinkOnNewClip Then StartBlink()
-        If App.Settings.NotifyOnNewClip Then
-            Dim now2 = DateTime.Now
-            If (now2 - lastToastTime).TotalMilliseconds > toastCooldownMs Then
-                lastToastTime = now2
-                Dim toast As New Skye.UI.ToastOptions With {
-                .Title = App.GetAppTitle,
-                .Message = App.CBLivePreview,
-                .Icon = My.Resources.IconApp,
-                .BackColor = Skye.UI.ThemeManager.CurrentTheme.BackColor,
-                .BorderColor = Skye.UI.ThemeManager.CurrentTheme.BorderColor,
-                .ForeColor = Skye.UI.ThemeManager.CurrentTheme.ForeColor,
-                .Duration = 4000,
-                .PlaySound = App.Settings.PlaySoundWithNotify
-            }
-                Skye.UI.Toast.ShowToast(toast)
+        If notify Then
+            If App.Settings.BlinkOnNewClip Then StartBlink()
+            If App.Settings.NotifyOnNewClip Then
+                Dim now2 = DateTime.Now
+                If (now2 - lastToastTime).TotalMilliseconds > toastCooldownMs Then
+                    lastToastTime = now2
+                    Dim toast As New Skye.UI.ToastOptions With {
+                        .Title = App.GetAppTitle,
+                        .Message = App.CBLivePreview,
+                        .Icon = My.Resources.IconApp,
+                        .BackColor = Skye.UI.ThemeManager.CurrentTheme.BackColor,
+                        .BorderColor = Skye.UI.ThemeManager.CurrentTheme.BorderColor,
+                        .ForeColor = Skye.UI.ThemeManager.CurrentTheme.ForeColor,
+                        .Duration = 4000,
+                        .PlaySound = App.Settings.PlaySoundWithNotify
+                    }
+                    Skye.UI.Toast.ShowToast(toast)
+                End If
             End If
         End If
 
@@ -441,6 +458,21 @@ Friend Class TrayAppContext
                 End If
             End If
         Next
+    End Sub
+    Public Sub ShowToast(message As String)
+        App.Tray.RunOnUI(Sub()
+                             Dim t As New Skye.UI.ToastOptions With {
+                                    .Title = App.GetAppTitle,
+                                    .Message = message,
+                                    .Icon = My.Resources.IconApp,
+                                    .BackColor = Skye.UI.ThemeManager.CurrentTheme.BackColor,
+                                    .BorderColor = Skye.UI.ThemeManager.CurrentTheme.BorderColor,
+                                    .ForeColor = Skye.UI.ThemeManager.CurrentTheme.ForeColor,
+                                    .Duration = 4000,
+                                    .PlaySound = App.Settings.PlaySoundWithNotify
+                                }
+                             Skye.UI.Toast.ShowToast(t)
+                         End Sub)
     End Sub
     Private Shared Function HotKeyMatches(e As KeyEventArgs, hotkey As Keys) As Boolean
         Dim mods = hotkey And Keys.Modifiers
@@ -557,5 +589,6 @@ Friend Class TrayAppContext
         End Sub
 
     End Class
+
 
 End Class

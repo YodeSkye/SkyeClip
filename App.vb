@@ -1,5 +1,6 @@
 ﻿
 Imports System.IO
+Imports System.IO.Compression
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 Imports System.Text
@@ -349,7 +350,6 @@ Friend Module App
             FrmChangeLog.Close()
         End If
     End Sub
-
     Friend Sub ShowDevTools()
         If FrmDevTools Is Nothing OrElse FrmDevTools.IsDisposed Then
             FrmDevTools = New DevTools With {.WindowState = FormWindowState.Maximized}
@@ -363,6 +363,262 @@ Friend Module App
         If FrmDevTools IsNot Nothing AndAlso Not FrmDevTools.IsDisposed Then
             FrmDevTools.Close()
         End If
+    End Sub
+
+    ' EXPORT TO FILE
+    Friend Sub ExportClipToFile(clipId As Integer)
+        Dim formats = App.Tray.repo.GetClipFormats(clipId)
+        If formats Is Nothing OrElse formats.Count = 0 Then
+            MessageBox.Show("This clip has no exportable formats.")
+            Exit Sub
+        End If
+
+        Dim exportOptions = BuildExportOptions(formats)
+        If exportOptions.Count = 0 Then
+            MessageBox.Show("No supported export formats found.")
+            Exit Sub
+        End If
+
+        Dim sfd As New SaveFileDialog With {
+            .Title = "Export Clip",
+            .Filter = BuildFilterString(exportOptions),
+            .FileName = "Clip_" & clipId
+        }
+
+        If sfd.ShowDialog() <> DialogResult.OK Then Exit Sub
+
+        Dim chosenExt = Path.GetExtension(sfd.FileName).ToLower()
+        ExportByExtension(formats, chosenExt, sfd.FileName)
+    End Sub
+    Private Function BuildExportOptions(formats As List(Of ClipData)) As Dictionary(Of String, String)
+        Dim opts As New Dictionary(Of String, String)
+
+        If HasFormat(formats, "HTML Format") Then
+            opts(".html") = "HTML File (*.html)|*.html"
+        End If
+
+        If HasFormat(formats, "Rich Text Format") Then
+            opts(".rtf") = "Rich Text (*.rtf)|*.rtf"
+        End If
+
+        If HasFormat(formats, "UnicodeText") OrElse HasFormat(formats, "Text") Then
+            opts(".txt") = "Plain Text (*.txt)|*.txt"
+        End If
+
+        If HasFormat(formats, "PNG") Then
+            opts(".png") = "PNG Image (*.png)|*.png"
+        End If
+
+        If HasFormat(formats, "JFIF") OrElse HasFormat(formats, "JPEG") Then
+            opts(".jpg") = "JPEG Image (*.jpg)|*.jpg"
+        End If
+
+        If HasFormat(formats, "Bitmap") Then
+            opts(".bmp") = "Bitmap Image (*.bmp)|*.bmp"
+        End If
+
+        If formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_DIB OrElse
+                          f.FormatId = Skye.WinAPI.CF_DIBV5 OrElse
+                          f.FormatName.Contains("DIB", StringComparison.OrdinalIgnoreCase)) Then
+            opts(".png") = "PNG Image (*.png)|*.png"
+            opts(".bmp") = "Bitmap Image (*.bmp)|*.bmp"
+        End If
+
+        If HasFormat(formats, "FileDrop") Then
+            opts(".zip") = "ZIP Archive (*.zip)|*.zip"
+        End If
+
+        If opts.Count = 0 Then
+            opts(".bin") = "Binary Data (*.bin)|*.bin"
+        End If
+
+        Return opts
+    End Function
+    Private Function BuildFilterString(opts As Dictionary(Of String, String)) As String
+        Return String.Join("|", opts.Values)
+    End Function
+    Private Sub ExportByExtension(formats As List(Of ClipData), ext As String, outPath As String)
+        Select Case ext
+            Case ".html"
+                File.WriteAllBytes(outPath, GetFormatBytes(formats, "HTML Format"))
+            Case ".rtf"
+                File.WriteAllBytes(outPath, GetFormatBytes(formats, "Rich Text Format"))
+            Case ".txt"
+                File.WriteAllBytes(outPath, GetBestTextBytes(formats))
+            Case ".png"
+                Dim img = ResolveImageBytes(formats)
+                If img.bytes Is Nothing Then Exit Select
+
+                If img.kind = "png" Then
+                    File.WriteAllBytes(outPath, img.bytes)
+                Else
+                    Using bmp = If(img.kind = "dib",
+                    DIBToBitmap(img.bytes),
+                    New Bitmap(New MemoryStream(img.bytes)))
+                        Using safeBmp = NormalizeBitmap(bmp)
+                            safeBmp.Save(outPath, Imaging.ImageFormat.Png)
+                        End Using
+                    End Using
+                End If
+            Case ".jpg"
+                Dim img = ResolveImageBytes(formats)
+                If img.bytes Is Nothing Then Exit Select
+
+                If img.kind = "jpg" Then
+                    File.WriteAllBytes(outPath, img.bytes)
+                Else
+                    Using bmp = If(img.kind = "dib",
+                    DIBToBitmap(img.bytes),
+                    New Bitmap(New MemoryStream(img.bytes)))
+                        Using safeBmp = NormalizeBitmap(bmp)
+                            safeBmp.Save(outPath, Imaging.ImageFormat.Jpeg)
+                        End Using
+                    End Using
+                End If
+            Case ".bmp"
+                Dim img = ResolveImageBytes(formats)
+                If img.bytes Is Nothing Then Exit Select
+
+                If img.kind = "bmp" Then
+                    File.WriteAllBytes(outPath, img.bytes)
+                Else
+                    Using bmp = If(img.kind = "dib",
+                    DIBToBitmap(img.bytes),
+                    New Bitmap(New MemoryStream(img.bytes)))
+                        Using safeBmp = NormalizeBitmap(bmp)
+                            safeBmp.Save(outPath, Imaging.ImageFormat.Bmp)
+                        End Using
+                    End Using
+                End If
+            Case ".zip"
+                Task.Run(Sub()
+                             Try
+                                 ExportFileDropAsZip(formats, outPath)
+                                 App.Tray.ShowToast("Export Complete, Your ZIP File Is Ready.")
+                             Catch ex As Exception
+                                 App.Tray.ShowToast("Clip Export Failed.")
+                                 App.WriteToLog("Clip Export Failed: " & ex.Message)
+                             End Try
+                         End Sub)
+            Case ".bin"
+                File.WriteAllBytes(outPath, formats(0).DataBytes)
+        End Select
+    End Sub
+    Private Function HasFormat(formats As List(Of ClipData), name As String) As Boolean
+        Return formats.Any(Function(f) f.FormatName.Equals(name, StringComparison.OrdinalIgnoreCase))
+    End Function
+    Private Function GetFormatBytes(formats As List(Of ClipData), name As String) As Byte()
+        Dim f = formats.FirstOrDefault(Function(x) x.FormatName.Equals(name, StringComparison.OrdinalIgnoreCase))
+        If f Is Nothing Then Return Nothing
+        Return f.DataBytes
+    End Function
+    Private Function GetBestTextBytes(formats As List(Of ClipData)) As Byte()
+        Dim uni = formats.FirstOrDefault(Function(f) f.FormatName = "UnicodeText")
+        If uni IsNot Nothing Then Return uni.DataBytes
+
+        Dim txt = formats.FirstOrDefault(Function(f) f.FormatName = "Text")
+        If txt IsNot Nothing Then Return txt.DataBytes
+
+        Return Encoding.UTF8.GetBytes("") ' fallback
+    End Function
+    Private Function ResolveImageBytes(formats As List(Of ClipData)) As (kind As String, bytes As Byte())
+        ' 1. Prefer real PNG
+        Dim png = formats.FirstOrDefault(Function(f) f.FormatName.Contains("PNG", StringComparison.OrdinalIgnoreCase))
+        If png IsNot Nothing Then Return ("png", png.DataBytes)
+
+        ' 2. Prefer real JPEG/JFIF
+        Dim jpg = formats.FirstOrDefault(Function(f) f.FormatName.Contains("JFIF", StringComparison.OrdinalIgnoreCase) _
+                                   OrElse f.FormatName.Contains("JPEG", StringComparison.OrdinalIgnoreCase))
+        If jpg IsNot Nothing Then Return ("jpg", jpg.DataBytes)
+
+        ' 3. Prefer real BMP
+        Dim bmp = formats.FirstOrDefault(Function(f) f.FormatName.Contains("Bitmap", StringComparison.OrdinalIgnoreCase))
+        If bmp IsNot Nothing Then Return ("bmp", bmp.DataBytes)
+
+        ' 4. Fall back to DIB / DIBV5
+        Dim dib = formats.FirstOrDefault(Function(f) _
+        f.FormatName.Contains("DIB", StringComparison.OrdinalIgnoreCase) _
+        OrElse f.FormatId = Skye.WinAPI.CF_DIB _
+        OrElse f.FormatId = Skye.WinAPI.CF_DIBV5)
+
+        If dib IsNot Nothing Then Return ("dib", dib.DataBytes)
+
+        ' 5. Nothing found
+        Return (Nothing, Nothing)
+    End Function
+    Private Function DIBToBitmap(dibBytes As Byte()) As Bitmap
+        Dim headerSize As Integer = BitConverter.ToInt32(dibBytes, 0)
+
+        ' Validate header
+        If headerSize < 40 OrElse headerSize > dibBytes.Length Then
+            Throw New Exception("Invalid DIB header.")
+        End If
+
+        ' Pixel data offset = 14 + headerSize
+        Dim pixelOffset As Integer = 14 + headerSize
+
+        Using ms As New MemoryStream()
+            ' Build BMP header
+            Dim fileHeader(13) As Byte
+
+            ' Signature "BM"
+            fileHeader(0) = &H42
+            fileHeader(1) = &H4D
+
+            ' File size
+            Dim fileSize As Integer = dibBytes.Length + 14
+            BitConverter.GetBytes(fileSize).CopyTo(fileHeader, 2)
+
+            ' Reserved (4 bytes) = 0
+
+            ' Pixel data offset
+            BitConverter.GetBytes(pixelOffset).CopyTo(fileHeader, 10)
+
+            ' Write BMP header + DIB
+            ms.Write(fileHeader, 0, fileHeader.Length)
+            ms.Write(dibBytes, 0, dibBytes.Length)
+            ms.Position = 0
+
+            Return CType(Bitmap.FromStream(ms), Bitmap)
+        End Using
+    End Function
+    Private Function NormalizeBitmap(bmp As Bitmap) As Bitmap
+        Dim safeBmp As New Bitmap(bmp.Width, bmp.Height, Imaging.PixelFormat.Format24bppRgb)
+        Using g = Graphics.FromImage(safeBmp)
+            g.DrawImage(bmp, 0, 0)
+        End Using
+        Return safeBmp
+    End Function
+    Private Sub ExportFileDropAsZip(formats As List(Of ClipData), outPath As String)
+        Dim fd = formats.FirstOrDefault(Function(f) f.FormatName = "FileDrop")
+        If fd Is Nothing Then Exit Sub
+
+        Dim paths = DecodeFileDrop(fd.DataBytes)
+        If paths Is Nothing OrElse paths.Length = 0 Then Exit Sub
+
+        If File.Exists(outPath) Then File.Delete(outPath)
+
+        Using zip As ZipArchive = ZipFile.Open(outPath, ZipArchiveMode.Create)
+            For Each p In paths
+                If File.Exists(p) Then
+                    zip.CreateEntryFromFile(p, Path.GetFileName(p))
+                ElseIf Directory.Exists(p) Then
+                    AddFolderToZip(zip, p, Path.GetFileName(p))
+                End If
+            Next
+        End Using
+    End Sub
+    Private Sub AddFolderToZip(zip As ZipArchive, folderPath As String, entryRoot As String)
+        ' Add an empty directory entry (optional but nice)
+        zip.CreateEntry(entryRoot & "/")
+
+        For Each file In Directory.GetFiles(folderPath)
+            zip.CreateEntryFromFile(file, entryRoot & "/" & Path.GetFileName(file))
+        Next
+
+        For Each d In Directory.GetDirectories(folderPath)
+            AddFolderToZip(zip, d, entryRoot & "/" & Path.GetFileName(d))
+        Next
     End Sub
 
     ' METHODS
