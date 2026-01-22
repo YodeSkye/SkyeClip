@@ -62,6 +62,7 @@ Partial Class ClipExplorer
         ILFileDrop = New ImageList(components)
         RTB = New Skye.UI.RichTextBox()
         TipClipExplorer = New Skye.UI.ToolTipEX(components)
+        CMICAExport = New ToolStripMenuItem()
         StatusStripCE.SuspendLayout()
         PanelCE.SuspendLayout()
         GrpBoxSearch.SuspendLayout()
@@ -328,9 +329,9 @@ Partial Class ClipExplorer
         ' 
         CMClipActions.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.SetImage(CMClipActions, Nothing)
-        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
+        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICAExport, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
         CMClipActions.Name = "CMClipActions"
-        CMClipActions.Size = New Size(196, 148)
+        CMClipActions.Size = New Size(196, 192)
         TipClipExplorer.SetText(CMClipActions, Nothing)
         ' 
         ' CMICAUseClip
@@ -440,6 +441,13 @@ Partial Class ClipExplorer
         TipClipExplorer.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.ShadowThickness = 0
         ' 
+        ' CMICAExport
+        ' 
+        CMICAExport.Image = My.Resources.Resources.ImageExport16
+        CMICAExport.Name = "CMICAExport"
+        CMICAExport.Size = New Size(195, 22)
+        CMICAExport.Text = "Export"
+        ' 
         ' ClipExplorer
         ' 
         AutoScaleMode = AutoScaleMode.None
@@ -509,4 +517,5 @@ Partial Class ClipExplorer
     Friend WithEvents FileIcon As ColumnHeader
     Friend WithEvents FileName As ColumnHeader
     Friend WithEvents FileSize As ColumnHeader
+    Friend WithEvents CMICAExport As ToolStripMenuItem
 End Class

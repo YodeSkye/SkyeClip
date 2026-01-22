@@ -11,6 +11,7 @@ Friend Class ClipViewer
     Friend fadeOutTimer As Timer
     Private Const FadeStep As Double = 0.08 ' adjust for speed
     Private Browser As New WebBrowser
+    Private _clipID As Integer
     Protected Overrides ReadOnly Property ShowWithoutActivation As Boolean
         Get
             Return True
@@ -21,6 +22,8 @@ Friend Class ClipViewer
     Public Sub New()
         InitializeComponent()
         Opacity = 0
+        Skye.UI.ThemeManager.ApplyTheme(Me)
+        Skye.UI.ThemeManager.ApplyToTooltip(TipClipViewer)
 
         fadeInTimer = New Timer With {.Interval = 15}
         AddHandler fadeInTimer.Tick, AddressOf FadeIn_Tick
@@ -43,8 +46,6 @@ Friend Class ClipViewer
                 WebView.DefaultBackgroundColor = Color.Transparent
             End If
         Catch ex As Exception
-            ' Optional: log or ignore depending on your needs
-            ' Debug.WriteLine("WebView2 init failed: " & ex.Message)
         End Try
 
         Dim emptyMenu As New ContextMenuStrip()
@@ -52,6 +53,7 @@ Friend Class ClipViewer
 
     End Sub
     Friend Sub ShowAtScreenPoint(clipID As Integer, screenPos As System.Drawing.Point)
+        _clipID = clipID
         Location = New System.Drawing.Point(screenPos.X, screenPos.Y)
         Show()
 
@@ -68,6 +70,12 @@ Friend Class ClipViewer
     End Sub
     Private Sub ClipViewer_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyCode = Keys.Escape Then StartFadeOut()
+    End Sub
+
+    ' Control Events
+    Private Sub BtnExport_Click(sender As Object, e As EventArgs) Handles BtnExport.Click
+        Close()
+        App.ExportClipToFile(_clipID)
     End Sub
 
     ' Handlers
@@ -147,25 +155,20 @@ Friend Class ClipViewer
         Select Case format
             Case "FileDrop"
                 ShowFileDrop(bytes)
-
             Case "HTML Format"
                 ShowHtml(bytes)
-
             Case "Rich Text Format"
                 ShowRtf(bytes)
-
             Case "CF_DIB", "CF_DIBV5"
                 ShowImage(bytes)
-
             Case "UnicodeText"
                 ShowUnicode(bytes)
-
             Case "Text"
                 ShowAnsi(bytes)
-
             Case Else
                 ShowRaw(bytes, format)
         End Select
+        BtnExport.BringToFront()
 
     End Sub
     Private Function ExtractHtmlFragment(rawHtml As String) As String
@@ -233,6 +236,7 @@ Friend Class ClipViewer
                     WebView.CoreWebView2?.NavigateToString(wrappedHtml)
                     WebView.Visible = True
                     WebView.BringToFront()
+                    BtnExport.BringToFront()
                 End Sub
             Return
         End If

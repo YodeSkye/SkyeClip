@@ -376,17 +376,7 @@ Friend Class TrayAppContext
                 Dim now2 = DateTime.Now
                 If (now2 - lastToastTime).TotalMilliseconds > toastCooldownMs Then
                     lastToastTime = now2
-                    Dim toast As New Skye.UI.ToastOptions With {
-                        .Title = App.GetAppTitle,
-                        .Message = App.CBLivePreview,
-                        .Icon = My.Resources.IconApp,
-                        .BackColor = Skye.UI.ThemeManager.CurrentTheme.BackColor,
-                        .BorderColor = Skye.UI.ThemeManager.CurrentTheme.BorderColor,
-                        .ForeColor = Skye.UI.ThemeManager.CurrentTheme.ForeColor,
-                        .Duration = 4000,
-                        .PlaySound = App.Settings.PlaySoundWithNotify
-                    }
-                    Skye.UI.Toast.ShowToast(toast)
+                    ShowToast(App.CBLivePreview)
                 End If
             End If
         End If

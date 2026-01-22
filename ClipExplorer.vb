@@ -201,6 +201,17 @@ Public Class ClipExplorer
         App.ShowScratchPad(clipId)
 
     End Sub
+    Private Sub CMICAExport_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAExport.MouseDown
+        If DGV.SelectedRows.Count = 0 Then Return
+        If _primaryRowIndex < 0 Then Return
+        If _primaryRowIndex >= DGV.Rows.Count Then Return
+
+        Dim row = DGV.Rows(_primaryRowIndex)
+        Dim clipId = CInt(row.Cells("Id").Value)
+        CMClipActions.Close()
+        App.ExportClipToFile(clipId)
+
+    End Sub
     Private Sub CMICAOpenSourceApp_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAOpenSourceApp.MouseDown
         If DGV.SelectedRows.Count = 0 Then Return
 
