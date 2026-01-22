@@ -187,37 +187,52 @@ Friend Class ClipViewer
         Return rawHtml
     End Function
     Private Sub ShowFileDrop(bytes As Byte())
+
         Dim entries = App.ParseFileDrop(bytes)
 
         LVFileDrop.Items.Clear()
         ILFileDrop.Images.Clear()
 
-        ' Compute totals
+        ' Compute file-only size first (instant)
+        Dim fileBytes As Long = entries.Where(Function(e) File.Exists(e.FullPath)).Sum(Function(e) New FileInfo(e.FullPath).Length)
         Dim count = entries.Count
-        Dim totalBytes As Long = entries.Where(Function(e) File.Exists(e.FullPath)).Sum(Function(e) New FileInfo(e.FullPath).Length)
-        Dim totalSizeText = Skye.Common.FormatFileSize(totalBytes, Skye.Common.FormatFileSizeUnits.Auto)
+        Dim totalSizeText = Skye.Common.FormatFileSize(fileBytes, Skye.Common.FormatFileSizeUnits.Auto)
 
-        ' Update column headers
+        ' Update headers immediately
         LVFileDrop.Columns(1).Text = $"Name ({count})"
         LVFileDrop.Columns(2).Text = $"Size ({totalSizeText})"
 
+        ' Populate list
         For Each e In entries
             Dim iconIndex As Integer = -1
             If e.Icon IsNot Nothing Then
                 ILFileDrop.Images.Add(e.Icon)
                 iconIndex = ILFileDrop.Images.Count - 1
             End If
-
             Dim item As New ListViewItem("", iconIndex)
             item.SubItems.Add(e.FileName)
             item.SubItems.Add(e.SizeText)
             item.Tag = e.FullPath
-
             LVFileDrop.Items.Add(item)
         Next
 
         LVFileDrop.Visible = True
         LVFileDrop.BringToFront()
+
+        ' Compute folder sizes asynchronously
+        UpdateFolderSizesAsync(entries, fileBytes)
+
+    End Sub
+    Private Async Sub UpdateFolderSizesAsync(entries As List(Of FileDropEntry), fileBytes As Long)
+
+        Dim folderBytes = Await App.ComputeFolderSizesAsync(entries)
+        Dim totalBytes = fileBytes + folderBytes
+        Dim totalSizeText = Skye.Common.FormatFileSize(totalBytes, Skye.Common.FormatFileSizeUnits.Auto)
+
+        App.Tray.RunOnUI(Sub()
+                             LVFileDrop.Columns(2).Text = $"Size ({totalSizeText})"
+                         End Sub)
+
     End Sub
     Private Sub ShowHtml(bytes As Byte())
         Dim rawhtml As String = System.Text.Encoding.UTF8.GetString(bytes)

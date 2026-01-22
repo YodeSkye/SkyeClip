@@ -420,6 +420,7 @@ Friend Module App
         If formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_DIB OrElse
                           f.FormatId = Skye.WinAPI.CF_DIBV5 OrElse
                           f.FormatName.Contains("DIB", StringComparison.OrdinalIgnoreCase)) Then
+            opts(".jpg") = "JPEG Image (*.jpg)|*.jpg"
             opts(".png") = "PNG Image (*.png)|*.png"
             opts(".bmp") = "Bitmap Image (*.bmp)|*.bmp"
         End If
@@ -810,6 +811,35 @@ Friend Module App
         Next
 
         Return list
+    End Function
+    Public Async Function ComputeFolderSizesAsync(entries As List(Of FileDropEntry)) As Task(Of Long)
+        Dim folderPaths = entries.
+            Where(Function(e) Directory.Exists(e.FullPath)).
+            Select(Function(e) e.FullPath).
+            ToList()
+
+        Dim total As Long = 0
+
+        For Each folder In folderPaths
+            total += Await Task.Run(Function() GetFolderSize(folder))
+        Next
+
+        Return total
+    End Function
+    Private Function GetFolderSize(path As String) As Long
+        Dim total As Long = 0
+
+        Try
+            For Each file In Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
+                Try
+                    total += New FileInfo(file).Length
+                Catch
+                End Try
+            Next
+        Catch
+        End Try
+
+        Return total
     End Function
     Friend Function GetSourceAppInfo() As (AppName As String, IconBytes As Byte(), ExePath As String)
         Dim hwnd = Skye.WinAPI.GetForegroundWindow()

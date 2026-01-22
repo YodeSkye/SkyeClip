@@ -387,14 +387,14 @@ Public Class ClipExplorer
         Return "< No Text Formats >"
     End Function
     Private Sub ShowFileDrop(entries As List(Of FileDropEntry))
+
         ' Clear old UI content
         LVFileDrop.Items.Clear()
         ILFileDrop.Images.Clear()
 
-        ' Compute totals
+        ' Compute totals (files only)
         Dim count = entries.Count
-        Dim totalBytes As Long = entries.
-        Where(Function(e) File.Exists(e.FullPath)).Sum(Function(e) New FileInfo(e.FullPath).Length)
+        Dim totalBytes As Long = entries.Where(Function(e) File.Exists(e.FullPath)).Sum(Function(e) New FileInfo(e.FullPath).Length)
         Dim totalSizeText = Skye.Common.FormatFileSize(totalBytes, Skye.Common.FormatFileSizeUnits.Auto)
 
         ' Update column headers
@@ -403,25 +403,34 @@ Public Class ClipExplorer
 
         For Each e In entries
             Dim iconIndex As Integer = -1
-
-            ' Add icon if available
             If e.Icon IsNot Nothing Then
                 ILFileDrop.Images.Add(e.Icon)
                 iconIndex = ILFileDrop.Images.Count - 1
             End If
-
-            ' Build ListView item
             Dim item As New ListViewItem("", iconIndex)
             item.SubItems.Add(e.FileName)
             item.SubItems.Add(e.SizeText)
             item.Tag = e.FullPath
-
             LVFileDrop.Items.Add(item)
         Next
 
-        ' Show the ListView preview
         LVFileDrop.Visible = True
         LVFileDrop.BringToFront()
+
+        ' Compute folder sizes in the background
+        UpdateFolderSizesAsync(entries, totalBytes)
+
+    End Sub
+    Private Async Sub UpdateFolderSizesAsync(entries As List(Of FileDropEntry), fileBytes As Long)
+
+        Dim folderBytes = Await App.ComputeFolderSizesAsync(entries)
+        Dim totalBytes = fileBytes + folderBytes
+        Dim totalSizeText = Skye.Common.FormatFileSize(totalBytes, Skye.Common.FormatFileSizeUnits.Auto)
+
+        App.Tray.RunOnUI(Sub()
+                             LVFileDrop.Columns(2).Text = $"Size ({totalSizeText})"
+                         End Sub)
+
     End Sub
     Private Function GetCachedSearchText(clipId As Integer) As String
         Dim cached As String = Nothing
