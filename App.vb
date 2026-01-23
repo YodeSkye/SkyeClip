@@ -547,7 +547,7 @@ Friend Module App
         ' 5. Nothing found
         Return (Nothing, Nothing)
     End Function
-    Private Function DIBToBitmap(dibBytes As Byte()) As Bitmap
+    Friend Function DIBToBitmap(dibBytes As Byte()) As Bitmap
         Dim headerSize As Integer = BitConverter.ToInt32(dibBytes, 0)
 
         ' Validate header

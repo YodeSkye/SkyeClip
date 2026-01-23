@@ -103,6 +103,22 @@ Public Class ClipExplorer
             Return
         End If
 
+        ' Detect Image formats
+        Dim img = formats.FirstOrDefault(Function(f) _
+            f.FormatId = Skye.WinAPI.CF_DIB OrElse
+            f.FormatId = Skye.WinAPI.CF_DIBV5 OrElse
+            f.FormatId = Skye.WinAPI.CF_BITMAP OrElse
+            f.FormatName.Contains("PNG", StringComparison.OrdinalIgnoreCase) OrElse
+            f.FormatName.Contains("JFIF", StringComparison.OrdinalIgnoreCase) OrElse
+            f.FormatName.Contains("JPEG", StringComparison.OrdinalIgnoreCase) OrElse
+            f.FormatName.Contains("JPG", StringComparison.OrdinalIgnoreCase) OrElse
+            f.FormatName.Contains("Bitmap", StringComparison.OrdinalIgnoreCase) OrElse
+            f.FormatName.Contains("DeviceIndependentBitmap", StringComparison.OrdinalIgnoreCase))
+        If img IsNot Nothing Then
+            ShowImage(img.DataBytes, img)
+            Return
+        End If
+
         ' Otherwise show text/HTML/RTF preview
         Dim preview = BuildPreviewText(formats)
         RTB.Text = preview
@@ -432,6 +448,47 @@ Public Class ClipExplorer
                          End Sub)
 
     End Sub
+    Private Sub ShowImage(bytes As Byte(), format As ClipData)
+        Dim img As Image = Nothing
+        Select Case format.FormatId
+            Case Skye.WinAPI.CF_DIB, Skye.WinAPI.CF_DIBV5
+                ' Wrap DIB into BMP
+                Dim bmpBytes = WrapDibAsBmp(bytes)
+                Using ms As New MemoryStream(bmpBytes)
+                    img = Image.FromStream(ms)
+                End Using
+            Case Skye.WinAPI.CF_BITMAP
+                ' Convert HBITMAP → Bitmap
+                img = App.DIBToBitmap(bytes)
+            Case Else
+                ' PNG, JFIF, JPEG, etc. → load directly
+                Using ms As New MemoryStream(bytes)
+                    img = Image.FromStream(ms)
+                End Using
+        End Select
+        PicBox.Image = img
+        PicBox.Visible = True
+        PicBox.BringToFront()
+    End Sub
+    Private Function WrapDibAsBmp(dib() As Byte) As Byte()
+        Dim header(13) As Byte
+
+        header(0) = &H42 ' B
+        header(1) = &H4D ' M
+
+        Dim biSize As Integer = BitConverter.ToInt32(dib, 0)
+        Dim bfOffBits As Integer = 14 + biSize
+        Buffer.BlockCopy(BitConverter.GetBytes(bfOffBits), 0, header, 10, 4)
+
+        Dim bfSize As Integer = 14 + dib.Length
+        Buffer.BlockCopy(BitConverter.GetBytes(bfSize), 0, header, 2, 4)
+
+        Dim result(header.Length + dib.Length - 1) As Byte
+        Buffer.BlockCopy(header, 0, result, 0, header.Length)
+        Buffer.BlockCopy(dib, 0, result, header.Length, dib.Length)
+
+        Return result
+    End Function
     Private Function GetCachedSearchText(clipId As Integer) As String
         Dim cached As String = Nothing
         If _searchCache.TryGetValue(clipId, cached) Then

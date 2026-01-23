@@ -52,9 +52,11 @@ Partial Class ClipExplorer
         CMICAFavorite = New ToolStripMenuItem()
         CMICAClipViewer = New ToolStripMenuItem()
         CMICAScratchPad = New ToolStripMenuItem()
+        CMICAExport = New ToolStripMenuItem()
         CMICAOpenSourceApp = New ToolStripMenuItem()
         ToolStripSeparator2 = New ToolStripSeparator()
         CMICADelete = New ToolStripMenuItem()
+        PicBox = New PictureBox()
         LVFileDrop = New ListView()
         FileIcon = New ColumnHeader()
         FileName = New ColumnHeader()
@@ -62,7 +64,6 @@ Partial Class ClipExplorer
         ILFileDrop = New ImageList(components)
         RTB = New Skye.UI.RichTextBox()
         TipClipExplorer = New Skye.UI.ToolTipEX(components)
-        CMICAExport = New ToolStripMenuItem()
         StatusStripCE.SuspendLayout()
         PanelCE.SuspendLayout()
         GrpBoxSearch.SuspendLayout()
@@ -72,6 +73,7 @@ Partial Class ClipExplorer
         SplitContainerCE.SuspendLayout()
         CType(DGV, ComponentModel.ISupportInitialize).BeginInit()
         CMClipActions.SuspendLayout()
+        CType(PicBox, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' StatusStripCE
@@ -251,6 +253,7 @@ Partial Class ClipExplorer
         ' 
         ' SplitContainerCE.Panel2
         ' 
+        SplitContainerCE.Panel2.Controls.Add(PicBox)
         SplitContainerCE.Panel2.Controls.Add(LVFileDrop)
         SplitContainerCE.Panel2.Controls.Add(RTB)
         TipClipExplorer.SetImage(SplitContainerCE.Panel2, Nothing)
@@ -331,7 +334,7 @@ Partial Class ClipExplorer
         TipClipExplorer.SetImage(CMClipActions, Nothing)
         CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICAExport, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
         CMClipActions.Name = "CMClipActions"
-        CMClipActions.Size = New Size(196, 192)
+        CMClipActions.Size = New Size(196, 170)
         TipClipExplorer.SetText(CMClipActions, Nothing)
         ' 
         ' CMICAUseClip
@@ -367,6 +370,13 @@ Partial Class ClipExplorer
         CMICAScratchPad.Size = New Size(195, 22)
         CMICAScratchPad.Text = "Send To Scratch Pad"
         ' 
+        ' CMICAExport
+        ' 
+        CMICAExport.Image = My.Resources.Resources.ImageExport16
+        CMICAExport.Name = "CMICAExport"
+        CMICAExport.Size = New Size(195, 22)
+        CMICAExport.Text = "Export"
+        ' 
         ' CMICAOpenSourceApp
         ' 
         CMICAOpenSourceApp.Name = "CMICAOpenSourceApp"
@@ -384,6 +394,19 @@ Partial Class ClipExplorer
         CMICADelete.Name = "CMICADelete"
         CMICADelete.Size = New Size(195, 22)
         CMICADelete.Text = "Delete"
+        ' 
+        ' PicBox
+        ' 
+        PicBox.Dock = DockStyle.Fill
+        TipClipExplorer.SetImage(PicBox, Nothing)
+        PicBox.Location = New Point(0, 0)
+        PicBox.Name = "PicBox"
+        PicBox.Size = New Size(240, 369)
+        PicBox.SizeMode = PictureBoxSizeMode.Zoom
+        PicBox.TabIndex = 31
+        PicBox.TabStop = False
+        TipClipExplorer.SetText(PicBox, Nothing)
+        PicBox.Visible = False
         ' 
         ' LVFileDrop
         ' 
@@ -441,13 +464,6 @@ Partial Class ClipExplorer
         TipClipExplorer.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.ShadowThickness = 0
         ' 
-        ' CMICAExport
-        ' 
-        CMICAExport.Image = My.Resources.Resources.ImageExport16
-        CMICAExport.Name = "CMICAExport"
-        CMICAExport.Size = New Size(195, 22)
-        CMICAExport.Text = "Export"
-        ' 
         ' ClipExplorer
         ' 
         AutoScaleMode = AutoScaleMode.None
@@ -475,6 +491,7 @@ Partial Class ClipExplorer
         SplitContainerCE.ResumeLayout(False)
         CType(DGV, ComponentModel.ISupportInitialize).EndInit()
         CMClipActions.ResumeLayout(False)
+        CType(PicBox, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -518,4 +535,5 @@ Partial Class ClipExplorer
     Friend WithEvents FileName As ColumnHeader
     Friend WithEvents FileSize As ColumnHeader
     Friend WithEvents CMICAExport As ToolStripMenuItem
+    Friend WithEvents PicBox As PictureBox
 End Class
