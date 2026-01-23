@@ -45,6 +45,7 @@ Module Startup
         Else
             App.ScratchPadText = String.Empty
         End If
+        Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Scratch Pad Proper Case function.
 
         ' Start the application
         Application.EnableVisualStyles()

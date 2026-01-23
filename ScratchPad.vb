@@ -189,6 +189,11 @@ Friend Class ScratchPad
         CMICopy.Enabled = RTB.SelectedText.Length > 0
         CMIDelete.Enabled = RTB.SelectedText.Length > 0
         CMIPaste.Enabled = Clipboard.ContainsText()
+        If RTB.SelectionLength = 0 Then
+            MICase.Enabled = False
+        Else
+            MICase.Enabled = True
+        End If
         If RTB.TextLength = 0 OrElse RTB.SelectionLength = RTB.TextLength Then
             CMISelectAll.Enabled = False
         Else
@@ -229,6 +234,18 @@ Friend Class ScratchPad
     End Sub
     Private Sub CMIDelete_Click(sender As Object, e As EventArgs) Handles CMIDelete.Click
         Delete()
+    End Sub
+    Private Sub CMIToUpperCase_Click(sender As Object, e As EventArgs) Handles CMIToUpperCase.Click
+        ApplyUpperCase()
+    End Sub
+    Private Sub CMIToLowerCase_Click(sender As Object, e As EventArgs) Handles CMIToLowerCase.Click
+        ApplyLowerCase()
+    End Sub
+    Private Sub CMIToProperCase_Click(sender As Object, e As EventArgs) Handles CMIToProperCase.Click
+        ApplyProperCase()
+    End Sub
+    Private Sub CMIToSentenceCase_Click(sender As Object, e As EventArgs) Handles CMIToSentenceCase.Click
+        ApplySentenceCase()
     End Sub
     Private Sub CMISelectAll_Click(sender As Object, e As EventArgs) Handles CMISelectAll.Click
         SelectAll()
@@ -298,6 +315,7 @@ Friend Class ScratchPad
     End Function
     Private Function PickBestFormat(dt As DataTable) As DataRow
         Dim priority = {
+            "FileDrop",
             "Rich Text Format",
             "UnicodeText",
             "Text",
@@ -327,6 +345,8 @@ Friend Class ScratchPad
                 ShowUnicode(bytes)
             Case "Text"
                 ShowAnsi(bytes)
+            Case "FileDrop"
+                ShowFileDropAsText(bytes)
             Case Else
                 ShowRaw(bytes, format)
         End Select
@@ -349,6 +369,19 @@ Friend Class ScratchPad
         Dim raw = Encoding.UTF8.GetString(bytes)
         Dim plain = Regex.Replace(raw, "<.*?>", "")
         RTB.Text &= plain
+    End Sub
+    Private Sub ShowFileDropAsText(bytes As Byte())
+
+        Dim entries = App.ParseFileDrop(bytes)
+
+        Dim sb As New StringBuilder()
+        For Each e In entries
+            sb.AppendLine(e.FullPath)
+        Next
+
+        ' Show in the Scratch Pad text box
+        RTB.Text &= sb.ToString()
+
     End Sub
     Private Sub ShowRaw(bytes As Byte(), format As String)
         RTB.Text &= $"[{format}] {bytes.Length} bytes"
@@ -422,6 +455,18 @@ Friend Class ScratchPad
     End Sub
     Private Sub Delete()
         RTB.SelectedText = String.Empty
+    End Sub
+    Private Sub ApplyUpperCase()
+        RTB.SelectedText = RTB.SelectedText.ToUpperInvariant()
+    End Sub
+    Private Sub ApplyLowerCase()
+        RTB.SelectedText = RTB.SelectedText.ToLowerInvariant()
+    End Sub
+    Private Sub ApplyProperCase()
+        RTB.SelectedText = StrConv(RTB.SelectedText, VbStrConv.ProperCase)
+    End Sub
+    Private Sub ApplySentenceCase()
+        Skye.Common.ToSentenceCasePreserveFormatting(RTB)
     End Sub
     Private Sub SelectAll()
         RTB.SelectAll()
