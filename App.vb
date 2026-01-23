@@ -729,9 +729,10 @@ Friend Module App
         Dim preview = Skye.Common.Trunc(s, App.Settings.MaxClipPreviewLength)
 
         ' Detect RTF/HTML
-        Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").ToLower().Contains("rtf"))
-        Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").ToLower().Contains("html"))
-
+        'Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").ToLower().Contains("rtf"))
+        'Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").ToLower().Contains("html"))
+        Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").Contains("rtf", StringComparison.OrdinalIgnoreCase))
+        Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").Contains("html", StringComparison.OrdinalIgnoreCase))
         If hasRtf Then preview &= App.CBRTFSuffix
         If hasHtml Then preview &= App.CBHTMLSuffix
 
