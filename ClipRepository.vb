@@ -394,7 +394,7 @@ Friend Class ClipRepository
                 While reader.Read()
                     Dim ci As New BasicClipInfo With {
                         .Id = reader.GetInt32(0),
-                        .Preview = If(reader.IsDBNull(1), "", reader.GetString(1))
+                        .Preview = If(reader.IsDBNull(1), String.Empty, reader.GetString(1))
                     }
 
                     ' LastUsedAt

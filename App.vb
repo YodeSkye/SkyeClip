@@ -719,7 +719,7 @@ Friend Module App
 
         ' Normalize whitespace
         s = s.Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ")
-        s = System.Text.RegularExpressions.Regex.Replace(s, "\s+", " ").Trim()
+        s = System.Text.RegularExpressions.Regex.Replace(s, "\s+", " ").TrimEnd()
 
         If String.IsNullOrWhiteSpace(s) Then
             Return "< No Preview >"

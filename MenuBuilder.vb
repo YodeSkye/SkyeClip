@@ -2,7 +2,9 @@
 Public Class MenuBuilder
 
     Friend Shared Function BuildMenu(repo As ClipRepository, commonActions As List(Of App.CommonAction), clipClickHandler As MouseEventHandler, menuKeyHandler As KeyEventHandler) As ContextMenuStrip
-        Dim menu As New ContextMenuStrip With {.Font = App.MenuFont}
+        Dim menu As New ContextMenuStrip With {
+            .Font = App.MenuFont,
+            .ShowItemToolTips = False}
 
         ' ============================================================
         ' --- LIVE CLIPBOARD ITEM (always first) ---
@@ -24,10 +26,10 @@ Public Class MenuBuilder
             menu.Items.Add(none)
         Else
             For Each clip In clips
-                Dim rawText = clip.Preview
-                Dim previewText = System.Text.RegularExpressions.Regex.Replace(
-                    rawText.Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " "),
-                    "\s+", " ").Trim()
+                Dim previewText = clip.Preview
+                'Dim previewText = System.Text.RegularExpressions.Regex.Replace(
+                '    rawText.Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " "),
+                '    "\s+", " ").Trim()
                 Dim preview = If(String.IsNullOrWhiteSpace(previewText), "< No Preview >", previewText)
 
                 Dim item As New ToolStripMenuItem(preview) With {
@@ -36,9 +38,9 @@ Public Class MenuBuilder
                     .Font = App.MenuFont
                 }
 
-                If Not String.Equals(preview, rawText, StringComparison.Ordinal) Then
-                    item.ToolTipText = rawText
-                End If
+                'If Not String.Equals(preview, rawText, StringComparison.Ordinal) Then
+                '    item.ToolTipText = rawText
+                'End If
 
                 If clip.SourceAppIcon IsNot Nothing AndAlso clip.SourceAppIcon.Length > 0 Then
                     Using ms As New IO.MemoryStream(clip.SourceAppIcon)
@@ -88,8 +90,9 @@ Public Class MenuBuilder
 
         Dim favDropDown As New ContextMenuStrip With {
             .Name = "FavoritesDropDown",
-            .Font = App.MenuFont}
-        favDropDown.Renderer = New Skye.UI.SkyeMenuRenderer
+            .Font = App.MenuFont,
+            .Renderer = New Skye.UI.SkyeMenuRenderer
+        }
         AddHandler favDropDown.KeyDown, menuKeyHandler
 
         For Each fav In favorites
