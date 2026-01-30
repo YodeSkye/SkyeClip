@@ -1,7 +1,7 @@
 ﻿# SkyeClip
 A lightweight, fast, and elegant clipboard manager for Windows.
 ![Clip Explorer](media/SkyeClipExplorer.png)
-![Tray Menu & Viewer](media/SkyeClipViewer.png)
+![Tray Menu & Viewer](media/SkyeClip%20Viewer.png)
 
 ---
 
