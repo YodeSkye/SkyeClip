@@ -389,12 +389,12 @@ Partial Class Settings
         CoBoxAutoBackupFrequency.DrawMode = DrawMode.OwnerDrawFixed
         CoBoxAutoBackupFrequency.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxAutoBackupFrequency.FormattingEnabled = True
-        TipSettings.SetImage(CoBoxAutoBackupFrequency, Nothing)
+        TipSettings.SetImage(CoBoxAutoBackupFrequency, My.Resources.Resources.ImageBackup16)
         CoBoxAutoBackupFrequency.Location = New Point(526, 118)
         CoBoxAutoBackupFrequency.Name = "CoBoxAutoBackupFrequency"
         CoBoxAutoBackupFrequency.Size = New Size(216, 30)
         CoBoxAutoBackupFrequency.TabIndex = 1105
-        TipSettings.SetText(CoBoxAutoBackupFrequency, "Select a backup frequency.")
+        TipSettings.SetText(CoBoxAutoBackupFrequency, "Select a backup frequency." & vbCrLf & "Automatic Backups are stored in ")
         ' 
         ' LblAutoBackup
         ' 
@@ -410,32 +410,34 @@ Partial Class Settings
         ' ChkBoxAutoPurgeBackups
         ' 
         ChkBoxAutoPurgeBackups.AutoSize = True
-        TipSettings.SetImage(ChkBoxAutoPurgeBackups, Nothing)
+        TipSettings.SetImage(ChkBoxAutoPurgeBackups, My.Resources.Resources.ImageBackup16)
         ChkBoxAutoPurgeBackups.Location = New Point(550, 149)
         ChkBoxAutoPurgeBackups.Name = "ChkBoxAutoPurgeBackups"
         ChkBoxAutoPurgeBackups.RightToLeft = RightToLeft.Yes
         ChkBoxAutoPurgeBackups.Size = New Size(168, 25)
         ChkBoxAutoPurgeBackups.TabIndex = 1107
-        TipSettings.SetText(ChkBoxAutoPurgeBackups, "Automatically purge older auto-saved backups, keeping the most recent 10. Manually saved backups are never deleted.")
+        TipSettings.SetText(ChkBoxAutoPurgeBackups, "Automatically purge older auto-saved backups, keeping the most recent 10." & vbCrLf & "Manually saved backups are never deleted.")
         ChkBoxAutoPurgeBackups.Text = "Auto Purge Backups"
         ChkBoxAutoPurgeBackups.UseVisualStyleBackColor = True
         ' 
         ' BtnBackupNow
         ' 
-        TipSettings.SetImage(BtnBackupNow, Nothing)
+        BtnBackupNow.Image = My.Resources.Resources.ImageBackup16
+        TipSettings.SetImage(BtnBackupNow, My.Resources.Resources.ImageBackup16)
         BtnBackupNow.ImageAlign = ContentAlignment.MiddleLeft
         BtnBackupNow.Location = New Point(550, 12)
         BtnBackupNow.Name = "BtnBackupNow"
         BtnBackupNow.Size = New Size(194, 32)
         BtnBackupNow.TabIndex = 1108
-        TipSettings.SetText(BtnBackupNow, "Backup the clip database now.")
+        TipSettings.SetText(BtnBackupNow, "Backup the clip database now." & vbCrLf & "Backups are located in ")
         BtnBackupNow.Text = "Backup Now"
         BtnBackupNow.TextAlign = ContentAlignment.MiddleRight
         BtnBackupNow.UseVisualStyleBackColor = True
         ' 
         ' BtnRestoreNow
         ' 
-        TipSettings.SetImage(BtnRestoreNow, Nothing)
+        BtnRestoreNow.Image = My.Resources.Resources.ImageRestore16
+        TipSettings.SetImage(BtnRestoreNow, My.Resources.Resources.ImageRestore16)
         BtnRestoreNow.ImageAlign = ContentAlignment.MiddleLeft
         BtnRestoreNow.Location = New Point(550, 50)
         BtnRestoreNow.Name = "BtnRestoreNow"

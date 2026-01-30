@@ -14,6 +14,12 @@ Public Class Settings
         AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
         Text = "Settings for " & GetAppTitle()
         CMTxtBox.Font = App.MenuFont
+        Dim bstr As String = TipSettings.GetText(BtnBackupNow)
+        bstr &= App.UserPath
+        TipSettings.SetText(BtnBackupNow, bstr)
+        bstr = TipSettings.GetText(CoBoxAutoBackupFrequency)
+        bstr &= App.UserPath
+        TipSettings.SetText(CoBoxAutoBackupFrequency, bstr)
 
         'Settings
         ChkBoxThemeAuto.Checked = App.Settings.ThemeAuto
