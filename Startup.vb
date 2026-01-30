@@ -9,7 +9,7 @@ Module Startup
     <STAThread>
     Friend Sub Main()
 
-        ' Single-Instance check
+        ' SINGLE INSTANCE CHECK
 #If DEBUG Then
         Const MutexName As String = "SkyeClip_SingleInstanceDEV"
 #Else
@@ -19,7 +19,7 @@ Module Startup
         appmutex = New Mutex(True, MutexName, createdNew)
         If Not createdNew Then Return 'Another instance is already running → just exit
 
-        ' Initialize the application
+        ' INITIALIZE APPLICATION
         App.WriteToLog(GetAssemblyName() & " Started...")
 #If DEBUG Then
         Skye.Common.RegistryHelper.BaseKey = "Software\" + App.GetAssemblyName + "DEV" 'Use separate registry key for debug builds
@@ -27,18 +27,21 @@ Module Startup
         Skye.Common.RegistryHelper.BaseKey = "Software\" + App.GetAssemblyName 'Use standard registry key for release builds
 #End If
         App.Settings.Load()
+
         ' Get Theme
         If App.Settings.ThemeAuto Then
             Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
         Else
             Skye.UI.ThemeManager.CurrentTheme = Skye.UI.SkyeThemes.GetTheme(App.Settings.ThemeName)
         End If
+
         ' Check autostart setting
         Dim autostart As Boolean = App.IsAutoStartEnabled
         If autostart <> App.Settings.AutoStartWithWindows Then
             App.Settings.AutoStartWithWindows = autostart
             App.Settings.Save()
         End If
+
         ' Load scratchpad text if setting enabled
         If App.Settings.ScratchPadKeepText AndAlso IO.File.Exists(App.ScratchPadPath) Then
             App.ScratchPadText = IO.File.ReadAllText(App.ScratchPadPath)
@@ -47,14 +50,15 @@ Module Startup
         End If
         Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Scratch Pad Proper Case function.
 
-        ' Start the application
+        ' START APPLICATION
         Application.EnableVisualStyles()
         Application.SetCompatibleTextRenderingDefault(False)
         App.Tray = New TrayAppContext()
         AddHandler Skye.UI.ThemeManager.ThemeChanged, AddressOf App.Tray.OnThemeChanged
+        App.MaintenanceTimer.Start()
         Application.Run(App.Tray)
 
-        ' Application is closing
+        ' APPLICATION IS CLOSING
         App.WriteToLog("..." & GetAssemblyName() & " Closed")
 
     End Sub

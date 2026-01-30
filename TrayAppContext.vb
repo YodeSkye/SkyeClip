@@ -32,7 +32,7 @@ Friend Class TrayAppContext
             .Handler = AddressOf OnAppView_MouseDown,
             .Image = My.Resources.ImageSettings16
         }}
-    Friend ReadOnly repo As ClipRepository
+    Friend repo As ClipRepository
     Private ReadOnly ClipCM As New ContextMenuStrip()
     Private ClipCMCurrentClipId As Integer
     Private ReadOnly uiInvoker As New Control ' for cross-thread invokes
@@ -72,16 +72,6 @@ Friend Class TrayAppContext
 
         ' Instantiate repository once, pointing to your database file
         repo = New ClipRepository()
-
-        ' Auto-purge old clips once per day
-        If App.Settings.AutoPurge Then
-            If Date.Today > App.Settings.LastPurgeDate Then
-                Dim cutoff = DateTime.Now.AddDays(-App.Settings.PurgeDays)
-                repo.PurgeClips(cutoff)
-                App.Settings.LastPurgeDate = Date.Today
-                App.Settings.Save()
-            End If
-        End If
 
         ' Tray icon setup
         NIClipboard = New NotifyIcon With {
@@ -361,7 +351,7 @@ Friend Class TrayAppContext
     Friend Sub RefreshMenu()
         BuildMenu()
     End Sub
-    Private Sub UpdateUI(Optional notify As Boolean = True)
+    Friend Sub UpdateUI(Optional notify As Boolean = True)
 
         ' Build preview
         App.CBLivePreview = App.BuildLiveClipboardPreview()
@@ -449,7 +439,7 @@ Friend Class TrayAppContext
             End If
         Next
     End Sub
-    Public Sub ShowToast(message As String)
+    Friend Sub ShowToast(message As String)
         App.Tray.RunOnUI(Sub()
                              Dim t As New Skye.UI.ToastOptions With {
                                     .Title = App.GetAppTitle,

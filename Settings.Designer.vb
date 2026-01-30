@@ -52,6 +52,11 @@ Partial Class Settings
         ChkBoxThemeAuto = New CheckBox()
         LblTheme = New Label()
         CoBoxTheme = New Skye.UI.ComboBox()
+        CoBoxAutoBackupFrequency = New Skye.UI.ComboBox()
+        LblAutoBackup = New Label()
+        ChkBoxAutoPurgeBackups = New CheckBox()
+        BtnBackupNow = New Button()
+        BtnRestoreNow = New Button()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -59,7 +64,7 @@ Partial Class Settings
         BtnOK.Anchor = AnchorStyles.Bottom
         BtnOK.Image = My.Resources.Resources.ImageOK
         TipSettings.SetImage(BtnOK, Nothing)
-        BtnOK.Location = New Point(210, 469)
+        BtnOK.Location = New Point(346, 469)
         BtnOK.Margin = New Padding(4)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
@@ -379,11 +384,78 @@ Partial Class Settings
         CoBoxTheme.TabIndex = 100
         TipSettings.SetText(CoBoxTheme, "Select a Theme.")
         ' 
+        ' CoBoxAutoBackupFrequency
+        ' 
+        CoBoxAutoBackupFrequency.DrawMode = DrawMode.OwnerDrawFixed
+        CoBoxAutoBackupFrequency.DropDownStyle = ComboBoxStyle.DropDownList
+        CoBoxAutoBackupFrequency.FormattingEnabled = True
+        TipSettings.SetImage(CoBoxAutoBackupFrequency, Nothing)
+        CoBoxAutoBackupFrequency.Location = New Point(526, 118)
+        CoBoxAutoBackupFrequency.Name = "CoBoxAutoBackupFrequency"
+        CoBoxAutoBackupFrequency.Size = New Size(216, 30)
+        CoBoxAutoBackupFrequency.TabIndex = 1105
+        TipSettings.SetText(CoBoxAutoBackupFrequency, "Select a backup frequency.")
+        ' 
+        ' LblAutoBackup
+        ' 
+        TipSettings.SetImage(LblAutoBackup, Nothing)
+        LblAutoBackup.Location = New Point(526, 97)
+        LblAutoBackup.Name = "LblAutoBackup"
+        LblAutoBackup.Size = New Size(216, 21)
+        LblAutoBackup.TabIndex = 1106
+        LblAutoBackup.Text = "Auto Backup:"
+        TipSettings.SetText(LblAutoBackup, Nothing)
+        LblAutoBackup.TextAlign = ContentAlignment.MiddleLeft
+        ' 
+        ' ChkBoxAutoPurgeBackups
+        ' 
+        ChkBoxAutoPurgeBackups.AutoSize = True
+        TipSettings.SetImage(ChkBoxAutoPurgeBackups, Nothing)
+        ChkBoxAutoPurgeBackups.Location = New Point(550, 149)
+        ChkBoxAutoPurgeBackups.Name = "ChkBoxAutoPurgeBackups"
+        ChkBoxAutoPurgeBackups.RightToLeft = RightToLeft.Yes
+        ChkBoxAutoPurgeBackups.Size = New Size(168, 25)
+        ChkBoxAutoPurgeBackups.TabIndex = 1107
+        TipSettings.SetText(ChkBoxAutoPurgeBackups, "Automatically purge older auto-saved backups, keeping the most recent 10. Manually saved backups are never deleted.")
+        ChkBoxAutoPurgeBackups.Text = "Auto Purge Backups"
+        ChkBoxAutoPurgeBackups.UseVisualStyleBackColor = True
+        ' 
+        ' BtnBackupNow
+        ' 
+        TipSettings.SetImage(BtnBackupNow, Nothing)
+        BtnBackupNow.ImageAlign = ContentAlignment.MiddleLeft
+        BtnBackupNow.Location = New Point(550, 12)
+        BtnBackupNow.Name = "BtnBackupNow"
+        BtnBackupNow.Size = New Size(194, 32)
+        BtnBackupNow.TabIndex = 1108
+        TipSettings.SetText(BtnBackupNow, "Backup the clip database now.")
+        BtnBackupNow.Text = "Backup Now"
+        BtnBackupNow.TextAlign = ContentAlignment.MiddleRight
+        BtnBackupNow.UseVisualStyleBackColor = True
+        ' 
+        ' BtnRestoreNow
+        ' 
+        TipSettings.SetImage(BtnRestoreNow, Nothing)
+        BtnRestoreNow.ImageAlign = ContentAlignment.MiddleLeft
+        BtnRestoreNow.Location = New Point(550, 50)
+        BtnRestoreNow.Name = "BtnRestoreNow"
+        BtnRestoreNow.Size = New Size(194, 32)
+        BtnRestoreNow.TabIndex = 1109
+        TipSettings.SetText(BtnRestoreNow, "Restore a backup file and overwrite the current clip database.")
+        BtnRestoreNow.Text = "Restore From Backup"
+        BtnRestoreNow.TextAlign = ContentAlignment.MiddleRight
+        BtnRestoreNow.UseVisualStyleBackColor = True
+        ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(484, 546)
+        ClientSize = New Size(756, 546)
+        Controls.Add(BtnRestoreNow)
+        Controls.Add(BtnBackupNow)
+        Controls.Add(ChkBoxAutoPurgeBackups)
+        Controls.Add(CoBoxAutoBackupFrequency)
+        Controls.Add(LblAutoBackup)
         Controls.Add(CoBoxTheme)
         Controls.Add(ChkBoxAutoStartWithWindows)
         Controls.Add(ChkBoxPlaySoundWithNotify)
@@ -452,4 +524,9 @@ Partial Class Settings
     Friend WithEvents ChkBoxThemeAuto As CheckBox
     Friend WithEvents LblTheme As Label
     Friend WithEvents CoBoxTheme As Skye.UI.ComboBox
+    Friend WithEvents CoBoxAutoBackupFrequency As Skye.UI.ComboBox
+    Friend WithEvents LblAutoBackup As Label
+    Friend WithEvents ChkBoxAutoPurgeBackups As CheckBox
+    Friend WithEvents BtnBackupNow As Button
+    Friend WithEvents BtnRestoreNow As Button
 End Class

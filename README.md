@@ -1,7 +1,14 @@
 ﻿# SkyeClip
 A lightweight, fast, and elegant clipboard manager for Windows.
+![Clip Explorer](media/SkyeClipExplorer.png)
+![Tray Menu & Viewer](media/SkyeClipTray.png)
 
-SkyeClip keeps track of everything you copy, lets you favorite important items, and gives you quick access through a clean tray menu and optional toast notifications. Designed to stay out of your way until you need it — and to feel like a natural extension of Windows.
+---
+
+## ⚡ Quick Overview
+SkyeClip is a modern clipboard manager for Windows that captures everything you copy, 
+keeps your history organized, and gives you fast access through a clean tray menu, 
+Clip Explorer, and customizable HotKeys.
 
 ---
 
@@ -38,7 +45,16 @@ SkyeClip keeps track of everything you copy, lets you favorite important items, 
 ### 🧹 Auto‑Purge & Cleanup
 - Automatically remove old clips after X days  
 - Manual purge option for instant cleanup  
-- Favorites are always preserved  
+- Favorites are always preserved
+
+### ⚙️ Automatic Backups
+- Regular backups of clipboard history
+- Manual option
+- Flexible schedule
+- Auto‑purge of old backups
+- Restore support
+
+### ⚙️ Customizable Settings
 
 ### 🛠️ Lightweight & Efficient
 - Minimal CPU usage  
@@ -59,7 +75,7 @@ SkyeClip supports customizable HotKeys for:
 
 ---
 
-💡 Why SkyeClip?
+## 💡 Why SkyeClip?
 Most clipboard managers are either too heavy, too limited, or too intrusive.
 SkyeClip focuses on:
 - Fidelity — preserves original clipboard formats
@@ -69,20 +85,28 @@ SkyeClip focuses on:
 
 ---
 
+## 🖥️ System Requirements
+- Windows 10 or later
+- .NET 10.0 Runtime
+
+---
+
 ## 📦 Installation
 Download the latest release from the **Releases** page and run the installer.  
 No additional dependencies required.
 
 ---
 
-## 📝 What’s New (v1.1)
-- Improved clipboard format handling
-- More reliable duplicate detection
-- Cleaner previews for text, HTML, and RTF
+## 📝 What’s New (v1.2)
+- Backup System
+- Better filedrop previews
+- Image Previews in Clip Explorer
+- Export Clip
+- Cleaner unified previews for text, HTML, and RTF
 - Better stability when capturing images and file drops
-- General performance and reliability improvements
-- Clip Explorer
-- Themes: Light, Dark, and System Default
+- Update/Version Checker
+- Clip Explorer improvements
+- More Themes
 
 Full changelog available in app.
 

@@ -36,6 +36,20 @@ Public Class Settings
         TxtBoxHotKeyShowScratchPad.Text = FormatHotKey(App.Settings.HotKeys.ShowScratchPad)
         TxtBoxPurgeDays.Text = App.Settings.PurgeDays.ToString
         ChkBoxAutoPurge.Checked = App.Settings.AutoPurge
+        CoBoxAutoBackupFrequency.Items.Clear()
+        For Each freq As AutoBackupFrequency In [Enum].GetValues(GetType(AutoBackupFrequency))
+            CoBoxAutoBackupFrequency.Items.Add(New App.AutoBackupFrequencyEnumItem With {
+                .Value = freq,
+                .Text = freq.ToString().Replace("_", " ")
+            })
+        Next
+        For Each item As App.AutoBackupFrequencyEnumItem In CoBoxAutoBackupFrequency.Items
+            If item.Value = App.Settings.AutoBackup Then
+                CoBoxAutoBackupFrequency.SelectedItem = item
+                Exit For
+            End If
+        Next
+        ChkBoxAutoPurgeBackups.Checked = App.Settings.AutoBackupPurge
 
     End Sub
     Private Sub Settings_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
@@ -87,6 +101,54 @@ Public Class Settings
         App.Tray.repo.PurgeClips(cutoff)
         App.Tray.RefreshMenu()
     End Sub
+    Private Sub BtnBackupNow_Click(sender As Object, e As EventArgs) Handles BtnBackupNow.Click
+        App.BackupManual()
+    End Sub
+    Private Sub BtnRestoreNow_Click(sender As Object, e As EventArgs) Handles BtnRestoreNow.Click
+        Using dlg As New OpenFileDialog()
+            dlg.Title = "Select a SkyeClip Backup"
+            dlg.InitialDirectory = App.UserPath
+            dlg.Filter = "SkyeClip Backups (*.db)|*.db"
+            dlg.RestoreDirectory = True
+
+            If dlg.ShowDialog() <> DialogResult.OK Then
+                Exit Sub
+            End If
+
+            Dim backupPath As String = dlg.FileName
+
+            ' ---------------------------------------------------------
+            ' 1. Ask if user wants to back up current DB first
+            ' ---------------------------------------------------------
+            Dim backupFirst = MessageBox.Show("Would you like to create a backup of your current clipboard history before restoring?",
+                                "Backup Before Restore",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Question)
+
+            If backupFirst = DialogResult.Yes Then BackupManual()
+
+            ' ---------------------------------------------------------
+            ' 2. Confirm destructive restore
+            ' ---------------------------------------------------------
+            Dim msg As String = "Restoring a backup will replace your current database. This action cannot be undone." & vbCrLf & vbCrLf & "Are you sure you want to continue?"
+            Dim result = MessageBox.Show(msg,
+                                     "Restore Backup",
+                                     MessageBoxButtons.YesNo,
+                                     MessageBoxIcon.Warning)
+            If result <> DialogResult.Yes Then Exit Sub
+
+            App.RestoreBackup(backupPath)
+
+        End Using
+    End Sub
+    Private Sub CoBoxAutoBackupFrequency_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxAutoBackupFrequency.SelectionChangeCommitted
+        Dim item = CType(CoBoxAutoBackupFrequency.SelectedItem, App.AutoBackupFrequencyEnumItem)
+        App.Settings.AutoBackup = item.Value
+    End Sub
+    Private Sub ChkBoxAutoPurgeBackups_Click(sender As Object, e As EventArgs) Handles ChkBoxAutoPurgeBackups.Click
+        App.Settings.AutoBackupPurge = ChkBoxAutoPurgeBackups.Checked
+    End Sub
+
     Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxMaxClips.KeyDown, TxtBoxMaxClipPreviewLength.KeyDown, TxtBoxPurgeDays.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.Handled = True
@@ -97,7 +159,7 @@ Public Class Settings
         If Not Char.IsNumber(e.KeyChar) AndAlso Not e.KeyChar = ControlChars.Back Then e.Handled = True
     End Sub
     Private Sub TxtBox_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles TxtBoxMaxClips.PreviewKeyDown, TxtBoxMaxClipPreviewLength.PreviewKeyDown, TxtBoxPurgeDays.PreviewKeyDown
-        CMTxtBox.ShortcutKeys(CType(sender, TextBox), e)
+        CMTxtBox.ShortcutKeys(CType(sender, System.Windows.Forms.TextBox), e)
     End Sub
     Private Sub TxtBoxMaxClips_Validated(sender As Object, e As EventArgs) Handles TxtBoxMaxClips.Validated
         If Not String.IsNullOrEmpty(TxtBoxMaxClips.Text) Then

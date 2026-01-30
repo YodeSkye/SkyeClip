@@ -1,6 +1,7 @@
 ﻿
 Imports System.IO
 Imports System.IO.Compression
+Imports System.Linq.Expressions
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 Imports System.Text
@@ -50,14 +51,36 @@ Friend Module App
     Friend Property ChangeLogLastVersionShown As String = String.Empty
     Friend Property CBLivePreview As String
     Friend Property AppHandle As IntPtr
+    Friend Enum AutoBackupFrequency
+        Never
+        Every_Day
+        Every_Other_Day
+        Every_Three_Days
+        Every_Week
+        Every_Other_Week
+        Every_Month
+    End Enum
+    Friend Class AutoBackupFrequencyEnumItem
+        Public Property Value As AutoBackupFrequency
+        Public Property Text As String
+        Public Overrides Function ToString() As String
+            Return Text
+        End Function
+    End Class
+    Friend WithEvents MaintenanceTimer As New Timer() With {
+        .Interval = 60000, ' 1 minute
+        .Enabled = False
+    }
 
     ' Paths
     Friend ReadOnly UserPath As String = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) & "\Skye\" 'UserPath is the base path for user-specific files.
 #If DEBUG Then
+    Private ReadOnly devFileTag As String = "DEV"
     Friend ReadOnly LogPath As String = IO.Path.GetTempPath & GetAssemblyName() & "LogDEV.txt" 'LogPath is the path to the log file.
     Friend ReadOnly DBPath As String = UserPath & Application.ProductName & "ClipboardDEV.db" 'DatabasePath is the path to the SQLite database file.
     Friend ReadOnly ScratchPadPath As String = UserPath & Application.ProductName & "ScratchPadDEV.rtf" 'ScratchPadPath is the path to the ScratchPad KeepText RTF file.
 #Else
+    Private ReadOnly devFileTag As String = String.Empty
     Friend ReadOnly LogPath As String = IO.Path.GetTempPath & GetAssemblyName() & "Log.txt" 'LogPath is the path to the log file.
     Friend ReadOnly DBPath As String = UserPath & Application.ProductName & "Clipboard.db" 'DatabasePath is the path to the SQLite database file.
     Friend ReadOnly ScratchPadPath As String = UserPath & Application.ProductName & "ScratchPad.rtf" 'ScratchPadPath is the path to the ScratchPad KeepText RTF file.
@@ -68,6 +91,9 @@ Friend Module App
     Friend Class Settings
         Friend Shared ThemeName As String ' the name of the current theme
         Friend Shared ThemeAuto As Boolean ' whether to auto-switch theme based on system settings
+        Friend Shared AutoBackup As AutoBackupFrequency ' frequency of automatic backups
+        Friend Shared LastAutoBackup As DateTime ' the last date when automatic backup was performed
+        Friend Shared AutoBackupPurge As Boolean ' whether to auto-purge old backups
         Friend Shared AutoStartWithWindows As Boolean ' whether to auto-start with Windows
         Friend Shared MaxClips As Integer ' maximum number of clipboard entries to show
         Friend Shared MaxClipPreviewLength As Integer ' in characters
@@ -96,6 +122,9 @@ Friend Module App
             Dim starttime As TimeSpan = DateTime.Now.TimeOfDay
             ThemeName = Skye.Common.RegistryHelper.GetString("ThemeName", "Dark")
             ThemeAuto = Skye.Common.RegistryHelper.GetBool("ThemeAuto", False)
+            AutoBackup = CType(Skye.Common.RegistryHelper.GetInt("AutoBackup", CInt(AutoBackupFrequency.Never)), AutoBackupFrequency)
+            LastAutoBackup = Skye.Common.RegistryHelper.GetDateTime("LastAutoBackup", DateTime.MinValue)
+            AutoBackupPurge = Skye.Common.RegistryHelper.GetBool("AutoBackupPurge", True)
             ChangeLogLastVersionShown = Skye.Common.RegistryHelper.GetString("ChangeLogLastVersionShown", String.Empty)
             AutoStartWithWindows = Skye.Common.RegistryHelper.GetBool("AutoStartWithWindows", False)
             MaxClips = Skye.Common.RegistryHelper.GetInt("MaxClips", 30)
@@ -131,6 +160,9 @@ Friend Module App
             Dim starttime As TimeSpan = DateTime.Now.TimeOfDay
             Skye.Common.RegistryHelper.SetString("ThemeName", ThemeName)
             Skye.Common.RegistryHelper.SetBool("ThemeAuto", ThemeAuto)
+            Skye.Common.RegistryHelper.SetInt("AutoBackup", CInt(AutoBackup))
+            Skye.Common.RegistryHelper.SetDateTime("LastAutoBackup", LastAutoBackup)
+            Skye.Common.RegistryHelper.SetBool("AutoBackupPurge", AutoBackupPurge)
             Skye.Common.RegistryHelper.SetString("ChangeLogLastVersionShown", ChangeLogLastVersionShown)
             Skye.Common.RegistryHelper.SetBool("AutoStartWithWindows", AutoStartWithWindows)
             Skye.Common.RegistryHelper.SetInt("MaxClips", MaxClips)
@@ -174,6 +206,51 @@ Friend Module App
     Private FrmAbout As About
     Private FrmChangeLog As ChangeLog
     Private FrmDevTools As DevTools
+
+    ' HANDLERS
+    Private Sub MaintenanceTimer_Tick(sender As Object, e As EventArgs) Handles MaintenanceTimer.Tick
+
+        ' ---------------------------------------------------------
+        ' Auto Purge old clips once per day
+        ' ---------------------------------------------------------
+        Try
+            If App.Settings.AutoPurge Then
+                If Date.Today > App.Settings.LastPurgeDate Then
+                    Dim cutoff = DateTime.Now.AddDays(-App.Settings.PurgeDays)
+
+                    Tray.repo.PurgeClips(cutoff)
+                    App.Settings.LastPurgeDate = Date.Today
+                    App.Settings.Save()
+
+                    App.Tray.ShowToast("Daily purge completed")
+                End If
+            End If
+        Catch ex As Exception
+            WriteToLog("Auto Clip Purge Execution Error: " & ex.Message)
+        End Try
+
+
+        ' ---------------------------------------------------------
+        ' Auto Backup based on frequency enum
+        ' ---------------------------------------------------------
+        Try
+            Dim freq = App.Settings.AutoBackup
+            If freq <> AutoBackupFrequency.Never Then
+                Dim last = App.Settings.LastAutoBackup
+                Dim nextTime = GetNextAutoBackupTime(last, freq)
+                If DateTime.Now >= nextTime Then
+
+                    BackupAuto()
+                    App.Settings.LastAutoBackup = DateTime.Now
+                    App.Settings.Save()
+
+                End If
+            End If
+        Catch ex As Exception
+            App.WriteToLog("Auto Backup Execution Error: " & ex.Message)
+        End Try
+
+    End Sub
 
     ' FORMS
     Friend Sub ShowClipExplorer()
@@ -621,6 +698,88 @@ Friend Module App
             AddFolderToZip(zip, d, entryRoot & "/" & Path.GetFileName(d))
         Next
     End Sub
+
+    ' BACKUP SYSTEM
+    Friend Sub BackupManual()
+        Dim fileName As String = $"{Application.ProductName}{devFileTag}_Backup_{DateTime.Now:yyyyMMdd_HHmmss}.db"
+        Dim path As String = IO.Path.Combine(App.UserPath, fileName)
+        Try
+            File.Copy(App.DBPath, path, overwrite:=True)
+            Tray.ShowToast("Backup Completed Successfully")
+            WriteToLog("Manual Backup Successful: " & path)
+        Catch ex As Exception
+            WriteToLog("Manual Backup Failed: " & path & vbCr & ex.Message)
+        End Try
+    End Sub
+    Friend Sub BackupAuto()
+        Dim fileName As String = $"{Application.ProductName}{devFileTag}_AutoBackup_{DateTime.Now:yyyyMMdd_HHmmss}.db"
+        Dim path As String = IO.Path.Combine(App.UserPath, fileName)
+        Try
+            File.Copy(App.DBPath, path, overwrite:=True)
+            If App.Settings.AutoBackupPurge Then
+                PurgeOldAutoBackups()
+            End If
+            WriteToLog("Auto Backup Successful: " & path)
+        Catch ex As Exception
+            WriteToLog("Auto Backup Failed: " & path & vbCr & ex.Message)
+        End Try
+    End Sub
+    Private Sub PurgeOldAutoBackups()
+        Try
+            Dim files = Directory.GetFiles(App.UserPath, $"{Application.ProductName}{devFileTag}_AutoBackup_*.db").OrderByDescending(Function(f) File.GetCreationTime(f)).ToList()
+            If files.Count > 10 Then
+                For Each f In files.Skip(10)
+                    File.Delete(f)
+                Next
+                WriteToLog("Auto Backup Purge Completed.")
+            End If
+        Catch ex As Exception
+            WriteToLog("Auto Backup Purge Failed." & vbCr & ex.Message)
+        End Try
+    End Sub
+    Friend Sub RestoreBackup(backupPath As String)
+        Try
+
+            ' 1. Overwrite current database
+            File.Copy(backupPath, App.DBPath, overwrite:=True)
+
+            ' 2. Recreate the repository so migrations run
+            Tray.repo = New ClipRepository()
+            Tray.UpdateUI(False)
+
+            Tray.ShowToast("Backup Restored Successfully")
+            WriteToLog("Backup successfully restored from: " & backupPath)
+        Catch ex As Exception
+            WriteToLog("Failed to restore backup from: " & backupPath & vbCr & ex.Message)
+        End Try
+    End Sub
+    Private Function GetNextAutoBackupTime(last As DateTime, freq As AutoBackupFrequency) As DateTime
+        Select Case freq
+            Case AutoBackupFrequency.Never
+                Return DateTime.MaxValue
+
+            Case AutoBackupFrequency.Every_Day
+                Return last.AddDays(1)
+
+            Case AutoBackupFrequency.Every_Other_Day
+                Return last.AddDays(2)
+
+            Case AutoBackupFrequency.Every_Three_Days
+                Return last.AddDays(3)
+
+            Case AutoBackupFrequency.Every_Week
+                Return last.AddDays(7)
+
+            Case AutoBackupFrequency.Every_Other_Week
+                Return last.AddDays(14)
+
+            Case AutoBackupFrequency.Every_Month
+                Return last.AddMonths(1)
+
+            Case Else
+                Return DateTime.MaxValue
+        End Select
+    End Function
 
     ' METHODS
     Friend Function BuildLiveClipboardPreview() As String
