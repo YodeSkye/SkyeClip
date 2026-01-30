@@ -62,9 +62,7 @@ Clip Explorer, and customizable HotKeys.
 - No background services  
 - Starts instantly and stays out of your way  
 
----
-
-## 🚀 HotKeys
+### 🚀 HotKeys
 SkyeClip supports customizable HotKeys for:
 
 - Favorites / Unfavorite the current clip
