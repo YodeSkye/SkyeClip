@@ -56,12 +56,6 @@ Clip Explorer, and customizable HotKeys.
 
 ### ⚙️ Customizable Settings
 
-### 🛠️ Lightweight & Efficient
-- Minimal CPU usage  
-- Small SQLite database  
-- No background services  
-- Starts instantly and stays out of your way  
-
 ### 🚀 HotKeys
 SkyeClip supports customizable HotKeys for:
 
@@ -70,6 +64,12 @@ SkyeClip supports customizable HotKeys for:
 - Opening the Scratch Pad and pasting the current clip into it
 
 (HotKeys can be configured in Settings.)
+
+### 🛠️ Lightweight & Efficient
+- Minimal CPU usage  
+- Small SQLite database  
+- No background services  
+- Starts instantly and stays out of your way  
 
 ---
 
