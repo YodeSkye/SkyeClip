@@ -124,7 +124,6 @@ Public Class Settings
         If item Is Nothing Then Return
 
         ' Ensure it becomes selected (for visual feedback)
-
         item.Selected = True
         Dim selectedSource As String = item.Text
 
@@ -331,14 +330,22 @@ Public Class Settings
 
     ' Methods
     Private Sub SetPage(page As String)
+        PanelGeneral.Enabled = False
+        PanelClips.Enabled = False
+        PanelHotKeys.Enabled = False
+        PanelBackup.Enabled = False
         Select Case page
             Case "General"
+                PanelGeneral.Enabled = True
                 PanelGeneral.BringToFront()
             Case "Clips"
+                PanelClips.Enabled = True
                 PanelClips.BringToFront()
             Case "Hot Keys"
+                PanelHotKeys.Enabled = True
                 PanelHotKeys.BringToFront()
             Case "Backup"
+                PanelBackup.Enabled = True
                 PanelBackup.BringToFront()
         End Select
     End Sub
