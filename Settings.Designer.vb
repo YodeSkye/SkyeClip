@@ -57,6 +57,20 @@ Partial Class Settings
         ChkBoxAutoPurgeBackups = New CheckBox()
         BtnBackupNow = New Button()
         BtnRestoreNow = New Button()
+        PanelPageSelector = New Panel()
+        LVPageSelector = New ListView()
+        ILPageSelector = New ImageList(components)
+        PanelGeneral = New Panel()
+        PanelClips = New Panel()
+        PanelHotKeys = New Panel()
+        PanelBackup = New Panel()
+        PanelControls = New Panel()
+        PanelPageSelector.SuspendLayout()
+        PanelGeneral.SuspendLayout()
+        PanelClips.SuspendLayout()
+        PanelHotKeys.SuspendLayout()
+        PanelBackup.SuspendLayout()
+        PanelControls.SuspendLayout()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -64,7 +78,7 @@ Partial Class Settings
         BtnOK.Anchor = AnchorStyles.Bottom
         BtnOK.Image = My.Resources.Resources.ImageOK
         TipSettings.SetImage(BtnOK, Nothing)
-        BtnOK.Location = New Point(346, 469)
+        BtnOK.Location = New Point(163, 14)
         BtnOK.Margin = New Padding(4)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
@@ -76,7 +90,7 @@ Partial Class Settings
         ' 
         LblMaxClips.AutoSize = True
         TipSettings.SetImage(LblMaxClips, Nothing)
-        LblMaxClips.Location = New Point(10, 7)
+        LblMaxClips.Location = New Point(10, 9)
         LblMaxClips.Name = "LblMaxClips"
         LblMaxClips.Size = New Size(77, 21)
         LblMaxClips.TabIndex = 1
@@ -87,10 +101,10 @@ Partial Class Settings
         ' 
         TxtBoxMaxClips.ContextMenuStrip = CMTxtBox
         TipSettings.SetImage(TxtBoxMaxClips, Nothing)
-        TxtBoxMaxClips.Location = New Point(12, 28)
+        TxtBoxMaxClips.Location = New Point(12, 30)
         TxtBoxMaxClips.Name = "TxtBoxMaxClips"
         TxtBoxMaxClips.ShortcutsEnabled = False
-        TxtBoxMaxClips.Size = New Size(60, 29)
+        TxtBoxMaxClips.Size = New Size(75, 29)
         TxtBoxMaxClips.TabIndex = 10
         TipSettings.SetText(TxtBoxMaxClips, "Maximum number of clips to show in the menu.")
         TxtBoxMaxClips.TextAlign = HorizontalAlignment.Center
@@ -106,10 +120,10 @@ Partial Class Settings
         ' 
         TxtBoxMaxClipPreviewLength.ContextMenuStrip = CMTxtBox
         TipSettings.SetImage(TxtBoxMaxClipPreviewLength, Nothing)
-        TxtBoxMaxClipPreviewLength.Location = New Point(12, 89)
+        TxtBoxMaxClipPreviewLength.Location = New Point(112, 30)
         TxtBoxMaxClipPreviewLength.Name = "TxtBoxMaxClipPreviewLength"
         TxtBoxMaxClipPreviewLength.ShortcutsEnabled = False
-        TxtBoxMaxClipPreviewLength.Size = New Size(60, 29)
+        TxtBoxMaxClipPreviewLength.Size = New Size(73, 29)
         TxtBoxMaxClipPreviewLength.TabIndex = 20
         TipSettings.SetText(TxtBoxMaxClipPreviewLength, "Maximum text length of each clip in the menu.")
         TxtBoxMaxClipPreviewLength.TextAlign = HorizontalAlignment.Center
@@ -118,7 +132,7 @@ Partial Class Settings
         ' 
         LblMaxClipPreviewLength.AutoSize = True
         TipSettings.SetImage(LblMaxClipPreviewLength, Nothing)
-        LblMaxClipPreviewLength.Location = New Point(10, 68)
+        LblMaxClipPreviewLength.Location = New Point(110, 9)
         LblMaxClipPreviewLength.Name = "LblMaxClipPreviewLength"
         LblMaxClipPreviewLength.Size = New Size(181, 21)
         LblMaxClipPreviewLength.TabIndex = 3
@@ -134,9 +148,8 @@ Partial Class Settings
         ' 
         ChkBoxBlinkOnNewClip.AutoSize = True
         TipSettings.SetImage(ChkBoxBlinkOnNewClip, Nothing)
-        ChkBoxBlinkOnNewClip.Location = New Point(317, 43)
+        ChkBoxBlinkOnNewClip.Location = New Point(12, 72)
         ChkBoxBlinkOnNewClip.Name = "ChkBoxBlinkOnNewClip"
-        ChkBoxBlinkOnNewClip.RightToLeft = RightToLeft.Yes
         ChkBoxBlinkOnNewClip.Size = New Size(155, 25)
         ChkBoxBlinkOnNewClip.TabIndex = 30
         TipSettings.SetText(ChkBoxBlinkOnNewClip, "Blink the tray icon several times when the clipboard changes.")
@@ -147,9 +160,8 @@ Partial Class Settings
         ' 
         ChkBoxNotifyOnNewClip.AutoSize = True
         TipSettings.SetImage(ChkBoxNotifyOnNewClip, Nothing)
-        ChkBoxNotifyOnNewClip.Location = New Point(308, 65)
+        ChkBoxNotifyOnNewClip.Location = New Point(12, 96)
         ChkBoxNotifyOnNewClip.Name = "ChkBoxNotifyOnNewClip"
-        ChkBoxNotifyOnNewClip.RightToLeft = RightToLeft.Yes
         ChkBoxNotifyOnNewClip.Size = New Size(164, 25)
         ChkBoxNotifyOnNewClip.TabIndex = 35
         TipSettings.SetText(ChkBoxNotifyOnNewClip, "Show a notification toast when the clipboard changes.")
@@ -160,7 +172,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyToggleFavorite.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyToggleFavorite, My.Resources.Resources.ImageFavorites16)
-        TxtBoxHotKeyToggleFavorite.Location = New Point(12, 211)
+        TxtBoxHotKeyToggleFavorite.Location = New Point(123, 96)
         TxtBoxHotKeyToggleFavorite.Name = "TxtBoxHotKeyToggleFavorite"
         TxtBoxHotKeyToggleFavorite.ReadOnly = True
         TxtBoxHotKeyToggleFavorite.ShortcutsEnabled = False
@@ -172,7 +184,7 @@ Partial Class Settings
         ' LblHotKeyToggleFavorite
         ' 
         TipSettings.SetImage(LblHotKeyToggleFavorite, Nothing)
-        LblHotKeyToggleFavorite.Location = New Point(10, 190)
+        LblHotKeyToggleFavorite.Location = New Point(121, 75)
         LblHotKeyToggleFavorite.Name = "LblHotKeyToggleFavorite"
         LblHotKeyToggleFavorite.Size = New Size(146, 24)
         LblHotKeyToggleFavorite.TabIndex = 7
@@ -184,7 +196,7 @@ Partial Class Settings
         ' 
         LblHotKeys.Font = New Font("Segoe UI", 12F, FontStyle.Underline, GraphicsUnit.Point, CByte(0))
         TipSettings.SetImage(LblHotKeys, Nothing)
-        LblHotKeys.Location = New Point(12, 166)
+        LblHotKeys.Location = New Point(123, 51)
         LblHotKeys.Name = "LblHotKeys"
         LblHotKeys.Size = New Size(144, 24)
         LblHotKeys.TabIndex = 9
@@ -196,7 +208,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyShowViewer.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyShowViewer, My.Resources.Resources.imageClipViewer16)
-        TxtBoxHotKeyShowViewer.Location = New Point(12, 264)
+        TxtBoxHotKeyShowViewer.Location = New Point(123, 149)
         TxtBoxHotKeyShowViewer.Name = "TxtBoxHotKeyShowViewer"
         TxtBoxHotKeyShowViewer.ReadOnly = True
         TxtBoxHotKeyShowViewer.ShortcutsEnabled = False
@@ -208,7 +220,7 @@ Partial Class Settings
         ' LblHotKeyShowViewer
         ' 
         TipSettings.SetImage(LblHotKeyShowViewer, Nothing)
-        LblHotKeyShowViewer.Location = New Point(10, 243)
+        LblHotKeyShowViewer.Location = New Point(121, 128)
         LblHotKeyShowViewer.Name = "LblHotKeyShowViewer"
         LblHotKeyShowViewer.Size = New Size(146, 24)
         LblHotKeyShowViewer.TabIndex = 10
@@ -220,7 +232,7 @@ Partial Class Settings
         ' 
         LblPurgeDays1.AutoSize = True
         TipSettings.SetImage(LblPurgeDays1, Nothing)
-        LblPurgeDays1.Location = New Point(10, 395)
+        LblPurgeDays1.Location = New Point(8, 159)
         LblPurgeDays1.Name = "LblPurgeDays1"
         LblPurgeDays1.Size = New Size(170, 21)
         LblPurgeDays1.TabIndex = 12
@@ -232,7 +244,7 @@ Partial Class Settings
         ' 
         LblPurgeDays2.AutoSize = True
         TipSettings.SetImage(LblPurgeDays2, Nothing)
-        LblPurgeDays2.Location = New Point(232, 395)
+        LblPurgeDays2.Location = New Point(230, 159)
         LblPurgeDays2.Name = "LblPurgeDays2"
         LblPurgeDays2.Size = New Size(44, 21)
         LblPurgeDays2.TabIndex = 13
@@ -242,7 +254,7 @@ Partial Class Settings
         ' TxtBoxPurgeDays
         ' 
         TipSettings.SetImage(TxtBoxPurgeDays, Nothing)
-        TxtBoxPurgeDays.Location = New Point(176, 392)
+        TxtBoxPurgeDays.Location = New Point(174, 156)
         TxtBoxPurgeDays.Name = "TxtBoxPurgeDays"
         TxtBoxPurgeDays.Size = New Size(58, 29)
         TxtBoxPurgeDays.TabIndex = 150
@@ -253,7 +265,7 @@ Partial Class Settings
         ' 
         ChkBoxAutoPurge.AutoSize = True
         TipSettings.SetImage(ChkBoxAutoPurge, Nothing)
-        ChkBoxAutoPurge.Location = New Point(325, 396)
+        ChkBoxAutoPurge.Location = New Point(12, 179)
         ChkBoxAutoPurge.Name = "ChkBoxAutoPurge"
         ChkBoxAutoPurge.Size = New Size(109, 25)
         ChkBoxAutoPurge.TabIndex = 170
@@ -264,7 +276,7 @@ Partial Class Settings
         ' BtnPurgeNow
         ' 
         TipSettings.SetImage(BtnPurgeNow, Nothing)
-        BtnPurgeNow.Location = New Point(155, 424)
+        BtnPurgeNow.Location = New Point(153, 188)
         BtnPurgeNow.Name = "BtnPurgeNow"
         BtnPurgeNow.Size = New Size(99, 32)
         BtnPurgeNow.TabIndex = 160
@@ -277,9 +289,8 @@ Partial Class Settings
         ' 
         ChkBoxShowOpenSourceApp.AutoSize = True
         TipSettings.SetImage(ChkBoxShowOpenSourceApp, Nothing)
-        ChkBoxShowOpenSourceApp.Location = New Point(278, 118)
+        ChkBoxShowOpenSourceApp.Location = New Point(14, 162)
         ChkBoxShowOpenSourceApp.Name = "ChkBoxShowOpenSourceApp"
-        ChkBoxShowOpenSourceApp.RightToLeft = RightToLeft.Yes
         ChkBoxShowOpenSourceApp.Size = New Size(194, 25)
         ChkBoxShowOpenSourceApp.TabIndex = 40
         TipSettings.SetText(ChkBoxShowOpenSourceApp, "Controls whether ""Open Source App"" appears as an Option in the Clip Context Menu.")
@@ -290,9 +301,8 @@ Partial Class Settings
         ' 
         ChkBoxKeepScratchPadText.AutoSize = True
         TipSettings.SetImage(ChkBoxKeepScratchPadText, Nothing)
-        ChkBoxKeepScratchPadText.Location = New Point(295, 149)
+        ChkBoxKeepScratchPadText.Location = New Point(14, 193)
         ChkBoxKeepScratchPadText.Name = "ChkBoxKeepScratchPadText"
-        ChkBoxKeepScratchPadText.RightToLeft = RightToLeft.Yes
         ChkBoxKeepScratchPadText.Size = New Size(177, 25)
         ChkBoxKeepScratchPadText.TabIndex = 45
         TipSettings.SetText(ChkBoxKeepScratchPadText, "Keep the contents of the Scratch Pad between sessions?")
@@ -303,7 +313,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyShowScratchPad.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyShowScratchPad, My.Resources.Resources.imageScratchPad16)
-        TxtBoxHotKeyShowScratchPad.Location = New Point(12, 317)
+        TxtBoxHotKeyShowScratchPad.Location = New Point(123, 202)
         TxtBoxHotKeyShowScratchPad.Name = "TxtBoxHotKeyShowScratchPad"
         TxtBoxHotKeyShowScratchPad.ReadOnly = True
         TxtBoxHotKeyShowScratchPad.ShortcutsEnabled = False
@@ -315,7 +325,7 @@ Partial Class Settings
         ' LblHotKeyShowScratchPad
         ' 
         TipSettings.SetImage(LblHotKeyShowScratchPad, Nothing)
-        LblHotKeyShowScratchPad.Location = New Point(10, 296)
+        LblHotKeyShowScratchPad.Location = New Point(121, 181)
         LblHotKeyShowScratchPad.Name = "LblHotKeyShowScratchPad"
         LblHotKeyShowScratchPad.Size = New Size(146, 24)
         LblHotKeyShowScratchPad.TabIndex = 1101
@@ -327,9 +337,8 @@ Partial Class Settings
         ' 
         ChkBoxPlaySoundWithNotify.AutoSize = True
         TipSettings.SetImage(ChkBoxPlaySoundWithNotify, Nothing)
-        ChkBoxPlaySoundWithNotify.Location = New Point(281, 87)
+        ChkBoxPlaySoundWithNotify.Location = New Point(12, 120)
         ChkBoxPlaySoundWithNotify.Name = "ChkBoxPlaySoundWithNotify"
-        ChkBoxPlaySoundWithNotify.RightToLeft = RightToLeft.Yes
         ChkBoxPlaySoundWithNotify.Size = New Size(191, 25)
         ChkBoxPlaySoundWithNotify.TabIndex = 36
         TipSettings.SetText(ChkBoxPlaySoundWithNotify, "Play a Sound with the Notification Toast.")
@@ -340,9 +349,8 @@ Partial Class Settings
         ' 
         ChkBoxAutoStartWithWindows.AutoSize = True
         TipSettings.SetImage(ChkBoxAutoStartWithWindows, Nothing)
-        ChkBoxAutoStartWithWindows.Location = New Point(266, 12)
+        ChkBoxAutoStartWithWindows.Location = New Point(14, 131)
         ChkBoxAutoStartWithWindows.Name = "ChkBoxAutoStartWithWindows"
-        ChkBoxAutoStartWithWindows.RightToLeft = RightToLeft.Yes
         ChkBoxAutoStartWithWindows.Size = New Size(206, 25)
         ChkBoxAutoStartWithWindows.TabIndex = 29
         TipSettings.SetText(ChkBoxAutoStartWithWindows, "Auto-Start the App with Windows.")
@@ -353,7 +361,7 @@ Partial Class Settings
         ' 
         ChkBoxThemeAuto.AutoSize = True
         TipSettings.SetImage(ChkBoxThemeAuto, Nothing)
-        ChkBoxThemeAuto.Location = New Point(256, 290)
+        ChkBoxThemeAuto.Location = New Point(14, 56)
         ChkBoxThemeAuto.Name = "ChkBoxThemeAuto"
         ChkBoxThemeAuto.Size = New Size(205, 25)
         ChkBoxThemeAuto.TabIndex = 110
@@ -365,7 +373,7 @@ Partial Class Settings
         ' 
         LblTheme.AutoSize = True
         TipSettings.SetImage(LblTheme, Nothing)
-        LblTheme.Location = New Point(256, 242)
+        LblTheme.Location = New Point(14, 8)
         LblTheme.Name = "LblTheme"
         LblTheme.Size = New Size(57, 21)
         LblTheme.TabIndex = 1104
@@ -378,7 +386,7 @@ Partial Class Settings
         CoBoxTheme.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxTheme.FormattingEnabled = True
         TipSettings.SetImage(CoBoxTheme, Nothing)
-        CoBoxTheme.Location = New Point(256, 263)
+        CoBoxTheme.Location = New Point(14, 29)
         CoBoxTheme.Name = "CoBoxTheme"
         CoBoxTheme.Size = New Size(216, 30)
         CoBoxTheme.TabIndex = 100
@@ -390,7 +398,7 @@ Partial Class Settings
         CoBoxAutoBackupFrequency.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxAutoBackupFrequency.FormattingEnabled = True
         TipSettings.SetImage(CoBoxAutoBackupFrequency, My.Resources.Resources.ImageBackup16)
-        CoBoxAutoBackupFrequency.Location = New Point(526, 118)
+        CoBoxAutoBackupFrequency.Location = New Point(16, 165)
         CoBoxAutoBackupFrequency.Name = "CoBoxAutoBackupFrequency"
         CoBoxAutoBackupFrequency.Size = New Size(216, 30)
         CoBoxAutoBackupFrequency.TabIndex = 1105
@@ -399,7 +407,7 @@ Partial Class Settings
         ' LblAutoBackup
         ' 
         TipSettings.SetImage(LblAutoBackup, Nothing)
-        LblAutoBackup.Location = New Point(526, 97)
+        LblAutoBackup.Location = New Point(16, 144)
         LblAutoBackup.Name = "LblAutoBackup"
         LblAutoBackup.Size = New Size(216, 21)
         LblAutoBackup.TabIndex = 1106
@@ -411,7 +419,7 @@ Partial Class Settings
         ' 
         ChkBoxAutoPurgeBackups.AutoSize = True
         TipSettings.SetImage(ChkBoxAutoPurgeBackups, My.Resources.Resources.ImageBackup16)
-        ChkBoxAutoPurgeBackups.Location = New Point(550, 149)
+        ChkBoxAutoPurgeBackups.Location = New Point(40, 196)
         ChkBoxAutoPurgeBackups.Name = "ChkBoxAutoPurgeBackups"
         ChkBoxAutoPurgeBackups.RightToLeft = RightToLeft.Yes
         ChkBoxAutoPurgeBackups.Size = New Size(168, 25)
@@ -425,7 +433,7 @@ Partial Class Settings
         BtnBackupNow.Image = My.Resources.Resources.ImageBackup16
         TipSettings.SetImage(BtnBackupNow, My.Resources.Resources.ImageBackup16)
         BtnBackupNow.ImageAlign = ContentAlignment.MiddleLeft
-        BtnBackupNow.Location = New Point(550, 12)
+        BtnBackupNow.Location = New Point(14, 18)
         BtnBackupNow.Name = "BtnBackupNow"
         BtnBackupNow.Size = New Size(194, 32)
         BtnBackupNow.TabIndex = 1108
@@ -439,7 +447,7 @@ Partial Class Settings
         BtnRestoreNow.Image = My.Resources.Resources.ImageRestore16
         TipSettings.SetImage(BtnRestoreNow, My.Resources.Resources.ImageRestore16)
         BtnRestoreNow.ImageAlign = ContentAlignment.MiddleLeft
-        BtnRestoreNow.Location = New Point(550, 50)
+        BtnRestoreNow.Location = New Point(14, 56)
         BtnRestoreNow.Name = "BtnRestoreNow"
         BtnRestoreNow.Size = New Size(194, 32)
         BtnRestoreNow.TabIndex = 1109
@@ -448,42 +456,133 @@ Partial Class Settings
         BtnRestoreNow.TextAlign = ContentAlignment.MiddleRight
         BtnRestoreNow.UseVisualStyleBackColor = True
         ' 
+        ' PanelPageSelector
+        ' 
+        PanelPageSelector.Controls.Add(LVPageSelector)
+        PanelPageSelector.Dock = DockStyle.Left
+        TipSettings.SetImage(PanelPageSelector, Nothing)
+        PanelPageSelector.Location = New Point(0, 0)
+        PanelPageSelector.Name = "PanelPageSelector"
+        PanelPageSelector.Size = New Size(93, 361)
+        PanelPageSelector.TabIndex = 1110
+        TipSettings.SetText(PanelPageSelector, Nothing)
+        ' 
+        ' LVPageSelector
+        ' 
+        LVPageSelector.AutoArrange = False
+        LVPageSelector.BorderStyle = BorderStyle.FixedSingle
+        LVPageSelector.Dock = DockStyle.Fill
+        LVPageSelector.HeaderStyle = ColumnHeaderStyle.None
+        TipSettings.SetImage(LVPageSelector, Nothing)
+        LVPageSelector.LargeImageList = ILPageSelector
+        LVPageSelector.Location = New Point(0, 0)
+        LVPageSelector.MultiSelect = False
+        LVPageSelector.Name = "LVPageSelector"
+        LVPageSelector.Scrollable = False
+        LVPageSelector.ShowGroups = False
+        LVPageSelector.Size = New Size(93, 361)
+        LVPageSelector.TabIndex = 0
+        TipSettings.SetText(LVPageSelector, Nothing)
+        LVPageSelector.UseCompatibleStateImageBehavior = False
+        ' 
+        ' ILPageSelector
+        ' 
+        ILPageSelector.ColorDepth = ColorDepth.Depth32Bit
+        ILPageSelector.ImageSize = New Size(48, 48)
+        ILPageSelector.TransparentColor = Color.Transparent
+        ' 
+        ' PanelGeneral
+        ' 
+        PanelGeneral.Controls.Add(CoBoxTheme)
+        PanelGeneral.Controls.Add(LblTheme)
+        PanelGeneral.Controls.Add(ChkBoxThemeAuto)
+        PanelGeneral.Controls.Add(ChkBoxAutoStartWithWindows)
+        PanelGeneral.Controls.Add(ChkBoxShowOpenSourceApp)
+        PanelGeneral.Controls.Add(ChkBoxKeepScratchPadText)
+        PanelGeneral.Dock = DockStyle.Fill
+        TipSettings.SetImage(PanelGeneral, Nothing)
+        PanelGeneral.Location = New Point(0, 0)
+        PanelGeneral.Name = "PanelGeneral"
+        PanelGeneral.Size = New Size(484, 361)
+        PanelGeneral.TabIndex = 1111
+        TipSettings.SetText(PanelGeneral, Nothing)
+        ' 
+        ' PanelClips
+        ' 
+        PanelClips.Controls.Add(TxtBoxMaxClipPreviewLength)
+        PanelClips.Controls.Add(LblMaxClips)
+        PanelClips.Controls.Add(TxtBoxMaxClips)
+        PanelClips.Controls.Add(LblMaxClipPreviewLength)
+        PanelClips.Controls.Add(TxtBoxPurgeDays)
+        PanelClips.Controls.Add(LblPurgeDays1)
+        PanelClips.Controls.Add(LblPurgeDays2)
+        PanelClips.Controls.Add(ChkBoxAutoPurge)
+        PanelClips.Controls.Add(BtnPurgeNow)
+        PanelClips.Controls.Add(ChkBoxPlaySoundWithNotify)
+        PanelClips.Controls.Add(ChkBoxNotifyOnNewClip)
+        PanelClips.Controls.Add(ChkBoxBlinkOnNewClip)
+        PanelClips.Dock = DockStyle.Fill
+        TipSettings.SetImage(PanelClips, Nothing)
+        PanelClips.Location = New Point(93, 0)
+        PanelClips.Name = "PanelClips"
+        PanelClips.Size = New Size(391, 270)
+        PanelClips.TabIndex = 1112
+        TipSettings.SetText(PanelClips, Nothing)
+        ' 
+        ' PanelHotKeys
+        ' 
+        PanelHotKeys.Controls.Add(LblHotKeys)
+        PanelHotKeys.Controls.Add(TxtBoxHotKeyToggleFavorite)
+        PanelHotKeys.Controls.Add(TxtBoxHotKeyShowViewer)
+        PanelHotKeys.Controls.Add(TxtBoxHotKeyShowScratchPad)
+        PanelHotKeys.Controls.Add(LblHotKeyShowViewer)
+        PanelHotKeys.Controls.Add(LblHotKeyToggleFavorite)
+        PanelHotKeys.Controls.Add(LblHotKeyShowScratchPad)
+        PanelHotKeys.Dock = DockStyle.Fill
+        TipSettings.SetImage(PanelHotKeys, Nothing)
+        PanelHotKeys.Location = New Point(0, 0)
+        PanelHotKeys.Name = "PanelHotKeys"
+        PanelHotKeys.Size = New Size(484, 361)
+        PanelHotKeys.TabIndex = 1113
+        TipSettings.SetText(PanelHotKeys, Nothing)
+        ' 
+        ' PanelBackup
+        ' 
+        PanelBackup.Controls.Add(BtnBackupNow)
+        PanelBackup.Controls.Add(LblAutoBackup)
+        PanelBackup.Controls.Add(CoBoxAutoBackupFrequency)
+        PanelBackup.Controls.Add(ChkBoxAutoPurgeBackups)
+        PanelBackup.Controls.Add(BtnRestoreNow)
+        PanelBackup.Dock = DockStyle.Fill
+        TipSettings.SetImage(PanelBackup, Nothing)
+        PanelBackup.Location = New Point(0, 0)
+        PanelBackup.Name = "PanelBackup"
+        PanelBackup.Size = New Size(484, 361)
+        PanelBackup.TabIndex = 1114
+        TipSettings.SetText(PanelBackup, Nothing)
+        ' 
+        ' PanelControls
+        ' 
+        PanelControls.Controls.Add(BtnOK)
+        PanelControls.Dock = DockStyle.Bottom
+        TipSettings.SetImage(PanelControls, Nothing)
+        PanelControls.Location = New Point(93, 270)
+        PanelControls.Name = "PanelControls"
+        PanelControls.Size = New Size(391, 91)
+        PanelControls.TabIndex = 1115
+        TipSettings.SetText(PanelControls, Nothing)
+        ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(756, 546)
-        Controls.Add(BtnRestoreNow)
-        Controls.Add(BtnBackupNow)
-        Controls.Add(ChkBoxAutoPurgeBackups)
-        Controls.Add(CoBoxAutoBackupFrequency)
-        Controls.Add(LblAutoBackup)
-        Controls.Add(CoBoxTheme)
-        Controls.Add(ChkBoxAutoStartWithWindows)
-        Controls.Add(ChkBoxPlaySoundWithNotify)
-        Controls.Add(TxtBoxHotKeyShowScratchPad)
-        Controls.Add(LblHotKeyShowScratchPad)
-        Controls.Add(ChkBoxKeepScratchPadText)
-        Controls.Add(ChkBoxShowOpenSourceApp)
-        Controls.Add(BtnPurgeNow)
-        Controls.Add(ChkBoxAutoPurge)
-        Controls.Add(TxtBoxPurgeDays)
-        Controls.Add(LblPurgeDays2)
-        Controls.Add(LblPurgeDays1)
-        Controls.Add(TxtBoxHotKeyShowViewer)
-        Controls.Add(LblHotKeyShowViewer)
-        Controls.Add(LblHotKeys)
-        Controls.Add(TxtBoxHotKeyToggleFavorite)
-        Controls.Add(LblHotKeyToggleFavorite)
-        Controls.Add(ChkBoxNotifyOnNewClip)
-        Controls.Add(ChkBoxBlinkOnNewClip)
-        Controls.Add(TxtBoxMaxClipPreviewLength)
-        Controls.Add(LblMaxClipPreviewLength)
-        Controls.Add(TxtBoxMaxClips)
-        Controls.Add(BtnOK)
-        Controls.Add(LblMaxClips)
-        Controls.Add(ChkBoxThemeAuto)
-        Controls.Add(LblTheme)
+        ClientSize = New Size(484, 361)
+        Controls.Add(PanelClips)
+        Controls.Add(PanelControls)
+        Controls.Add(PanelPageSelector)
+        Controls.Add(PanelHotKeys)
+        Controls.Add(PanelBackup)
+        Controls.Add(PanelGeneral)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         FormBorderStyle = FormBorderStyle.FixedDialog
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
@@ -494,8 +593,17 @@ Partial Class Settings
         StartPosition = FormStartPosition.CenterScreen
         TipSettings.SetText(Me, Nothing)
         Text = "Settings"
+        PanelPageSelector.ResumeLayout(False)
+        PanelGeneral.ResumeLayout(False)
+        PanelGeneral.PerformLayout()
+        PanelClips.ResumeLayout(False)
+        PanelClips.PerformLayout()
+        PanelHotKeys.ResumeLayout(False)
+        PanelHotKeys.PerformLayout()
+        PanelBackup.ResumeLayout(False)
+        PanelBackup.PerformLayout()
+        PanelControls.ResumeLayout(False)
         ResumeLayout(False)
-        PerformLayout()
     End Sub
 
     Friend WithEvents BtnOK As Button
@@ -531,4 +639,12 @@ Partial Class Settings
     Friend WithEvents ChkBoxAutoPurgeBackups As CheckBox
     Friend WithEvents BtnBackupNow As Button
     Friend WithEvents BtnRestoreNow As Button
+    Friend WithEvents PanelPageSelector As Panel
+    Friend WithEvents LVPageSelector As ListView
+    Friend WithEvents ILPageSelector As ImageList
+    Friend WithEvents PanelGeneral As Panel
+    Friend WithEvents PanelClips As Panel
+    Friend WithEvents PanelHotKeys As Panel
+    Friend WithEvents PanelBackup As Panel
+    Friend WithEvents PanelControls As Panel
 End Class

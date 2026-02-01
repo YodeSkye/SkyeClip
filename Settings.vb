@@ -6,6 +6,7 @@ Public Class Settings
     ' Declarations
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
+    Private suppressPageSelection As Boolean = False
 
     ' Form Events
     Private Sub Settings_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -13,6 +14,19 @@ Public Class Settings
         Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
         AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
         Text = "Settings for " & GetAppTitle()
+
+        'suppressPageSelection = True
+        ILPageSelector.Images.Add(My.Resources.ImageSettings48)
+        ILPageSelector.Images.Add(My.Resources.ImageApp48)
+        ILPageSelector.Images.Add(My.Resources.ImageHotKeys48)
+        ILPageSelector.Images.Add(My.Resources.ImageBackup48)
+        LVPageSelector.Items.Add(New ListViewItem("General", 0))
+        LVPageSelector.Items.Add(New ListViewItem("Clips", 1))
+        LVPageSelector.Items.Add(New ListViewItem("Hot Keys", 2))
+        LVPageSelector.Items.Add(New ListViewItem("Backup", 3))
+        LVPageSelector.Items(0).Selected = True
+        'suppressPageSelection = False
+
         CMTxtBox.Font = App.MenuFont
         Dim bstr As String = TipSettings.GetText(BtnBackupNow)
         bstr &= App.UserPath
@@ -58,6 +72,9 @@ Public Class Settings
         ChkBoxAutoPurgeBackups.Checked = App.Settings.AutoBackupPurge
 
     End Sub
+    Private Sub Settings_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
+        LVPageSelector.Focus()
+    End Sub
     Private Sub Settings_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         App.Settings.Save()
     End Sub
@@ -99,6 +116,27 @@ Public Class Settings
     End Sub
 
     ' Control Events
+    Private Sub LVPageSelector_MouseDown(sender As Object, e As MouseEventArgs) Handles LVPageSelector.MouseDown
+        ' Find the item under the mouse
+        suppressPageSelection = True
+        Dim info = LVPageSelector.HitTest(e.Location)
+        Dim item = info.Item
+        If item Is Nothing Then Return
+
+        ' Ensure it becomes selected (for visual feedback)
+
+        item.Selected = True
+        Dim selectedSource As String = item.Text
+
+        SetPage(selectedSource)
+        suppressPageSelection = False
+    End Sub
+    Private Sub LVPageSelector_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVPageSelector.SelectedIndexChanged
+        If suppressPageSelection OrElse LVPageSelector.SelectedItems.Count = 0 Then Return
+        Dim selectedSource As String = LVPageSelector.SelectedItems(0).Text
+        If selectedSource = "Add Stream To Playlist" OrElse selectedSource = "Import Playlist" Then Return
+        SetPage(LVPageSelector.SelectedItems(0).Text)
+    End Sub
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
     End Sub
@@ -292,6 +330,18 @@ Public Class Settings
     End Sub
 
     ' Methods
+    Private Sub SetPage(page As String)
+        Select Case page
+            Case "General"
+                PanelGeneral.BringToFront()
+            Case "Clips"
+                PanelClips.BringToFront()
+            Case "Hot Keys"
+                PanelHotKeys.BringToFront()
+            Case "Backup"
+                PanelBackup.BringToFront()
+        End Select
+    End Sub
     Private Function FormatHotKey(k As Keys) As String
         Dim parts As New List(Of String)
 

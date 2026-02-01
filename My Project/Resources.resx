@@ -391,6 +391,9 @@ Automatic maintenance never interferes with manual actions.\par
   <data name="ImageApp16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageApp16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImageApp48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageApp48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ImageAttributionGitHub" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageAttributionGitHub.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -408,6 +411,9 @@ Automatic maintenance never interferes with manual actions.\par
   </data>
   <data name="ImageBackup16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageBackup16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageBackup48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageBackup48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageChangeLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageChangeLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -472,6 +478,9 @@ Automatic maintenance never interferes with manual actions.\par
   <data name="ImageHelp32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageHelp32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImageHotKeys48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageHotKeys48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ImageKeepText16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageKeepText16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -501,5 +510,8 @@ Automatic maintenance never interferes with manual actions.\par
   </data>
   <data name="ImageSettings32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageSettings32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageSettings48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageSettings48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
