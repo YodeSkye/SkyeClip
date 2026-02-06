@@ -7,10 +7,10 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>My Project\IconApp.ico</ApplicationIcon>
     <AssemblyTitle>SkyeClip</AssemblyTitle>
-	<AssemblyVersion>1.2.0.0</AssemblyVersion>
-    <ProductVersion>1.2.0.0</ProductVersion>  
-	<FileVersion>1.2.0.0</FileVersion>
-	<Version>1.2.0</Version>
+	<AssemblyVersion>1.3.0.0</AssemblyVersion>
+    <ProductVersion>1.3.0.0</ProductVersion>  
+	<FileVersion>1.3.0.0</FileVersion>
+	<Version>1.3.0</Version>
 
 	<!-- Suppress assembly binding conflict warnings -->
 	<NoWarn>MSB3277</NoWarn>

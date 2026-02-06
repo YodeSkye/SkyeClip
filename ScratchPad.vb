@@ -102,8 +102,8 @@ Friend Class ScratchPad
                     Else
                         Undo()
                     End If
+                    e.SuppressKeyPress = True
                 End If
-                e.SuppressKeyPress = True
             Case Keys.X 'Cut
                 If e.Control Then
                     If e.Shift Then
@@ -111,8 +111,8 @@ Friend Class ScratchPad
                     Else
                         Cut()
                     End If
+                    e.SuppressKeyPress = True
                 End If
-                e.SuppressKeyPress = True
             Case Keys.C 'Copy
                 If e.Control Then
                     If e.Shift Then
@@ -120,8 +120,8 @@ Friend Class ScratchPad
                     Else
                         Copy()
                     End If
+                    e.SuppressKeyPress = True
                 End If
-                e.SuppressKeyPress = True
             Case Keys.V 'Paste
                 If e.Control Then
                     If e.Shift Then
@@ -129,14 +129,18 @@ Friend Class ScratchPad
                     Else
                         Paste()
                     End If
+                    e.SuppressKeyPress = True
                 End If
-                e.SuppressKeyPress = True
             Case Keys.D 'Delete
-                Delete()
-                e.SuppressKeyPress = True
+                If e.Control Then
+                    Delete()
+                    e.SuppressKeyPress = True
+                End If
             Case Keys.A 'Select All
-                SelectAll()
-                e.SuppressKeyPress = True
+                If e.Control Then
+                    SelectAll()
+                    e.SuppressKeyPress = True
+                End If
         End Select
     End Sub
 
