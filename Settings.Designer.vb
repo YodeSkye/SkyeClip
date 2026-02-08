@@ -65,12 +65,20 @@ Partial Class Settings
         PanelHotKeys = New Panel()
         PanelBackup = New Panel()
         PanelControls = New Panel()
+        PanelProfiles = New Panel()
+        BtnRemoveProfile = New Button()
+        BtnAddProfile = New Button()
+        LVProfiles = New Skye.UI.ListViewEX()
+        ColProfileName = New ColumnHeader()
+        ChkBoxUseProfiles = New CheckBox()
+        LblProfiles = New Skye.UI.Label()
         PanelPageSelector.SuspendLayout()
         PanelGeneral.SuspendLayout()
         PanelClips.SuspendLayout()
         PanelHotKeys.SuspendLayout()
         PanelBackup.SuspendLayout()
         PanelControls.SuspendLayout()
+        PanelProfiles.SuspendLayout()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -78,7 +86,7 @@ Partial Class Settings
         BtnOK.Anchor = AnchorStyles.Bottom
         BtnOK.Image = My.Resources.Resources.ImageOK
         TipSettings.SetImage(BtnOK, Nothing)
-        BtnOK.Location = New Point(163, 14)
+        BtnOK.Location = New Point(185, 14)
         BtnOK.Margin = New Padding(4)
         BtnOK.Name = "BtnOK"
         BtnOK.Size = New Size(64, 64)
@@ -172,7 +180,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyToggleFavorite.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyToggleFavorite, My.Resources.Resources.ImageFavorites16)
-        TxtBoxHotKeyToggleFavorite.Location = New Point(124, 96)
+        TxtBoxHotKeyToggleFavorite.Location = New Point(146, 96)
         TxtBoxHotKeyToggleFavorite.Name = "TxtBoxHotKeyToggleFavorite"
         TxtBoxHotKeyToggleFavorite.ReadOnly = True
         TxtBoxHotKeyToggleFavorite.ShortcutsEnabled = False
@@ -184,7 +192,7 @@ Partial Class Settings
         ' LblHotKeyToggleFavorite
         ' 
         TipSettings.SetImage(LblHotKeyToggleFavorite, Nothing)
-        LblHotKeyToggleFavorite.Location = New Point(122, 75)
+        LblHotKeyToggleFavorite.Location = New Point(144, 75)
         LblHotKeyToggleFavorite.Name = "LblHotKeyToggleFavorite"
         LblHotKeyToggleFavorite.Size = New Size(146, 24)
         LblHotKeyToggleFavorite.TabIndex = 7
@@ -196,7 +204,7 @@ Partial Class Settings
         ' 
         LblHotKeys.Font = New Font("Segoe UI", 12F, FontStyle.Underline, GraphicsUnit.Point, CByte(0))
         TipSettings.SetImage(LblHotKeys, Nothing)
-        LblHotKeys.Location = New Point(124, 51)
+        LblHotKeys.Location = New Point(146, 51)
         LblHotKeys.Name = "LblHotKeys"
         LblHotKeys.Size = New Size(144, 24)
         LblHotKeys.TabIndex = 9
@@ -208,7 +216,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyShowViewer.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyShowViewer, My.Resources.Resources.imageClipViewer16)
-        TxtBoxHotKeyShowViewer.Location = New Point(124, 149)
+        TxtBoxHotKeyShowViewer.Location = New Point(146, 149)
         TxtBoxHotKeyShowViewer.Name = "TxtBoxHotKeyShowViewer"
         TxtBoxHotKeyShowViewer.ReadOnly = True
         TxtBoxHotKeyShowViewer.ShortcutsEnabled = False
@@ -220,7 +228,7 @@ Partial Class Settings
         ' LblHotKeyShowViewer
         ' 
         TipSettings.SetImage(LblHotKeyShowViewer, Nothing)
-        LblHotKeyShowViewer.Location = New Point(122, 128)
+        LblHotKeyShowViewer.Location = New Point(144, 128)
         LblHotKeyShowViewer.Name = "LblHotKeyShowViewer"
         LblHotKeyShowViewer.Size = New Size(146, 24)
         LblHotKeyShowViewer.TabIndex = 10
@@ -312,7 +320,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyShowScratchPad.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyShowScratchPad, My.Resources.Resources.imageScratchPad16)
-        TxtBoxHotKeyShowScratchPad.Location = New Point(124, 202)
+        TxtBoxHotKeyShowScratchPad.Location = New Point(146, 202)
         TxtBoxHotKeyShowScratchPad.Name = "TxtBoxHotKeyShowScratchPad"
         TxtBoxHotKeyShowScratchPad.ReadOnly = True
         TxtBoxHotKeyShowScratchPad.ShortcutsEnabled = False
@@ -324,7 +332,7 @@ Partial Class Settings
         ' LblHotKeyShowScratchPad
         ' 
         TipSettings.SetImage(LblHotKeyShowScratchPad, Nothing)
-        LblHotKeyShowScratchPad.Location = New Point(122, 181)
+        LblHotKeyShowScratchPad.Location = New Point(144, 181)
         LblHotKeyShowScratchPad.Name = "LblHotKeyShowScratchPad"
         LblHotKeyShowScratchPad.Size = New Size(146, 24)
         LblHotKeyShowScratchPad.TabIndex = 1101
@@ -462,7 +470,7 @@ Partial Class Settings
         TipSettings.SetImage(PanelPageSelector, Nothing)
         PanelPageSelector.Location = New Point(0, 0)
         PanelPageSelector.Name = "PanelPageSelector"
-        PanelPageSelector.Size = New Size(93, 361)
+        PanelPageSelector.Size = New Size(93, 446)
         PanelPageSelector.TabIndex = 1110
         TipSettings.SetText(PanelPageSelector, Nothing)
         ' 
@@ -479,7 +487,7 @@ Partial Class Settings
         LVPageSelector.Name = "LVPageSelector"
         LVPageSelector.Scrollable = False
         LVPageSelector.ShowGroups = False
-        LVPageSelector.Size = New Size(93, 361)
+        LVPageSelector.Size = New Size(93, 446)
         LVPageSelector.TabIndex = 0
         LVPageSelector.TabStop = False
         TipSettings.SetText(LVPageSelector, Nothing)
@@ -500,11 +508,10 @@ Partial Class Settings
         PanelGeneral.Controls.Add(ChkBoxAutoStartWithWindows)
         PanelGeneral.Controls.Add(ChkBoxShowOpenSourceApp)
         PanelGeneral.Controls.Add(ChkBoxKeepScratchPadText)
-        PanelGeneral.Dock = DockStyle.Fill
         TipSettings.SetImage(PanelGeneral, Nothing)
-        PanelGeneral.Location = New Point(93, 0)
+        PanelGeneral.Location = New Point(215, 92)
         PanelGeneral.Name = "PanelGeneral"
-        PanelGeneral.Size = New Size(391, 270)
+        PanelGeneral.Size = New Size(198, 65)
         PanelGeneral.TabIndex = 1111
         TipSettings.SetText(PanelGeneral, Nothing)
         ' 
@@ -522,11 +529,10 @@ Partial Class Settings
         PanelClips.Controls.Add(ChkBoxPlaySoundWithNotify)
         PanelClips.Controls.Add(ChkBoxNotifyOnNewClip)
         PanelClips.Controls.Add(ChkBoxBlinkOnNewClip)
-        PanelClips.Dock = DockStyle.Fill
         TipSettings.SetImage(PanelClips, Nothing)
-        PanelClips.Location = New Point(0, 0)
+        PanelClips.Location = New Point(99, 163)
         PanelClips.Name = "PanelClips"
-        PanelClips.Size = New Size(484, 361)
+        PanelClips.Size = New Size(170, 98)
         PanelClips.TabIndex = 1112
         TipSettings.SetText(PanelClips, Nothing)
         ' 
@@ -539,11 +545,10 @@ Partial Class Settings
         PanelHotKeys.Controls.Add(LblHotKeyShowViewer)
         PanelHotKeys.Controls.Add(LblHotKeyToggleFavorite)
         PanelHotKeys.Controls.Add(LblHotKeyShowScratchPad)
-        PanelHotKeys.Dock = DockStyle.Fill
         TipSettings.SetImage(PanelHotKeys, Nothing)
-        PanelHotKeys.Location = New Point(0, 0)
+        PanelHotKeys.Location = New Point(215, 0)
         PanelHotKeys.Name = "PanelHotKeys"
-        PanelHotKeys.Size = New Size(484, 361)
+        PanelHotKeys.Size = New Size(241, 86)
         PanelHotKeys.TabIndex = 1113
         TipSettings.SetText(PanelHotKeys, Nothing)
         ' 
@@ -555,11 +560,10 @@ Partial Class Settings
         PanelBackup.Controls.Add(CoBoxAutoBackupFrequency)
         PanelBackup.Controls.Add(ChkBoxAutoPurgeBackups)
         PanelBackup.Controls.Add(BtnRestoreNow)
-        PanelBackup.Dock = DockStyle.Fill
         TipSettings.SetImage(PanelBackup, Nothing)
-        PanelBackup.Location = New Point(0, 0)
+        PanelBackup.Location = New Point(99, 12)
         PanelBackup.Name = "PanelBackup"
-        PanelBackup.Size = New Size(484, 361)
+        PanelBackup.Size = New Size(92, 121)
         PanelBackup.TabIndex = 1114
         TipSettings.SetText(PanelBackup, Nothing)
         ' 
@@ -568,23 +572,110 @@ Partial Class Settings
         PanelControls.Controls.Add(BtnOK)
         PanelControls.Dock = DockStyle.Bottom
         TipSettings.SetImage(PanelControls, Nothing)
-        PanelControls.Location = New Point(93, 270)
+        PanelControls.Location = New Point(93, 355)
         PanelControls.Name = "PanelControls"
-        PanelControls.Size = New Size(391, 91)
+        PanelControls.Size = New Size(435, 91)
         PanelControls.TabIndex = 1115
         TipSettings.SetText(PanelControls, Nothing)
+        ' 
+        ' PanelProfiles
+        ' 
+        PanelProfiles.AutoSizeMode = AutoSizeMode.GrowAndShrink
+        PanelProfiles.Controls.Add(BtnRemoveProfile)
+        PanelProfiles.Controls.Add(BtnAddProfile)
+        PanelProfiles.Controls.Add(LVProfiles)
+        PanelProfiles.Controls.Add(ChkBoxUseProfiles)
+        PanelProfiles.Controls.Add(LblProfiles)
+        TipSettings.SetImage(PanelProfiles, Nothing)
+        PanelProfiles.Location = New Point(312, 171)
+        PanelProfiles.Name = "PanelProfiles"
+        PanelProfiles.Size = New Size(157, 118)
+        PanelProfiles.TabIndex = 1116
+        TipSettings.SetText(PanelProfiles, Nothing)
+        ' 
+        ' BtnRemoveProfile
+        ' 
+        BtnRemoveProfile.Image = My.Resources.Resources.ImageClearRemoveDelete16
+        TipSettings.SetImage(BtnRemoveProfile, My.Resources.Resources.ImageClearRemoveDelete16)
+        BtnRemoveProfile.ImageAlign = ContentAlignment.MiddleLeft
+        BtnRemoveProfile.Location = New Point(13, 212)
+        BtnRemoveProfile.Name = "BtnRemoveProfile"
+        BtnRemoveProfile.Size = New Size(214, 32)
+        BtnRemoveProfile.TabIndex = 434
+        TipSettings.SetText(BtnRemoveProfile, "Remove Selected Profile.")
+        BtnRemoveProfile.Text = "Remove Profile"
+        BtnRemoveProfile.TextAlign = ContentAlignment.MiddleRight
+        BtnRemoveProfile.UseVisualStyleBackColor = True
+        ' 
+        ' BtnAddProfile
+        ' 
+        BtnAddProfile.Image = My.Resources.Resources.ImageAdd16
+        TipSettings.SetImage(BtnAddProfile, My.Resources.Resources.ImageAdd16)
+        BtnAddProfile.ImageAlign = ContentAlignment.MiddleLeft
+        BtnAddProfile.Location = New Point(13, 179)
+        BtnAddProfile.Name = "BtnAddProfile"
+        BtnAddProfile.Size = New Size(214, 32)
+        BtnAddProfile.TabIndex = 430
+        TipSettings.SetText(BtnAddProfile, "Add a New Profile.")
+        BtnAddProfile.Text = "Add Profile"
+        BtnAddProfile.TextAlign = ContentAlignment.MiddleRight
+        BtnAddProfile.UseVisualStyleBackColor = True
+        ' 
+        ' LVProfiles
+        ' 
+        LVProfiles.Columns.AddRange(New ColumnHeader() {ColProfileName})
+        LVProfiles.EditableColumns = CType(resources.GetObject("LVProfiles.EditableColumns"), List(Of Boolean))
+        LVProfiles.FullRowSelect = True
+        LVProfiles.HeaderStyle = ColumnHeaderStyle.None
+        TipSettings.SetImage(LVProfiles, My.Resources.Resources.ImageProfiles16)
+        LVProfiles.InsertionLineColor = Color.Teal
+        LVProfiles.Location = New Point(13, 75)
+        LVProfiles.MultiSelect = False
+        LVProfiles.Name = "LVProfiles"
+        LVProfiles.Size = New Size(214, 97)
+        LVProfiles.TabIndex = 420
+        TipSettings.SetText(LVProfiles, "Your Profiles. Click to Select a Profile, or 'Add Profile' to add a new one." & vbCrLf & "F2 or Double-click to edit the name.")
+        LVProfiles.UseCompatibleStateImageBehavior = False
+        LVProfiles.View = View.Details
+        ' 
+        ' ColProfileName
+        ' 
+        ColProfileName.Width = 200
+        ' 
+        ' ChkBoxUseProfiles
+        ' 
+        ChkBoxUseProfiles.AutoSize = True
+        TipSettings.SetImage(ChkBoxUseProfiles, My.Resources.Resources.ImageProfiles16)
+        ChkBoxUseProfiles.Location = New Point(13, 11)
+        ChkBoxUseProfiles.Name = "ChkBoxUseProfiles"
+        ChkBoxUseProfiles.Size = New Size(111, 25)
+        ChkBoxUseProfiles.TabIndex = 400
+        TipSettings.SetText(ChkBoxUseProfiles, "Enable Profiles in the App.")
+        ChkBoxUseProfiles.Text = "Use Profiles"
+        ChkBoxUseProfiles.UseVisualStyleBackColor = True
+        ' 
+        ' LblProfiles
+        ' 
+        TipSettings.SetImage(LblProfiles, Nothing)
+        LblProfiles.Location = New Point(11, 54)
+        LblProfiles.Name = "LblProfiles"
+        LblProfiles.Size = New Size(100, 23)
+        LblProfiles.TabIndex = 412
+        LblProfiles.Text = "Profiles"
+        TipSettings.SetText(LblProfiles, Nothing)
         ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(484, 361)
+        ClientSize = New Size(528, 446)
+        Controls.Add(PanelProfiles)
+        Controls.Add(PanelBackup)
+        Controls.Add(PanelHotKeys)
         Controls.Add(PanelGeneral)
         Controls.Add(PanelControls)
-        Controls.Add(PanelPageSelector)
         Controls.Add(PanelClips)
-        Controls.Add(PanelHotKeys)
-        Controls.Add(PanelBackup)
+        Controls.Add(PanelPageSelector)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         FormBorderStyle = FormBorderStyle.FixedDialog
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
@@ -605,6 +696,8 @@ Partial Class Settings
         PanelBackup.ResumeLayout(False)
         PanelBackup.PerformLayout()
         PanelControls.ResumeLayout(False)
+        PanelProfiles.ResumeLayout(False)
+        PanelProfiles.PerformLayout()
         ResumeLayout(False)
     End Sub
 
@@ -649,4 +742,11 @@ Partial Class Settings
     Friend WithEvents PanelHotKeys As Panel
     Friend WithEvents PanelBackup As Panel
     Friend WithEvents PanelControls As Panel
+    Friend WithEvents PanelProfiles As Panel
+    Friend WithEvents ChkBoxUseProfiles As CheckBox
+    Friend WithEvents LVProfiles As Skye.UI.ListViewEX
+    Friend WithEvents LblProfiles As Skye.UI.Label
+    Friend WithEvents ColProfileName As ColumnHeader
+    Friend WithEvents BtnAddProfile As Button
+    Friend WithEvents BtnRemoveProfile As Button
 End Class

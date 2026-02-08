@@ -388,6 +388,9 @@ Automatic maintenance never interferes with manual actions.\par
   <data name="ImageAbout32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageAbout32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImageAdd16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageAdd16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ImageApp16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageApp16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -495,6 +498,12 @@ Automatic maintenance never interferes with manual actions.\par
   </data>
   <data name="ImageOK16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageOK16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageProfiles16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageProfiles16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageProfiles48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>ImageProfiles48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageRefreshLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>ImageRefreshLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

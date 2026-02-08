@@ -111,15 +111,38 @@ Friend Module App
         Friend Shared ClipExplorerSize As Size ' size of the Clip Explorer window
         Friend Shared LastUpdateCheck As DateTime ' the last date when update check was performed
         Friend Shared LatestKnownVersion As String ' the latest known version
+        Private Shared _currentProfileID As Integer ' the ID of the currently active profile, used when profiles are enabled. 0 is the default profile.
+        Friend Shared Property CurrentProfileID As Integer ' the ID of the currently active profile, used when profiles are enabled. 0 is the default profile.
+            Get
+                Return _currentProfileID
+            End Get
+            Set(value As Integer)
+                If _currentProfileID <> value Then
+                    Debug.Print("Profile changed from " & _currentProfileID.ToString & " to " & value.ToString)
+                    _currentProfileID = value
+                    Skye.Common.RegistryHelper.SetInt("CurrentProfileID", _currentProfileID)
+                End If
+            End Set
+        End Property
+        Private Shared _nextProfileID As Integer ' the next profile ID to assign when creating a new profile
+        Friend Shared UseProfiles As Boolean ' whether to use profiles, which allow for separate clip histories and some settings per profile
+        Friend Shared Profiles As List(Of Profile) ' the list of profiles, used when profiles are enabled. The default profile with ID 0 is not stored in this list but is implicitly available.
+
         Friend Class HotKeys
             Friend Shared ToggleFavorite As Keys
             Friend Shared ShowViewer As Keys
             Friend Shared ShowScratchPad As Keys
             Friend Shared DevTools As Keys = Keys.Control Or Keys.Shift Or Keys.D 'Not a Saved Setting
         End Class
+        Friend Class Profile
+            Public Property ID As Integer ' unique identifier for the profile
+            Public Property Order As Integer ' sort order of the profile, used only for registry storage and retrieval, do not use for display, rely on the natural sort order of the list.
+            Public Property Name As String ' name of the profile
+        End Class
 
         Friend Shared Sub Load()
             Dim starttime As TimeSpan = DateTime.Now.TimeOfDay
+
             ThemeName = Skye.Common.RegistryHelper.GetString("ThemeName", "Dark")
             ThemeAuto = Skye.Common.RegistryHelper.GetBool("ThemeAuto", False)
             AutoBackup = CType(Skye.Common.RegistryHelper.GetInt("AutoBackup", CInt(AutoBackupFrequency.Never)), AutoBackupFrequency)
@@ -151,9 +174,44 @@ Friend Module App
             ClipExplorerSize = New Size(w, h)
             LastUpdateCheck = Skye.Common.RegistryHelper.GetDateTime("LastUpdateCheck", DateTime.MinValue)
             LatestKnownVersion = Skye.Common.RegistryHelper.GetString("LatestKnownVersion", String.Empty)
+
+            ' Profiles
+            _currentProfileID = Skye.Common.RegistryHelper.GetInt("CurrentProfileID", 0)
+            _nextProfileID = Skye.Common.RegistryHelper.GetInt("NextProfileID", 1)
+            UseProfiles = Skye.Common.RegistryHelper.GetBool("UseProfiles", False)
+            Dim valueNames = Skye.Common.RegistryHelper.GetValuesWithPrefix("Profile")
+            Dim profiles As New List(Of Profile)
+            For Each key In valueNames
+                If key.StartsWith("Profile") AndAlso key.EndsWith("ID") Then
+                    ' Extract the numeric ID between "Profile" and "ID"
+                    Dim idPart = key.Substring("Profile".Length, key.Length - "Profile".Length - "ID".Length)
+                    Dim id As Integer
+                    If Integer.TryParse(idPart, id) Then
+                        ' Load order (default to 9999 for old installs)
+                        Dim orderKey = "Profile" & id & "Order"
+                        Dim order = Skye.Common.RegistryHelper.GetInt(orderKey, 9999)
+                        ' Load name
+                        Dim nameKey = "Profile" & id & "Name"
+                        Dim name = Skye.Common.RegistryHelper.GetString(nameKey, "")
+                        ' Reconstruct the profile object
+                        Dim p As New Profile With {
+                            .ID = id,
+                            .Order = order,
+                            .Name = name
+                        }
+                        profiles.Add(p)
+                    End If
+                End If
+            Next
+            ' Sort by saved order
+            profiles = profiles.OrderBy(Function(p) p.Order).ToList()
+            Settings.Profiles = profiles
+
+            ' HotKeys
             HotKeys.ToggleFavorite = CType(Skye.Common.RegistryHelper.GetInt("HotKeyToggleFavorite", CInt(Keys.F)), Keys)
             HotKeys.ShowViewer = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowViewer", CInt(Keys.V)), Keys)
             HotKeys.ShowScratchPad = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowScratchPad", CInt(Keys.S)), Keys)
+
             WriteToLog("Settings Loaded (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
         End Sub
         Friend Shared Sub Save()
@@ -185,11 +243,54 @@ Friend Module App
             Skye.Common.RegistryHelper.SetInt("ClipExplorerSizeH", ClipExplorerSize.Height)
             Skye.Common.RegistryHelper.SetDateTime("LastUpdateCheck", LastUpdateCheck)
             Skye.Common.RegistryHelper.SetString("LatestKnownVersion", LatestKnownVersion)
+
+            ' Profiles
+            Skye.Common.RegistryHelper.SetInt("CurrentProfileID", _currentProfileID)
+            Skye.Common.RegistryHelper.SetInt("NextProfileID", _nextProfileID)
+            Skye.Common.RegistryHelper.SetBool("UseProfiles", UseProfiles)
+            Dim order As Integer = 0
+            For Each profile In Profiles
+                profile.Order = order
+                Skye.Common.RegistryHelper.SetInt("Profile" & profile.ID & "ID", profile.ID)
+                Skye.Common.RegistryHelper.SetInt("Profile" & profile.ID & "Order", profile.Order)
+                Skye.Common.RegistryHelper.SetString("Profile" & profile.ID & "Name", profile.Name)
+                order += 1
+            Next
+
+            ' HotKeys
             Skye.Common.RegistryHelper.SetInt("HotKeyToggleFavorite", CInt(HotKeys.ToggleFavorite))
             Skye.Common.RegistryHelper.SetInt("HotKeyShowViewer", CInt(HotKeys.ShowViewer))
             Skye.Common.RegistryHelper.SetInt("HotKeyShowScratchPad", CInt(HotKeys.ShowScratchPad))
             WriteToLog("Settings Saved (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
         End Sub
+        Friend Shared Function GetNextProfileID() As Integer
+            Dim id = _nextProfileID
+            _nextProfileID += 1
+            Skye.Common.RegistryHelper.SetInt("NextProfileID", _nextProfileID)
+            Return id
+        End Function
+        Friend Shared Function DeleteProfile(profileID As Integer) As Boolean
+            Try
+                ' Remove from registry
+                Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "ID")
+                Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "Order")
+                Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "Name")
+                ' Remove from in-memory list
+                Dim profileToRemove = Profiles.FirstOrDefault(Function(p) p.ID = profileID)
+                If profileToRemove IsNot Nothing Then
+                    Profiles.Remove(profileToRemove)
+                End If
+                ' If the deleted profile was the current one, switch to first in list or default
+                If CurrentProfileID = profileID Then
+                    CurrentProfileID = If(Profiles.Count > 0, Profiles(0).ID, 0)
+                    If CurrentProfileID = 0 Then UseProfiles = False
+                End If
+                Return True
+            Catch ex As Exception
+                App.WriteToLog("Error Deleting Profile ID " & profileID.ToString & ": " & ex.Message)
+                Return False
+            End Try
+        End Function
 
     End Class
 

@@ -7,6 +7,7 @@ Public Class Settings
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
     Private suppressPageSelection As Boolean = False
+    Private ProfileItemMove As ListViewItem 'Item being moved in the profile list
 
     ' Form Events
     Private Sub Settings_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -15,17 +16,24 @@ Public Class Settings
         AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
         Text = "Settings for " & GetAppTitle()
 
-        'suppressPageSelection = True
         ILPageSelector.Images.Add(My.Resources.ImageSettings48)
         ILPageSelector.Images.Add(My.Resources.ImageApp48)
         ILPageSelector.Images.Add(My.Resources.ImageHotKeys48)
         ILPageSelector.Images.Add(My.Resources.ImageBackup48)
+        ILPageSelector.Images.Add(My.Resources.ImageProfiles48)
+
         LVPageSelector.Items.Add(New ListViewItem("General", 0))
         LVPageSelector.Items.Add(New ListViewItem("Clips", 1))
         LVPageSelector.Items.Add(New ListViewItem("Hot Keys", 2))
         LVPageSelector.Items.Add(New ListViewItem("Backup", 3))
+        LVPageSelector.Items.Add(New ListViewItem("Profiles", 4))
         LVPageSelector.Items(0).Selected = True
-        'suppressPageSelection = False
+
+        PanelGeneral.Dock = DockStyle.Fill
+        PanelClips.Dock = DockStyle.Fill
+        PanelHotKeys.Dock = DockStyle.Fill
+        PanelBackup.Dock = DockStyle.Fill
+        PanelProfiles.Dock = DockStyle.Fill
 
         CMTxtBox.Font = App.MenuFont
         Dim bstr As String = TipSettings.GetText(BtnBackupNow)
@@ -34,6 +42,7 @@ Public Class Settings
         bstr = TipSettings.GetText(CoBoxAutoBackupFrequency)
         bstr &= App.UserPath
         TipSettings.SetText(CoBoxAutoBackupFrequency, bstr)
+        LVProfiles.Columns(0).Width = LVProfiles.Width - SystemInformation.VerticalScrollBarWidth
 
         'Settings
         ChkBoxThemeAuto.Checked = App.Settings.ThemeAuto
@@ -70,6 +79,11 @@ Public Class Settings
             End If
         Next
         ChkBoxAutoPurgeBackups.Checked = App.Settings.AutoBackupPurge
+        ChkBoxUseProfiles.Checked = App.Settings.UseProfiles
+        For Each p As App.Settings.Profile In App.Settings.Profiles
+            Dim lvi As New ListViewItem(p.Name) With {.Tag = p.ID}
+            LVProfiles.Items.Add(lvi)
+        Next
 
     End Sub
     Private Sub Settings_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
@@ -136,6 +150,57 @@ Public Class Settings
         If selectedSource = "Add Stream To Playlist" OrElse selectedSource = "Import Playlist" Then Return
         SetPage(LVPageSelector.SelectedItems(0).Text)
     End Sub
+    Private Sub LVProfiles_MouseDown(sender As Object, e As MouseEventArgs) Handles LVProfiles.MouseDown
+        If e.Clicks = 1 Then ProfileItemMove = LVProfiles.GetItemAt(e.X, e.Y)
+    End Sub
+    Private Sub LVProfiles_MouseMove(sender As Object, e As MouseEventArgs) Handles LVProfiles.MouseMove
+        If ProfileItemMove IsNot Nothing Then
+            Cursor = Cursors.Hand
+            Dim lastItemBottom = Math.Min(e.Y, LVProfiles.Items(LVProfiles.Items.Count - 1).GetBounds(ItemBoundsPortion.Entire).Bottom - 1)
+            Dim itemover = LVProfiles.GetItemAt(0, lastItemBottom)
+            If itemover IsNot Nothing Then
+                Dim rc = itemover.GetBounds(ItemBoundsPortion.Entire)
+                If e.Y < rc.Top + rc.Height / 2 Then
+                    LVProfiles.LineBefore = itemover.Index
+                    LVProfiles.LineAfter = -1
+                Else
+                    LVProfiles.LineBefore = -1
+                    LVProfiles.LineAfter = itemover.Index
+                End If
+                LVProfiles.Invalidate()
+            End If
+        End If
+    End Sub
+    Private Sub LVProfiles_MouseUp(sender As Object, e As MouseEventArgs) Handles LVProfiles.MouseUp
+        If ProfileItemMove IsNot Nothing Then
+            Dim lastItemBottom = Math.Min(e.Y, LVProfiles.Items(LVProfiles.Items.Count - 1).GetBounds(ItemBoundsPortion.Entire).Bottom - 1)
+            Dim itemover = LVProfiles.GetItemAt(0, lastItemBottom)
+            If itemover IsNot Nothing And itemover IsNot ProfileItemMove Then
+                Dim insertbefore As Boolean
+                Dim rc = itemover.GetBounds(ItemBoundsPortion.Entire)
+                If e.Y < rc.Top + rc.Height / 2 Then
+                    insertbefore = True
+                Else
+                    insertbefore = False
+                End If
+                LVProfiles.Items.Remove(ProfileItemMove)
+                If Not ProfileItemMove.Index = itemover.Index Then
+                    If insertbefore Then
+                        LVProfiles.Items.Insert(itemover.Index, ProfileItemMove)
+                    Else
+                        LVProfiles.Items.Insert(itemover.Index + 1, ProfileItemMove)
+                    End If
+                End If
+            End If
+            ProfileItemMove = Nothing
+            SaveProfiles()
+        End If
+        ProfileItemMove = Nothing
+        Cursor = Cursors.Default
+        LVProfiles.LineBefore = -1
+        LVProfiles.LineAfter = -1
+        LVProfiles.Invalidate()
+    End Sub
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
     End Sub
@@ -184,6 +249,19 @@ Public Class Settings
 
         End Using
     End Sub
+    Private Sub BtnAddProfile_Click(sender As Object, e As EventArgs) Handles BtnAddProfile.Click
+        Dim newid As Integer = App.Settings.GetNextProfileID
+        Dim lvi As New ListViewItem("Profile " & newid.ToString) With {.Tag = newid}
+        LVProfiles.Items.Add(lvi)
+        SaveProfiles()
+    End Sub
+    Private Sub BtnRemoveProfile_Click(sender As Object, e As EventArgs) Handles BtnRemoveProfile.Click
+        Dim lvi As ListViewItem = LVProfiles.SelectedItems(0)
+        Dim profileID As Integer = CInt(lvi.Tag)
+        App.Settings.DeleteProfile(profileID)
+        LVProfiles.Items.Remove(lvi)
+        SaveProfiles()
+    End Sub
     Private Sub CoBoxAutoBackupFrequency_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxAutoBackupFrequency.SelectionChangeCommitted
         Dim item = CType(CoBoxAutoBackupFrequency.SelectedItem, App.AutoBackupFrequencyEnumItem)
         App.Settings.AutoBackup = item.Value
@@ -191,7 +269,6 @@ Public Class Settings
     Private Sub ChkBoxAutoPurgeBackups_Click(sender As Object, e As EventArgs) Handles ChkBoxAutoPurgeBackups.Click
         App.Settings.AutoBackupPurge = ChkBoxAutoPurgeBackups.Checked
     End Sub
-
     Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxMaxClips.KeyDown, TxtBoxMaxClipPreviewLength.KeyDown, TxtBoxPurgeDays.KeyDown
         If e.KeyCode = Keys.Enter Then
             e.Handled = True
@@ -327,6 +404,12 @@ Public Class Settings
     Private Sub ChkBoxKeepScratchPadText_Click(sender As Object, e As EventArgs) Handles ChkBoxKeepScratchPadText.Click
         App.Settings.ScratchPadKeepText = Not App.Settings.ScratchPadKeepText
     End Sub
+    Private Sub ChkBoxUseProfiles_Click(sender As Object, e As EventArgs) Handles ChkBoxUseProfiles.Click
+        App.Settings.UseProfiles = Not App.Settings.UseProfiles
+    End Sub
+    Private Sub LVProfiles_AfterEdit(item As ListViewItem, subItemIndex As Integer, newValue As String) Handles LVProfiles.AfterEdit
+        SaveProfiles()
+    End Sub
 
     ' Methods
     Private Sub SetPage(page As String)
@@ -334,6 +417,7 @@ Public Class Settings
         PanelClips.Enabled = False
         PanelHotKeys.Enabled = False
         PanelBackup.Enabled = False
+        PanelProfiles.Enabled = False
         Select Case page
             Case "General"
                 PanelGeneral.Enabled = True
@@ -347,6 +431,9 @@ Public Class Settings
             Case "Backup"
                 PanelBackup.Enabled = True
                 PanelBackup.BringToFront()
+            Case "Profiles"
+                PanelProfiles.Enabled = True
+                PanelProfiles.BringToFront()
         End Select
     End Sub
     Private Function FormatHotKey(k As Keys) As String
@@ -367,6 +454,17 @@ Public Class Settings
         Else
             CoBoxTheme.Enabled = True
         End If
+    End Sub
+    Private Sub SaveProfiles()
+        App.Settings.Profiles = New List(Of App.Settings.Profile)
+        For Each item As ListViewItem In LVProfiles.Items
+            Dim p As New App.Settings.Profile With {
+                .ID = CInt(item.Tag),
+                .Name = item.Text
+            }
+            App.Settings.Profiles.Add(p)
+        Next
+        App.Settings.Save()
     End Sub
     Private Sub CheckMove(ByRef location As Point)
         Dim wa As Rectangle = Screen.FromPoint(location).WorkingArea
