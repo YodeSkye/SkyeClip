@@ -697,16 +697,6 @@ Friend Class ClipRepository
         EnsureMeta(conn, "DatabaseVersion", "1")
         EnsureMeta(conn, "HashVersion", "1")
     End Sub
-    Private Shared Sub EnsureMeta(conn As SQLiteConnection, key As String, defaultValue As String)
-        Using cmd As New SQLiteCommand("
-        INSERT INTO Meta([Key],[Value])
-        SELECT @k, @v
-        WHERE NOT EXISTS (SELECT 1 FROM Meta WHERE [Key] = @k);", conn)
-            cmd.Parameters.AddWithValue("@k", key)
-            cmd.Parameters.AddWithValue("@v", defaultValue)
-            cmd.ExecuteNonQuery()
-        End Using
-    End Sub
     Private Shared Sub EnsureColumn(conn As SQLiteConnection, table As String, column As String, definition As String)
         ' Check if column exists
         Using pragma As New SQLiteCommand($"PRAGMA table_info({table});", conn)
@@ -721,6 +711,16 @@ Friend Class ClipRepository
         ' Add missing column
         Using alter As New SQLiteCommand($"ALTER TABLE {table} ADD COLUMN {column} {definition};", conn)
             alter.ExecuteNonQuery()
+        End Using
+    End Sub
+    Private Shared Sub EnsureMeta(conn As SQLiteConnection, key As String, defaultValue As String)
+        Using cmd As New SQLiteCommand("
+        INSERT INTO Meta([Key],[Value])
+        SELECT @k, @v
+        WHERE NOT EXISTS (SELECT 1 FROM Meta WHERE [Key] = @k);", conn)
+            cmd.Parameters.AddWithValue("@k", key)
+            cmd.Parameters.AddWithValue("@v", defaultValue)
+            cmd.ExecuteNonQuery()
         End Using
     End Sub
     Friend Shared Function ComputeAggregateHash(formats As List(Of ClipData)) As String
