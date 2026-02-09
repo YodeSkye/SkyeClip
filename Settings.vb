@@ -66,7 +66,7 @@ Public Class Settings
         TxtBoxPurgeDays.Text = App.Settings.PurgeDays.ToString
         ChkBoxAutoPurge.Checked = App.Settings.AutoPurge
         CoBoxAutoBackupFrequency.Items.Clear()
-        For Each freq As AutoBackupFrequency In [Enum].GetValues(GetType(AutoBackupFrequency))
+        For Each freq As AutoBackupFrequency In [Enum].GetValues(Of AutoBackupFrequency)()
             CoBoxAutoBackupFrequency.Items.Add(New App.AutoBackupFrequencyEnumItem With {
                 .Value = freq,
                 .Text = freq.ToString().Replace("_", " ")
@@ -149,6 +149,9 @@ Public Class Settings
         Dim selectedSource As String = LVPageSelector.SelectedItems(0).Text
         If selectedSource = "Add Stream To Playlist" OrElse selectedSource = "Import Playlist" Then Return
         SetPage(LVPageSelector.SelectedItems(0).Text)
+    End Sub
+    Private Sub LVProfiles_AfterEdit(item As ListViewItem, subItemIndex As Integer, newValue As String) Handles LVProfiles.AfterEdit
+        SaveProfiles()
     End Sub
     Private Sub LVProfiles_MouseDown(sender As Object, e As MouseEventArgs) Handles LVProfiles.MouseDown
         If e.Clicks = 1 Then ProfileItemMove = LVProfiles.GetItemAt(e.X, e.Y)
@@ -368,7 +371,7 @@ Public Class Settings
         App.Settings.ThemeName = selected
         If Not App.Settings.ThemeAuto Then
             SetTheme(GetTheme(selected))
-            ApplyThemeToAllOpenForms
+            ApplyThemeToAllOpenForms()
         End If
     End Sub
     Private Sub ChkBoxThemeAuto_Click(sender As Object, e As EventArgs) Handles ChkBoxThemeAuto.Click
@@ -406,9 +409,6 @@ Public Class Settings
     End Sub
     Private Sub ChkBoxUseProfiles_Click(sender As Object, e As EventArgs) Handles ChkBoxUseProfiles.Click
         App.Settings.UseProfiles = Not App.Settings.UseProfiles
-    End Sub
-    Private Sub LVProfiles_AfterEdit(item As ListViewItem, subItemIndex As Integer, newValue As String) Handles LVProfiles.AfterEdit
-        SaveProfiles()
     End Sub
 
     ' Methods

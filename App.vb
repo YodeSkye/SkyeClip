@@ -118,14 +118,44 @@ Friend Module App
             End Get
             Set(value As Integer)
                 If _currentProfileID <> value Then
-                    Debug.Print("Profile changed from " & _currentProfileID.ToString & " to " & value.ToString)
+                    Debug.Print("Current Profile changed from " & _currentProfileID.ToString & " to " & value.ToString)
                     _currentProfileID = value
                     Skye.Common.RegistryHelper.SetInt("CurrentProfileID", _currentProfileID)
+                    Tray.RefreshMenu()
                 End If
             End Set
         End Property
         Private Shared _nextProfileID As Integer ' the next profile ID to assign when creating a new profile
-        Friend Shared UseProfiles As Boolean ' whether to use profiles, which allow for separate clip histories and some settings per profile
+        Private Shared _useProfiles As Boolean ' whether to use profiles, which allow for separate clip histories and some settings per profile
+        Friend Shared Property UseProfiles As Boolean
+            Get
+                Return _useProfiles
+            End Get
+            Set(value As Boolean)
+                If _useProfiles <> value Then
+                    'Debug.Print("UseProfiles changed from " & _useProfiles.ToString & " to " & value.ToString)
+                    _useProfiles = value
+                    Skye.Common.RegistryHelper.SetBool("UseProfiles", _useProfiles)
+                    If _useProfiles Then
+                        ' Turning profiles ON
+                        If LastUsedProfileID > 0 Then
+                            CurrentProfileID = LastUsedProfileID
+                        ElseIf Profiles.Count > 0 Then
+                            CurrentProfileID = Profiles(0).ID
+                        Else
+                            CurrentProfileID = 0
+                        End If
+                    Else
+                        ' Turning profiles OFF
+                        LastUsedProfileID = CurrentProfileID
+                        Skye.Common.RegistryHelper.SetInt("LastUsedProfileID", LastUsedProfileID)
+                        CurrentProfileID = 0
+                    End If
+                    Tray.RefreshMenu()
+                End If
+            End Set
+        End Property
+        Private Shared LastUsedProfileID As Integer
         Friend Shared Profiles As List(Of Profile) ' the list of profiles, used when profiles are enabled. The default profile with ID 0 is not stored in this list but is implicitly available.
 
         Friend Class HotKeys
@@ -178,7 +208,8 @@ Friend Module App
             ' Profiles
             _currentProfileID = Skye.Common.RegistryHelper.GetInt("CurrentProfileID", 0)
             _nextProfileID = Skye.Common.RegistryHelper.GetInt("NextProfileID", 1)
-            UseProfiles = Skye.Common.RegistryHelper.GetBool("UseProfiles", False)
+            _useProfiles = Skye.Common.RegistryHelper.GetBool("UseProfiles", False)
+            LastUsedProfileID = Skye.Common.RegistryHelper.GetInt("LastUsedProfileID", 0)
             Dim valueNames = Skye.Common.RegistryHelper.GetValuesWithPrefix("Profile")
             Dim profiles As New List(Of Profile)
             For Each key In valueNames
@@ -247,7 +278,8 @@ Friend Module App
             ' Profiles
             Skye.Common.RegistryHelper.SetInt("CurrentProfileID", _currentProfileID)
             Skye.Common.RegistryHelper.SetInt("NextProfileID", _nextProfileID)
-            Skye.Common.RegistryHelper.SetBool("UseProfiles", UseProfiles)
+            Skye.Common.RegistryHelper.SetBool("UseProfiles", _useProfiles)
+            Skye.Common.RegistryHelper.SetInt("LastUsedProfileID", LastUsedProfileID)
             Dim order As Integer = 0
             For Each profile In Profiles
                 profile.Order = order
@@ -269,6 +301,11 @@ Friend Module App
             Skye.Common.RegistryHelper.SetInt("NextProfileID", _nextProfileID)
             Return id
         End Function
+        Public Shared Function GetProfileName(id As Integer) As String
+            If id = 0 Then Return "No Profile"
+            Dim p = Settings.Profiles.FirstOrDefault(Function(x) x.ID = id)
+            Return If(p IsNot Nothing, p.Name, "Unknown Profile")
+        End Function
         Friend Shared Function DeleteProfile(profileID As Integer) As Boolean
             Try
                 ' Remove from registry
@@ -283,7 +320,7 @@ Friend Module App
                 ' If the deleted profile was the current one, switch to first in list or default
                 If CurrentProfileID = profileID Then
                     CurrentProfileID = If(Profiles.Count > 0, Profiles(0).ID, 0)
-                    If CurrentProfileID = 0 Then UseProfiles = False
+                    If CurrentProfileID = 0 Then _useProfiles = False
                 End If
                 Return True
             Catch ex As Exception

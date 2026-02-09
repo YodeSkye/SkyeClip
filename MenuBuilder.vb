@@ -68,7 +68,12 @@ Public Class MenuBuilder
             Dim commonSeparator As New ToolStripSeparator() With {.Name = "CommonActionsSeparator"}
             menu.Items.Add(commonSeparator)
             For Each action In commonActions
+                If action.Text.StartsWith("Profile", StringComparison.OrdinalIgnoreCase) AndAlso Not App.Settings.UseProfiles Then Continue For
                 Dim cmi As New ToolStripMenuItem(action.Text, action.Image) With {.Font = App.MenuFont}
+                If action.Text.StartsWith("Profile", StringComparison.OrdinalIgnoreCase) Then
+                    cmi.Text &= " (" & App.Settings.GetProfileName(App.Settings.CurrentProfileID) & ")"
+                    cmi.DropDown = BuildProfilesMenu(action.Handler)
+                End If
                 AddHandler cmi.MouseDown, action.Handler
                 menu.Items.Add(cmi)
             Next
@@ -121,5 +126,29 @@ Public Class MenuBuilder
         favMenu.DropDown = favDropDown
         Return favMenu
     End Function
-
+    Private Shared Function BuildProfilesMenu(profileClickHandler As MouseEventHandler) As ContextMenuStrip
+        Dim menu As New ContextMenuStrip With {
+            .Font = App.MenuFont,
+            .ShowItemToolTips = False,
+            .Renderer = New Skye.UI.SkyeMenuRenderer
+        }
+        If App.Settings.Profiles Is Nothing OrElse App.Settings.Profiles.Count = 0 Then
+            Dim none As New ToolStripMenuItem("< No Profiles >") With {
+                .Enabled = False,
+                .Font = App.MenuFont}
+            menu.Items.Add(none)
+        Else
+            For Each profile In App.Settings.Profiles
+                Dim item As New ToolStripMenuItem(profile.Name) With {
+                    .Tag = profile.ID,
+                    .Checked = profile.ID = App.Settings.CurrentProfileID,
+                    .Font = App.MenuFont
+                }
+                AddHandler item.MouseDown, profileClickHandler
+                menu.Items.Add(item)
+            Next
+        End If
+        Return menu
+        End
+    End Function
 End Class

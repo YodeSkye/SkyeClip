@@ -18,6 +18,11 @@ Friend Class TrayAppContext
             .Image = My.Resources.IconApp.ToBitmap
         },
         New CommonAction With {
+            .Text = "Profile",
+            .Handler = AddressOf OnProfile_MouseDown,
+            .Image = My.Resources.ImageProfiles16
+        },
+        New CommonAction With {
             .Text = "Scratch Pad",
             .Handler = AddressOf OnScratchPad_MouseDown,
             .Image = My.Resources.imageScratchPad16
@@ -263,6 +268,18 @@ Friend Class TrayAppContext
                 Clipboard.Clear()
                 App.CBLivePreview = App.BuildLiveClipboardPreview()
                 RefreshMenu()
+            Case MouseButtons.Right
+        End Select
+    End Sub
+    Private Sub OnProfile_MouseDown(sender As Object, e As MouseEventArgs)
+        Select Case e.Button
+            Case MouseButtons.Left
+                Dim cmi As ToolStripMenuItem = DirectCast(sender, ToolStripMenuItem)
+                Dim newprofileID As Integer = CInt(cmi.Tag)
+                'Debug.Print("Profile menu clicked: " & newprofileID.ToString)
+                If Not App.Settings.CurrentProfileID = newprofileID Then
+                    App.Settings.CurrentProfileID = newprofileID
+                End If
             Case MouseButtons.Right
         End Select
     End Sub
