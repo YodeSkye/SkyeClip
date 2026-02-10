@@ -120,6 +120,9 @@ Friend Module App
                 If _currentProfileID <> value Then
                     Debug.Print("Current Profile changed from " & _currentProfileID.ToString & " to " & value.ToString)
                     _currentProfileID = value
+                    If _currentProfileID <> 0 AndAlso Not Settings.Profiles.Any(Function(p) p.ID = _currentProfileID) Then
+                        _currentProfileID = 0
+                    End If
                     Skye.Common.RegistryHelper.SetInt("CurrentProfileID", _currentProfileID)
                     Tray.RefreshMenu()
                 End If

@@ -106,7 +106,19 @@ Public Class DevTools
         Using conn As New SQLiteConnection(MyConnectionString)
             conn.Open()
 
-            Dim da As New SQLiteDataAdapter("SELECT * FROM Clips ORDER BY ID DESC", conn)
+            Dim da As New SQLiteDataAdapter("SELECT 
+                                                Id,
+                                                ProfileID,
+                                                Preview,
+                                                CreatedAt,
+                                                LastUsedAt,
+                                                AggregateHash,
+                                                HashVersion,
+                                                SourceAppName,
+                                                SourceAppPath,
+                                                SourceAppIcon,
+                                                IsFavorite
+                                            FROM Clips ORDER BY ID DESC", conn)
             Dim dt As New DataTable()
             da.Fill(dt)
 

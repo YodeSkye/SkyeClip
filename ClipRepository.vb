@@ -52,6 +52,7 @@ Friend Class ClipRepository
             Dim createClipsCmd As New SQLiteCommand("
             CREATE TABLE IF NOT EXISTS Clips (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ProfileID INTEGER NOT NULL DEFAULT 0,
                 Preview TEXT,
                 CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
                 LastUsedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -98,7 +99,7 @@ Friend Class ClipRepository
             dropOldIdx.ExecuteNonQuery()
 
             ' Composite unique index on (AggregateHash, HashVersion)
-            Dim idxHashCmd As New SQLiteCommand("CREATE UNIQUE INDEX IF NOT EXISTS idx_clips_hash ON Clips(AggregateHash, HashVersion)", conn)
+            Dim idxHashCmd As New SQLiteCommand("CREATE UNIQUE INDEX IF NOT EXISTS idx_clips_hash ON Clips(AggregateHash, HashVersion, ProfileID)", conn)
             idxHashCmd.ExecuteNonQuery()
 
             Dim indexCmd As New SQLiteCommand("CREATE INDEX IF NOT EXISTS idx_ClipFormats_EntryId ON ClipFormats(EntryId)", conn)
@@ -130,10 +131,13 @@ Friend Class ClipRepository
 
             ' Check for existing clip in SAME hash version
             Dim checkCmd As New SQLiteCommand("
-            SELECT Id FROM Clips
-            WHERE AggregateHash=@hash AND HashVersion=@hv", conn)
+                SELECT Id FROM Clips
+                WHERE AggregateHash=@hash
+                  AND HashVersion=@hv
+                  AND ProfileID=@pid", conn)
             checkCmd.Parameters.AddWithValue("@hash", aggHash)
             checkCmd.Parameters.AddWithValue("@hv", hashVersion)
+            checkCmd.Parameters.AddWithValue("@pid", App.Settings.CurrentProfileID)
             Dim existingIdObj = checkCmd.ExecuteScalar()
 
             Dim entryId As Integer
@@ -151,12 +155,13 @@ Friend Class ClipRepository
                 Dim sourceInfo = GetSourceAppInfo()
                 Dim insertEntry As New SQLiteCommand("
                 INSERT INTO Clips
-                    (Preview, CreatedAt, LastUsedAt, AggregateHash, HashVersion,
+                    (ProfileID, Preview, CreatedAt, LastUsedAt, AggregateHash, HashVersion,
                      SourceAppName, SourceAppPath, SourceAppIcon)
                 VALUES
-                    (@p, @c, @l, @hash, @hv, @app, @apppath, @icon);
+                    (@pid, @p, @c, @l, @hash, @hv, @app, @apppath, @icon);
                 SELECT last_insert_rowid();", conn)
 
+                insertEntry.Parameters.AddWithValue("@pid", App.Settings.CurrentProfileID)
                 insertEntry.Parameters.AddWithValue("@p", preview)
                 insertEntry.Parameters.AddWithValue("@c", nowVal)
                 insertEntry.Parameters.AddWithValue("@l", nowVal)
@@ -687,11 +692,14 @@ Friend Class ClipRepository
 
     ' Methods
     Private Shared Sub RunMigrations(conn As SQLiteConnection)
-        ' Existing migration
+        ' Source App Pathh on Clips
         EnsureColumn(conn, "Clips", "SourceAppPath", "TEXT")
 
-        ' New: HashVersion on Clips
+        ' HashVersion on Clips
         EnsureColumn(conn, "Clips", "HashVersion", "INTEGER NOT NULL DEFAULT 0")
+
+        ' Profile ID on Clips (for multi-profile support)
+        EnsureColumn(conn, "Clips", "ProfileID", "INTEGER NOT NULL DEFAULT 0")
 
         ' Ensure Meta rows
         EnsureMeta(conn, "DatabaseVersion", "1")

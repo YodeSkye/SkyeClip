@@ -197,6 +197,7 @@ Public Class Settings
             End If
             ProfileItemMove = Nothing
             SaveProfiles()
+            App.Tray.RefreshMenu()
         End If
         ProfileItemMove = Nothing
         Cursor = Cursors.Default
