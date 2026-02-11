@@ -125,7 +125,7 @@ Partial Class ClipExplorer
         ChkBoxShowAll.Name = "ChkBoxShowAll"
         ChkBoxShowAll.Size = New Size(128, 25)
         ChkBoxShowAll.TabIndex = 31
-        TipClipExplorer.SetText(ChkBoxShowAll, "Only Search through Favorite Clips.")
+        TipClipExplorer.SetText(ChkBoxShowAll, "If Profiles are enabled, this option becomes available." & vbCrLf & "It toggles between showing only the current profile’s clips or showing all clips.")
         ChkBoxShowAll.Text = "Show All Clips"
         ChkBoxShowAll.UseVisualStyleBackColor = True
         ' 
