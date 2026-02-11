@@ -459,9 +459,7 @@ Friend Module App
     End Sub
     Friend Sub HideScratchPad()
         If FmrScratchPad IsNot Nothing AndAlso Not FmrScratchPad.IsDisposed Then
-            If Not FmrScratchPad.Bounds.Contains(Cursor.Position) Then
-                FmrScratchPad.Close()
-            End If
+            FmrScratchPad.Close()
         End If
     End Sub
     Friend Sub ShowAppView()
