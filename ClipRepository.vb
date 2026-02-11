@@ -17,6 +17,7 @@ Friend Class ClipRepository
     End Class
     Friend Class FullClipInfo
         Public Property Id As Integer
+        Public Property ProfileID As Integer
         Public Property Preview As String
         Public Property SourceAppName As String
         Public Property SourceAppPath As String
@@ -26,6 +27,7 @@ Friend Class ClipRepository
     End Class
     Friend Class ExplorerClipInfo
         Public Property Id As Integer
+        Public Property ProfileID As Integer
         Public Property Preview As String
         Public Property CreatedAt As DateTime
         Public Property LastUsedAt As DateTime
@@ -211,6 +213,16 @@ Friend Class ClipRepository
         End Using
     End Sub
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Public Sub MoveClipToProfile(clipId As Integer, newProfileId As Integer)
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+            Dim cmd As New SQLiteCommand("UPDATE Clips SET ProfileID = @pid WHERE Id = @id", conn)
+            cmd.Parameters.AddWithValue("@pid", newProfileId)
+            cmd.Parameters.AddWithValue("@id", clipId)
+            cmd.ExecuteNonQuery()
+        End Using
+    End Sub
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Sub RestoreClip(entryId As Integer)
 
         ' ---------------------------------------------------------
@@ -344,7 +356,7 @@ Friend Class ClipRepository
             conn.Open()
 
             Dim cmd As New SQLiteCommand("
-            SELECT Id, Preview, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite, LastUsedAt
+            SELECT Id, ProfileID, Preview, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite, LastUsedAt
             FROM Clips
             WHERE Id = @id", conn)
 
@@ -354,23 +366,24 @@ Friend Class ClipRepository
                 If reader.Read() Then
                     Dim ci As New FullClipInfo With {
                     .Id = reader.GetInt32(0),
-                    .Preview = If(reader.IsDBNull(1), "", reader.GetString(1)),
-                    .SourceAppName = If(reader.IsDBNull(2), "", reader.GetString(2)),
-                    .SourceAppPath = If(reader.IsDBNull(3), "", reader.GetString(3)),
-                    .IsFavorite = (Not reader.IsDBNull(5) AndAlso reader.GetInt32(5) = 1)
+                    .ProfileID = reader.GetInt32(1),
+                    .Preview = If(reader.IsDBNull(2), "", reader.GetString(2)),
+                    .SourceAppName = If(reader.IsDBNull(3), "", reader.GetString(3)),
+                    .SourceAppPath = If(reader.IsDBNull(4), "", reader.GetString(4)),
+                    .IsFavorite = (Not reader.IsDBNull(6) AndAlso reader.GetInt32(6) = 1)
                 }
 
                     ' Icon
-                    If Not reader.IsDBNull(4) Then
-                        Dim length As Integer = CInt(reader.GetBytes(4, 0, Nothing, 0, 0))
+                    If Not reader.IsDBNull(5) Then
+                        Dim length As Integer = CInt(reader.GetBytes(5, 0, Nothing, 0, 0))
                         Dim buffer(length - 1) As Byte
-                        reader.GetBytes(4, 0, buffer, 0, length)
+                        reader.GetBytes(5, 0, buffer, 0, length)
                         ci.SourceAppIcon = buffer
                     End If
 
                     ' LastUsedAt
-                    If Not reader.IsDBNull(6) Then
-                        ci.LastUsedAt = reader.GetDateTime(6)
+                    If Not reader.IsDBNull(7) Then
+                        ci.LastUsedAt = reader.GetDateTime(7)
                     End If
 
                     Return ci
@@ -383,94 +396,129 @@ Friend Class ClipRepository
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Function GetRecentClips(limit As Integer) As List(Of BasicClipInfo)
         Dim clips As New List(Of BasicClipInfo)
+
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
 
-            ' Query Clips table ordered by LastUsedAt, include IsFavorite
-            Dim cmd As New SQLiteCommand("
-            SELECT Id, Preview, LastUsedAt, SourceAppIcon, IsFavorite
-            FROM Clips
-            ORDER BY LastUsedAt DESC
-            LIMIT @l", conn)
+            Dim sql As String
 
-            cmd.Parameters.AddWithValue("@l", limit)
+            If App.Settings.UseProfiles Then
+                ' Profiles ON → only show clips from the active profile
+                sql = "
+                SELECT Id, Preview, LastUsedAt, SourceAppIcon, IsFavorite
+                FROM Clips
+                WHERE ProfileID = @pid
+                ORDER BY LastUsedAt DESC
+                LIMIT @l"
+            Else
+                ' Profiles OFF → show ALL clips (no filter)
+                sql = "
+                SELECT Id, Preview, LastUsedAt, SourceAppIcon, IsFavorite
+                FROM Clips
+                ORDER BY LastUsedAt DESC
+                LIMIT @l"
+            End If
 
-            Using reader = cmd.ExecuteReader()
-                While reader.Read()
-                    Dim ci As New BasicClipInfo With {
+            Using cmd As New SQLiteCommand(sql, conn)
+                cmd.Parameters.AddWithValue("@l", limit)
+
+                If App.Settings.UseProfiles Then
+                    cmd.Parameters.AddWithValue("@pid", App.Settings.CurrentProfileID)
+                End If
+
+                Using reader = cmd.ExecuteReader()
+                    While reader.Read()
+                        Dim ci As New BasicClipInfo With {
                         .Id = reader.GetInt32(0),
                         .Preview = If(reader.IsDBNull(1), String.Empty, reader.GetString(1))
                     }
 
-                    ' LastUsedAt
-                    If Not reader.IsDBNull(2) Then
-                        ci.LastUsedAt = reader.GetDateTime(2)
-                    End If
+                        If Not reader.IsDBNull(2) Then
+                            ci.LastUsedAt = reader.GetDateTime(2)
+                        End If
 
-                    ' SourceAppIcon (stored as BLOB)
-                    If Not reader.IsDBNull(3) Then
-                        Dim length As Integer = CInt(reader.GetBytes(3, 0, Nothing, 0, 0))
-                        Dim buffer(length - 1) As Byte
-                        reader.GetBytes(3, 0, buffer, 0, CInt(length))
-                        ci.SourceAppIcon = buffer
-                    End If
+                        If Not reader.IsDBNull(3) Then
+                            Dim length As Integer = CInt(reader.GetBytes(3, 0, Nothing, 0, 0))
+                            Dim buffer(length - 1) As Byte
+                            reader.GetBytes(3, 0, buffer, 0, length)
+                            ci.SourceAppIcon = buffer
+                        End If
 
-                    ' IsFavorite (INTEGER 0/1 → Boolean)
-                    If Not reader.IsDBNull(4) Then
-                        ci.IsFavorite = (reader.GetInt32(4) = 1)
-                    End If
+                        If Not reader.IsDBNull(4) Then
+                            ci.IsFavorite = (reader.GetInt32(4) = 1)
+                        End If
 
-                    clips.Add(ci)
-                End While
+                        clips.Add(ci)
+                    End While
+                End Using
             End Using
         End Using
+
         Return clips
     End Function
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Function GetFavoriteClips(limit As Integer) As List(Of BasicClipInfo)
         Dim clips As New List(Of BasicClipInfo)
+
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
 
-            ' Query Clips table for favorites only, ordered by LastUsedAt
-            Dim cmd As New SQLiteCommand("
-            SELECT Id, Preview, LastUsedAt, SourceAppIcon, IsFavorite
-            FROM Clips
-            WHERE IsFavorite = 1
-            ORDER BY LastUsedAt DESC
-            LIMIT @l", conn)
+            Dim sql As String
 
-            cmd.Parameters.AddWithValue("@l", limit)
+            If App.Settings.UseProfiles Then
+                ' Profiles ON → only favorites from the active profile
+                sql = "
+                SELECT Id, Preview, LastUsedAt, SourceAppIcon, IsFavorite
+                FROM Clips
+                WHERE IsFavorite = 1
+                  AND ProfileID = @pid
+                ORDER BY LastUsedAt DESC
+                LIMIT @l"
+            Else
+                ' Profiles OFF → show ALL favorites from ALL profiles
+                sql = "
+                SELECT Id, Preview, LastUsedAt, SourceAppIcon, IsFavorite
+                FROM Clips
+                WHERE IsFavorite = 1
+                ORDER BY LastUsedAt DESC
+                LIMIT @l"
+            End If
 
-            Using reader = cmd.ExecuteReader()
-                While reader.Read()
-                    Dim ci As New BasicClipInfo With {
+            Using cmd As New SQLiteCommand(sql, conn)
+                cmd.Parameters.AddWithValue("@l", limit)
+
+                If App.Settings.UseProfiles Then
+                    cmd.Parameters.AddWithValue("@pid", App.Settings.CurrentProfileID)
+                End If
+
+                Using reader = cmd.ExecuteReader()
+                    While reader.Read()
+                        Dim ci As New BasicClipInfo With {
                         .Id = reader.GetInt32(0),
                         .Preview = If(reader.IsDBNull(1), "", reader.GetString(1))
                     }
 
-                    ' LastUsedAt
-                    If Not reader.IsDBNull(2) Then
-                        ci.LastUsedAt = reader.GetDateTime(2)
-                    End If
+                        If Not reader.IsDBNull(2) Then
+                            ci.LastUsedAt = reader.GetDateTime(2)
+                        End If
 
-                    ' SourceAppIcon (stored as BLOB)
-                    If Not reader.IsDBNull(3) Then
-                        Dim length As Integer = CInt(reader.GetBytes(3, 0, Nothing, 0, 0))
-                        Dim buffer(length - 1) As Byte
-                        reader.GetBytes(3, 0, buffer, 0, CInt(length))
-                        ci.SourceAppIcon = buffer
-                    End If
+                        If Not reader.IsDBNull(3) Then
+                            Dim length As Integer = CInt(reader.GetBytes(3, 0, Nothing, 0, 0))
+                            Dim buffer(length - 1) As Byte
+                            reader.GetBytes(3, 0, buffer, 0, length)
+                            ci.SourceAppIcon = buffer
+                        End If
 
-                    ' IsFavorite (INTEGER 0/1 → Boolean)
-                    If Not reader.IsDBNull(4) Then
-                        ci.IsFavorite = (reader.GetInt32(4) = 1)
-                    End If
+                        If Not reader.IsDBNull(4) Then
+                            ci.IsFavorite = (reader.GetInt32(4) = 1)
+                        End If
 
-                    clips.Add(ci)
-                End While
+                        clips.Add(ci)
+                    End While
+                End Using
             End Using
         End Using
+
         Return clips
     End Function
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
@@ -481,7 +529,7 @@ Friend Class ClipRepository
             conn.Open()
 
             Dim cmd As New SQLiteCommand("
-            SELECT Id, Preview, CreatedAt, LastUsedAt, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite
+            SELECT Id, ProfileID, Preview, CreatedAt, LastUsedAt, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite
             FROM Clips
             ORDER BY LastUsedAt DESC", conn)
 
@@ -489,19 +537,20 @@ Friend Class ClipRepository
                 While reader.Read()
                     Dim ci As New ExplorerClipInfo With {
                     .Id = reader.GetInt32(0),
-                    .Preview = If(reader.IsDBNull(1), "", reader.GetString(1)),
-                    .CreatedAt = If(reader.IsDBNull(2), Date.MinValue, reader.GetDateTime(2)),
-                    .LastUsedAt = If(reader.IsDBNull(3), Date.MinValue, reader.GetDateTime(3)),
-                    .SourceAppName = If(reader.IsDBNull(4), "", reader.GetString(4)),
-                    .SourceAppPath = If(reader.IsDBNull(5), "", reader.GetString(5)),
-                    .IsFavorite = (Not reader.IsDBNull(7) AndAlso reader.GetInt32(7) = 1)
+                    .ProfileID = If(reader.IsDBNull(1), 0, reader.GetInt32(1)),
+                    .Preview = If(reader.IsDBNull(2), "", reader.GetString(2)),
+                    .CreatedAt = If(reader.IsDBNull(3), Date.MinValue, reader.GetDateTime(3)),
+                    .LastUsedAt = If(reader.IsDBNull(4), Date.MinValue, reader.GetDateTime(4)),
+                    .SourceAppName = If(reader.IsDBNull(5), "", reader.GetString(5)),
+                    .SourceAppPath = If(reader.IsDBNull(6), "", reader.GetString(6)),
+                    .IsFavorite = (Not reader.IsDBNull(8) AndAlso reader.GetInt32(8) = 1)
                 }
 
                     ' Icon
-                    If Not reader.IsDBNull(6) Then
-                        Dim length As Integer = CInt(reader.GetBytes(6, 0, Nothing, 0, 0))
+                    If Not reader.IsDBNull(7) Then
+                        Dim length As Integer = CInt(reader.GetBytes(7, 0, Nothing, 0, 0))
                         Dim buffer(length - 1) As Byte
-                        reader.GetBytes(6, 0, buffer, 0, length)
+                        reader.GetBytes(7, 0, buffer, 0, length)
                         ci.SourceAppIcon = buffer
                     End If
 

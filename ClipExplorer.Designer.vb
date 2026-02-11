@@ -27,6 +27,7 @@ Partial Class ClipExplorer
         StatusStripCE = New StatusStrip()
         TSSLabelStatus = New ToolStripStatusLabel()
         PanelCE = New Panel()
+        ChkBoxShowAll = New CheckBox()
         GrpBoxSearch = New GroupBox()
         RadBtnHTML = New RadioButton()
         RadBtnPlainText = New RadioButton()
@@ -48,6 +49,7 @@ Partial Class ClipExplorer
         Favorite = New DataGridViewCheckBoxColumn()
         CMClipActions = New ContextMenuStrip(components)
         CMICAUseClip = New ToolStripMenuItem()
+        CMIUseClipAndToSetCurrentProfile = New ToolStripMenuItem()
         ToolStripSeparator1 = New ToolStripSeparator()
         CMICAFavorite = New ToolStripMenuItem()
         CMICAClipViewer = New ToolStripMenuItem()
@@ -96,6 +98,7 @@ Partial Class ClipExplorer
         ' PanelCE
         ' 
         PanelCE.BorderStyle = BorderStyle.FixedSingle
+        PanelCE.Controls.Add(ChkBoxShowAll)
         PanelCE.Controls.Add(GrpBoxSearch)
         PanelCE.Controls.Add(TxtBoxDays)
         PanelCE.Controls.Add(ChkBoxFavorites)
@@ -106,10 +109,23 @@ Partial Class ClipExplorer
         TipClipExplorer.SetImage(PanelCE, Nothing)
         PanelCE.Location = New Point(0, 0)
         PanelCE.Name = "PanelCE"
-        PanelCE.Size = New Size(800, 55)
+        PanelCE.Size = New Size(800, 58)
         PanelCE.TabIndex = 0
         PanelCE.TabStop = True
         TipClipExplorer.SetText(PanelCE, Nothing)
+        ' 
+        ' ChkBoxShowAll
+        ' 
+        ChkBoxShowAll.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        ChkBoxShowAll.AutoSize = True
+        TipClipExplorer.SetImage(ChkBoxShowAll, Nothing)
+        ChkBoxShowAll.Location = New Point(309, 28)
+        ChkBoxShowAll.Name = "ChkBoxShowAll"
+        ChkBoxShowAll.Size = New Size(128, 25)
+        ChkBoxShowAll.TabIndex = 31
+        TipClipExplorer.SetText(ChkBoxShowAll, "Only Search through Favorite Clips.")
+        ChkBoxShowAll.Text = "Show All Clips"
+        ChkBoxShowAll.UseVisualStyleBackColor = True
         ' 
         ' GrpBoxSearch
         ' 
@@ -119,7 +135,7 @@ Partial Class ClipExplorer
         GrpBoxSearch.Controls.Add(RadBtnAllText)
         GrpBoxSearch.Controls.Add(RadBtnRTF)
         TipClipExplorer.SetImage(GrpBoxSearch, Nothing)
-        GrpBoxSearch.Location = New Point(597, -10)
+        GrpBoxSearch.Location = New Point(596, -8)
         GrpBoxSearch.Name = "GrpBoxSearch"
         GrpBoxSearch.Size = New Size(200, 63)
         GrpBoxSearch.TabIndex = 5
@@ -205,7 +221,7 @@ Partial Class ClipExplorer
         ChkBoxFavorites.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         ChkBoxFavorites.AutoSize = True
         TipClipExplorer.SetImage(ChkBoxFavorites, Nothing)
-        ChkBoxFavorites.Location = New Point(309, 15)
+        ChkBoxFavorites.Location = New Point(309, 5)
         ChkBoxFavorites.Name = "ChkBoxFavorites"
         ChkBoxFavorites.Size = New Size(179, 25)
         ChkBoxFavorites.TabIndex = 20
@@ -242,7 +258,7 @@ Partial Class ClipExplorer
         ' 
         SplitContainerCE.Dock = DockStyle.Fill
         TipClipExplorer.SetImage(SplitContainerCE, Nothing)
-        SplitContainerCE.Location = New Point(0, 55)
+        SplitContainerCE.Location = New Point(0, 58)
         SplitContainerCE.Name = "SplitContainerCE"
         ' 
         ' SplitContainerCE.Panel1
@@ -258,7 +274,7 @@ Partial Class ClipExplorer
         SplitContainerCE.Panel2.Controls.Add(RTB)
         TipClipExplorer.SetImage(SplitContainerCE.Panel2, Nothing)
         TipClipExplorer.SetText(SplitContainerCE.Panel2, Nothing)
-        SplitContainerCE.Size = New Size(800, 369)
+        SplitContainerCE.Size = New Size(800, 366)
         SplitContainerCE.SplitterDistance = 556
         SplitContainerCE.TabIndex = 100
         TipClipExplorer.SetText(SplitContainerCE, Nothing)
@@ -276,7 +292,7 @@ Partial Class ClipExplorer
         DGV.Location = New Point(0, 0)
         DGV.Name = "DGV"
         DGV.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-        DGV.Size = New Size(556, 369)
+        DGV.Size = New Size(556, 366)
         DGV.TabIndex = 0
         TipClipExplorer.SetText(DGV, Nothing)
         ' 
@@ -332,67 +348,74 @@ Partial Class ClipExplorer
         ' 
         CMClipActions.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.SetImage(CMClipActions, Nothing)
-        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICAExport, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
+        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, CMIUseClipAndToSetCurrentProfile, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICAExport, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
         CMClipActions.Name = "CMClipActions"
-        CMClipActions.Size = New Size(196, 170)
+        CMClipActions.Size = New Size(277, 192)
         TipClipExplorer.SetText(CMClipActions, Nothing)
         ' 
         ' CMICAUseClip
         ' 
         CMICAUseClip.Image = My.Resources.Resources.ImageApp16
         CMICAUseClip.Name = "CMICAUseClip"
-        CMICAUseClip.Size = New Size(195, 22)
+        CMICAUseClip.Size = New Size(276, 22)
         CMICAUseClip.Text = "Use Clip"
+        ' 
+        ' CMIUseClipAndToSetCurrentProfile
+        ' 
+        CMIUseClipAndToSetCurrentProfile.Image = My.Resources.Resources.ImageApp16
+        CMIUseClipAndToSetCurrentProfile.Name = "CMIUseClipAndToSetCurrentProfile"
+        CMIUseClipAndToSetCurrentProfile.Size = New Size(276, 22)
+        CMIUseClipAndToSetCurrentProfile.Text = "Set Clip to Current Profile and Use"
         ' 
         ' ToolStripSeparator1
         ' 
         ToolStripSeparator1.Name = "ToolStripSeparator1"
-        ToolStripSeparator1.Size = New Size(192, 6)
+        ToolStripSeparator1.Size = New Size(273, 6)
         ' 
         ' CMICAFavorite
         ' 
         CMICAFavorite.Image = My.Resources.Resources.ImageFavorites16
         CMICAFavorite.Name = "CMICAFavorite"
-        CMICAFavorite.Size = New Size(195, 22)
+        CMICAFavorite.Size = New Size(276, 22)
         CMICAFavorite.Text = "Favorite"
         ' 
         ' CMICAClipViewer
         ' 
         CMICAClipViewer.Image = My.Resources.Resources.imageClipViewer16
         CMICAClipViewer.Name = "CMICAClipViewer"
-        CMICAClipViewer.Size = New Size(195, 22)
+        CMICAClipViewer.Size = New Size(276, 22)
         CMICAClipViewer.Text = "Clip Viewer"
         ' 
         ' CMICAScratchPad
         ' 
         CMICAScratchPad.Image = My.Resources.Resources.imageScratchPad16
         CMICAScratchPad.Name = "CMICAScratchPad"
-        CMICAScratchPad.Size = New Size(195, 22)
+        CMICAScratchPad.Size = New Size(276, 22)
         CMICAScratchPad.Text = "Send To Scratch Pad"
         ' 
         ' CMICAExport
         ' 
         CMICAExport.Image = My.Resources.Resources.ImageExport16
         CMICAExport.Name = "CMICAExport"
-        CMICAExport.Size = New Size(195, 22)
+        CMICAExport.Size = New Size(276, 22)
         CMICAExport.Text = "Export"
         ' 
         ' CMICAOpenSourceApp
         ' 
         CMICAOpenSourceApp.Name = "CMICAOpenSourceApp"
-        CMICAOpenSourceApp.Size = New Size(195, 22)
+        CMICAOpenSourceApp.Size = New Size(276, 22)
         CMICAOpenSourceApp.Text = "Open Source App"
         ' 
         ' ToolStripSeparator2
         ' 
         ToolStripSeparator2.Name = "ToolStripSeparator2"
-        ToolStripSeparator2.Size = New Size(192, 6)
+        ToolStripSeparator2.Size = New Size(273, 6)
         ' 
         ' CMICADelete
         ' 
         CMICADelete.Image = My.Resources.Resources.ImageClearRemoveDelete16
         CMICADelete.Name = "CMICADelete"
-        CMICADelete.Size = New Size(195, 22)
+        CMICADelete.Size = New Size(276, 22)
         CMICADelete.Text = "Delete"
         ' 
         ' PicBox
@@ -401,7 +424,7 @@ Partial Class ClipExplorer
         TipClipExplorer.SetImage(PicBox, Nothing)
         PicBox.Location = New Point(0, 0)
         PicBox.Name = "PicBox"
-        PicBox.Size = New Size(240, 369)
+        PicBox.Size = New Size(240, 366)
         PicBox.SizeMode = PictureBoxSizeMode.Zoom
         PicBox.TabIndex = 31
         PicBox.TabStop = False
@@ -417,7 +440,7 @@ Partial Class ClipExplorer
         TipClipExplorer.SetImage(LVFileDrop, Nothing)
         LVFileDrop.Location = New Point(0, 0)
         LVFileDrop.Name = "LVFileDrop"
-        LVFileDrop.Size = New Size(240, 369)
+        LVFileDrop.Size = New Size(240, 366)
         LVFileDrop.SmallImageList = ILFileDrop
         LVFileDrop.TabIndex = 31
         TipClipExplorer.SetText(LVFileDrop, Nothing)
@@ -454,7 +477,7 @@ Partial Class ClipExplorer
         RTB.Location = New Point(0, 0)
         RTB.Name = "RTB"
         RTB.ReadOnly = True
-        RTB.Size = New Size(240, 369)
+        RTB.Size = New Size(240, 366)
         RTB.TabIndex = 0
         RTB.Text = ""
         TipClipExplorer.SetText(RTB, Nothing)
@@ -536,4 +559,6 @@ Partial Class ClipExplorer
     Friend WithEvents FileSize As ColumnHeader
     Friend WithEvents CMICAExport As ToolStripMenuItem
     Friend WithEvents PicBox As PictureBox
+    Friend WithEvents CMIUseClipAndToSetCurrentProfile As ToolStripMenuItem
+    Friend WithEvents ChkBoxShowAll As CheckBox
 End Class

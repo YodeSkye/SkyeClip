@@ -29,6 +29,11 @@ Public Class ClipExplorer
         AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
         Text = App.GetAppTitle() & " " & Text
         RadBtnPlainText.Checked = True
+        If App.Settings.UseProfiles Then
+            ChkBoxShowAll.Enabled = True
+        Else
+            ChkBoxShowAll.Enabled = False
+        End If
         CMClipActions.Font = App.MenuFont
         CMTxtBox.Font = App.MenuFont
         If App.Settings.ClipExplorerSize.Height >= 0 Then Size = App.Settings.ClipExplorerSize
@@ -167,6 +172,19 @@ Public Class ClipExplorer
         Else
             CMICAOpenSourceApp.Visible = False
         End If
+
+        ' --- Profiles ---
+        If App.Settings.UseProfiles Then
+            ' Only show if the clip is NOT already in the current profile
+            If clip.ProfileID <> App.Settings.CurrentProfileID Then
+                CMIUseClipAndToSetCurrentProfile.Visible = True
+            Else
+                CMIUseClipAndToSetCurrentProfile.Visible = False
+            End If
+        Else
+            CMIUseClipAndToSetCurrentProfile.Visible = False
+        End If
+
     End Sub
     Private Sub CMICAUseClip_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAUseClip.MouseDown
         If DGV.SelectedRows.Count = 0 Then Return
@@ -179,6 +197,22 @@ Public Class ClipExplorer
         App.Tray.repo.RestoreClip(clipId)
         LoadClips()
 
+    End Sub
+    Private Sub CMIUseClipAndToSetCurrentProfile_MouseDown(sender As Object, e As MouseEventArgs) Handles CMIUseClipAndToSetCurrentProfile.MouseDown
+        If DGV.SelectedRows.Count = 0 Then Return
+
+        Dim row = DGV.SelectedRows(0)
+        Dim clipId = CInt(row.Cells("Id").Value)
+
+        ' Move clip to current profile
+        App.Tray.repo.MoveClipToProfile(clipId, App.Settings.CurrentProfileID)
+
+        ' Promote it
+        App.Tray.repo.RestoreClip(clipId)
+
+        ' Refresh UI
+        LoadClips()
+        App.Tray.RefreshMenu()
     End Sub
     Private Sub CMICAFavorite_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAFavorite.MouseDown
         If DGV.SelectedRows.Count = 0 Then Return
@@ -280,6 +314,9 @@ Public Class ClipExplorer
         _searchText = TxtBoxSearch.Text.Trim
         LoadClips()
     End Sub
+    Private Sub ChkBoxShowAll_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxShowAll.CheckedChanged
+        LoadClips()
+    End Sub
     Private Sub ChkBoxFavorites_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxFavorites.CheckedChanged
         _searchFavoritesOnly = ChkBoxFavorites.Checked
         LoadClips()
@@ -327,7 +364,22 @@ Public Class ClipExplorer
         Dim result As New ClipLoadResult()
         Dim rows As New List(Of Object())()
 
-        Dim allClips = App.Tray.repo.GetAllClips()
+        Dim allClips As List(Of ExplorerClipInfo)
+
+        If App.Settings.UseProfiles Then
+            If ChkBoxShowAll.Checked Then
+                ' Profiles ON + Show All → show everything
+                allClips = App.Tray.repo.GetAllClips()
+            Else
+                ' Profiles ON + Show only current profile
+                allClips = App.Tray.repo.GetAllClips().
+            Where(Function(c) c.ProfileID = App.Settings.CurrentProfileID).ToList()
+            End If
+        Else
+            ' Profiles OFF → always show everything
+            allClips = App.Tray.repo.GetAllClips()
+        End If
+
         result.TotalCount = allClips.Count
 
         Dim filtered = allClips
