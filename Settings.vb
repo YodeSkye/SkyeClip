@@ -147,8 +147,40 @@ Public Class Settings
     Private Sub LVPageSelector_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVPageSelector.SelectedIndexChanged
         If suppressPageSelection OrElse LVPageSelector.SelectedItems.Count = 0 Then Return
         Dim selectedSource As String = LVPageSelector.SelectedItems(0).Text
-        If selectedSource = "Add Stream To Playlist" OrElse selectedSource = "Import Playlist" Then Return
         SetPage(LVPageSelector.SelectedItems(0).Text)
+    End Sub
+    Private Sub LVProfiles_BeforeEdit(item As ListViewItem, subItemIndex As Integer, ByRef cancel As Boolean) Handles LVProfiles.BeforeEdit
+        item.SubItems(subItemIndex).Tag = item.SubItems(subItemIndex).Text
+    End Sub
+    Private Sub LVProfiles_SubItemEdited(item As ListViewItem, subItemIndex As Integer, newValue As String) Handles LVProfiles.SubItemEdited
+
+        ' Only enforce uniqueness on the Name column
+        If subItemIndex <> 0 Then Exit Sub
+
+        Dim trimmed = newValue.Trim()
+
+        ' Empty names are not allowed
+        If trimmed = String.Empty Then
+            item.SubItems(subItemIndex).Text = item.SubItems(subItemIndex).Tag.ToString()
+            'Show tooltip
+            Exit Sub
+        End If
+
+        ' Check for duplicates
+        For Each li As ListViewItem In LVProfiles.Items
+            If li IsNot item Then
+                If String.Equals(li.SubItems(0).Text.Trim(), trimmed, StringComparison.OrdinalIgnoreCase) Then
+                    ' Restore old value (stored in Tag)
+                    item.SubItems(subItemIndex).Text = item.SubItems(subItemIndex).Tag.ToString()
+                    'Show tooltip
+                    Exit Sub
+                End If
+            End If
+        Next
+
+        ' If valid, update the Tag to the new value
+        item.SubItems(subItemIndex).Tag = trimmed
+
     End Sub
     Private Sub LVProfiles_AfterEdit(item As ListViewItem, subItemIndex As Integer, newValue As String) Handles LVProfiles.AfterEdit
         SaveProfiles()
