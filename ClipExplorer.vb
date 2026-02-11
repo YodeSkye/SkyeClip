@@ -364,7 +364,6 @@ Public Class ClipExplorer
 
         TSSLabelStatus.Text = $"Showing {result.FilteredCount} of {result.TotalCount} Clips"
         TSSLabelStatus.ResetForeColor()
-        DGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells)
     End Sub
     Private Function BuildClipList() As ClipLoadResult
         Dim result As New ClipLoadResult()
