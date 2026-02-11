@@ -40,15 +40,6 @@ Partial Class ClipExplorer
         TxtBoxSearch = New TextBox()
         SplitContainerCE = New SplitContainer()
         DGV = New DataGridView()
-        ID = New DataGridViewTextBoxColumn()
-        ProfileID = New DataGridViewTextBoxColumn()
-        ProfileName = New DataGridViewTextBoxColumn()
-        Preview = New DataGridViewTextBoxColumn()
-        CreatedDate = New DataGridViewTextBoxColumn()
-        LastUsedDate = New DataGridViewTextBoxColumn()
-        SourceApp = New DataGridViewTextBoxColumn()
-        SourceAppImage = New DataGridViewImageColumn()
-        Favorite = New DataGridViewCheckBoxColumn()
         CMClipActions = New ContextMenuStrip(components)
         CMICAUseClip = New ToolStripMenuItem()
         CMIUseClipAndToSetCurrentProfile = New ToolStripMenuItem()
@@ -68,6 +59,15 @@ Partial Class ClipExplorer
         ILFileDrop = New ImageList(components)
         RTB = New Skye.UI.RichTextBox()
         TipClipExplorer = New Skye.UI.ToolTipEX(components)
+        ID = New DataGridViewTextBoxColumn()
+        ProfileID = New DataGridViewTextBoxColumn()
+        ProfileName = New DataGridViewTextBoxColumn()
+        Preview = New DataGridViewTextBoxColumn()
+        CreatedDate = New DataGridViewTextBoxColumn()
+        LastUsedDate = New DataGridViewTextBoxColumn()
+        SourceApp = New DataGridViewTextBoxColumn()
+        SourceAppImage = New DataGridViewImageColumn()
+        Favorite = New DataGridViewCheckBoxColumn()
         StatusStripCE.SuspendLayout()
         PanelCE.SuspendLayout()
         GrpBoxSearch.SuspendLayout()
@@ -301,78 +301,6 @@ Partial Class ClipExplorer
         DGV.TabIndex = 0
         TipClipExplorer.SetText(DGV, Nothing)
         ' 
-        ' ID
-        ' 
-        ID.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        ID.HeaderText = "ID"
-        ID.Name = "ID"
-        ID.ReadOnly = True
-        ID.Width = 50
-        ' 
-        ' ProfileID
-        ' 
-        ProfileID.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        ProfileID.HeaderText = "PID"
-        ProfileID.Name = "ProfileID"
-        ProfileID.ReadOnly = True
-        ProfileID.Width = 59
-        ' 
-        ' ProfileName
-        ' 
-        ProfileName.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        ProfileName.HeaderText = "Profile Name"
-        ProfileName.Name = "ProfileName"
-        ProfileName.ReadOnly = True
-        ProfileName.Width = 126
-        ' 
-        ' Preview
-        ' 
-        Preview.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        Preview.HeaderText = "Preview"
-        Preview.Name = "Preview"
-        Preview.ReadOnly = True
-        Preview.Width = 90
-        ' 
-        ' CreatedDate
-        ' 
-        CreatedDate.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        CreatedDate.HeaderText = "Created"
-        CreatedDate.Name = "CreatedDate"
-        CreatedDate.ReadOnly = True
-        CreatedDate.Width = 89
-        ' 
-        ' LastUsedDate
-        ' 
-        LastUsedDate.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        LastUsedDate.HeaderText = "Last Used"
-        LastUsedDate.Name = "LastUsedDate"
-        LastUsedDate.ReadOnly = True
-        LastUsedDate.Width = 102
-        ' 
-        ' SourceApp
-        ' 
-        SourceApp.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        SourceApp.HeaderText = "Source App"
-        SourceApp.Name = "SourceApp"
-        SourceApp.ReadOnly = True
-        SourceApp.Width = 115
-        ' 
-        ' SourceAppImage
-        ' 
-        SourceAppImage.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        SourceAppImage.HeaderText = "Icon"
-        SourceAppImage.Name = "SourceAppImage"
-        SourceAppImage.ReadOnly = True
-        SourceAppImage.Width = 45
-        ' 
-        ' Favorite
-        ' 
-        Favorite.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        Favorite.HeaderText = "Fav"
-        Favorite.Name = "Favorite"
-        Favorite.ReadOnly = True
-        Favorite.Width = 39
-        ' 
         ' CMClipActions
         ' 
         CMClipActions.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
@@ -515,6 +443,79 @@ Partial Class ClipExplorer
         ' 
         TipClipExplorer.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.ShadowThickness = 0
+        ' 
+        ' ID
+        ' 
+        ID.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        ID.HeaderText = "ID"
+        ID.Name = "ID"
+        ID.ReadOnly = True
+        ID.Width = 50
+        ' 
+        ' ProfileID
+        ' 
+        ProfileID.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        ProfileID.HeaderText = "PID"
+        ProfileID.Name = "ProfileID"
+        ProfileID.ReadOnly = True
+        ProfileID.Visible = False
+        ProfileID.Width = 59
+        ' 
+        ' ProfileName
+        ' 
+        ProfileName.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        ProfileName.HeaderText = "Profile"
+        ProfileName.Name = "ProfileName"
+        ProfileName.ReadOnly = True
+        ProfileName.Width = 80
+        ' 
+        ' Preview
+        ' 
+        Preview.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        Preview.HeaderText = "Preview"
+        Preview.Name = "Preview"
+        Preview.ReadOnly = True
+        Preview.Width = 90
+        ' 
+        ' CreatedDate
+        ' 
+        CreatedDate.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        CreatedDate.HeaderText = "Created"
+        CreatedDate.Name = "CreatedDate"
+        CreatedDate.ReadOnly = True
+        CreatedDate.Width = 89
+        ' 
+        ' LastUsedDate
+        ' 
+        LastUsedDate.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        LastUsedDate.HeaderText = "Last Used"
+        LastUsedDate.Name = "LastUsedDate"
+        LastUsedDate.ReadOnly = True
+        LastUsedDate.Width = 102
+        ' 
+        ' SourceApp
+        ' 
+        SourceApp.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        SourceApp.HeaderText = "Source App"
+        SourceApp.Name = "SourceApp"
+        SourceApp.ReadOnly = True
+        SourceApp.Width = 115
+        ' 
+        ' SourceAppImage
+        ' 
+        SourceAppImage.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        SourceAppImage.HeaderText = "Icon"
+        SourceAppImage.Name = "SourceAppImage"
+        SourceAppImage.ReadOnly = True
+        SourceAppImage.Width = 45
+        ' 
+        ' Favorite
+        ' 
+        Favorite.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        Favorite.HeaderText = "Fav"
+        Favorite.Name = "Favorite"
+        Favorite.ReadOnly = True
+        Favorite.Width = 39
         ' 
         ' ClipExplorer
         ' 
