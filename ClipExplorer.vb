@@ -29,19 +29,16 @@ Public Class ClipExplorer
         AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
         Text = App.GetAppTitle() & " " & Text
         RadBtnPlainText.Checked = True
-        If App.Settings.UseProfiles Then
-            ChkBoxShowAll.Enabled = True
-        Else
-            ChkBoxShowAll.Enabled = False
-        End If
         CMClipActions.Font = App.MenuFont
         CMTxtBox.Font = App.MenuFont
         If App.Settings.ClipExplorerSize.Height >= 0 Then Size = App.Settings.ClipExplorerSize
         If App.Settings.ClipExplorerLocation.Y >= 0 Then Location = App.Settings.ClipExplorerLocation
-        LoadClips()
     End Sub
     Private Sub ClipExplorer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         App.Settings.Save()
+    End Sub
+    Private Sub ClipExplorer_Activated(sender As Object, e As EventArgs) Handles MyBase.Activated
+        UpdateProfileUI()
     End Sub
     Private Sub ClipExplorer_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PanelCE.MouseDown, StatusStripCE.MouseDown
         Dim cSender As Control
@@ -342,6 +339,14 @@ Public Class ClipExplorer
     End Sub
 
     ' Methods
+    Private Sub UpdateProfileUI()
+        If App.Settings.UseProfiles Then
+            ChkBoxShowAll.Enabled = True
+        Else
+            ChkBoxShowAll.Enabled = False
+        End If
+        LoadClips()
+    End Sub
     Private Async Sub LoadClips()
         TSSLabelStatus.Text = "Working..."
         TSSLabelStatus.ForeColor = Color.Red
@@ -359,6 +364,7 @@ Public Class ClipExplorer
 
         TSSLabelStatus.Text = $"Showing {result.FilteredCount} of {result.TotalCount} Clips"
         TSSLabelStatus.ResetForeColor()
+        DGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells)
     End Sub
     Private Function BuildClipList() As ClipLoadResult
         Dim result As New ClipLoadResult()
@@ -404,6 +410,15 @@ Public Class ClipExplorer
 
         ' Build rows
         For Each c In filtered
+
+            Dim profileName As String
+            If c.ProfileID = 0 Then
+                profileName = "No Profile"
+            Else
+                Dim p = App.Settings.Profiles.FirstOrDefault(Function(x) x.ID = c.ProfileID)
+                profileName = If(p IsNot Nothing, p.Name, "Unknown")
+            End If
+
             Dim iconImg As Image = Nothing
             If c.SourceAppIcon IsNot Nothing AndAlso c.SourceAppIcon.Length > 0 Then
                 Using ms As New MemoryStream(c.SourceAppIcon)
@@ -413,6 +428,8 @@ Public Class ClipExplorer
 
             rows.Add({
             c.Id,
+            c.ProfileID,
+            profileName,
             c.Preview,
             c.CreatedAt.ToString("g"),
             c.LastUsedAt.ToString("g"),

@@ -41,6 +41,8 @@ Partial Class ClipExplorer
         SplitContainerCE = New SplitContainer()
         DGV = New DataGridView()
         ID = New DataGridViewTextBoxColumn()
+        ProfileID = New DataGridViewTextBoxColumn()
+        ProfileName = New DataGridViewTextBoxColumn()
         Preview = New DataGridViewTextBoxColumn()
         CreatedDate = New DataGridViewTextBoxColumn()
         LastUsedDate = New DataGridViewTextBoxColumn()
@@ -281,11 +283,14 @@ Partial Class ClipExplorer
         ' 
         ' DGV
         ' 
+        DGV.AllowUserToAddRows = False
+        DGV.AllowUserToDeleteRows = False
+        DGV.AllowUserToOrderColumns = True
         DGV.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells
         DGV.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells
         DGV.BorderStyle = BorderStyle.None
         DGV.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DGV.Columns.AddRange(New DataGridViewColumn() {ID, Preview, CreatedDate, LastUsedDate, SourceApp, SourceAppImage, Favorite})
+        DGV.Columns.AddRange(New DataGridViewColumn() {ID, ProfileID, ProfileName, Preview, CreatedDate, LastUsedDate, SourceApp, SourceAppImage, Favorite})
         DGV.ContextMenuStrip = CMClipActions
         DGV.Dock = DockStyle.Fill
         TipClipExplorer.SetImage(DGV, Nothing)
@@ -298,12 +303,31 @@ Partial Class ClipExplorer
         ' 
         ' ID
         ' 
+        ID.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
         ID.HeaderText = "ID"
         ID.Name = "ID"
+        ID.ReadOnly = True
         ID.Width = 50
+        ' 
+        ' ProfileID
+        ' 
+        ProfileID.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        ProfileID.HeaderText = "PID"
+        ProfileID.Name = "ProfileID"
+        ProfileID.ReadOnly = True
+        ProfileID.Width = 59
+        ' 
+        ' ProfileName
+        ' 
+        ProfileName.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        ProfileName.HeaderText = "Profile Name"
+        ProfileName.Name = "ProfileName"
+        ProfileName.ReadOnly = True
+        ProfileName.Width = 126
         ' 
         ' Preview
         ' 
+        Preview.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
         Preview.HeaderText = "Preview"
         Preview.Name = "Preview"
         Preview.ReadOnly = True
@@ -311,6 +335,7 @@ Partial Class ClipExplorer
         ' 
         ' CreatedDate
         ' 
+        CreatedDate.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
         CreatedDate.HeaderText = "Created"
         CreatedDate.Name = "CreatedDate"
         CreatedDate.ReadOnly = True
@@ -318,6 +343,7 @@ Partial Class ClipExplorer
         ' 
         ' LastUsedDate
         ' 
+        LastUsedDate.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
         LastUsedDate.HeaderText = "Last Used"
         LastUsedDate.Name = "LastUsedDate"
         LastUsedDate.ReadOnly = True
@@ -325,6 +351,7 @@ Partial Class ClipExplorer
         ' 
         ' SourceApp
         ' 
+        SourceApp.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
         SourceApp.HeaderText = "Source App"
         SourceApp.Name = "SourceApp"
         SourceApp.ReadOnly = True
@@ -332,6 +359,7 @@ Partial Class ClipExplorer
         ' 
         ' SourceAppImage
         ' 
+        SourceAppImage.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
         SourceAppImage.HeaderText = "Icon"
         SourceAppImage.Name = "SourceAppImage"
         SourceAppImage.ReadOnly = True
@@ -339,6 +367,7 @@ Partial Class ClipExplorer
         ' 
         ' Favorite
         ' 
+        Favorite.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
         Favorite.HeaderText = "Fav"
         Favorite.Name = "Favorite"
         Favorite.ReadOnly = True
@@ -536,13 +565,6 @@ Partial Class ClipExplorer
     Friend WithEvents DGV As DataGridView
     Friend WithEvents TSSLabelStatus As ToolStripStatusLabel
     Friend WithEvents RTB As Skye.UI.RichTextBox
-    Friend WithEvents ID As DataGridViewTextBoxColumn
-    Friend WithEvents Preview As DataGridViewTextBoxColumn
-    Friend WithEvents CreatedDate As DataGridViewTextBoxColumn
-    Friend WithEvents LastUsedDate As DataGridViewTextBoxColumn
-    Friend WithEvents SourceApp As DataGridViewTextBoxColumn
-    Friend WithEvents SourceAppImage As DataGridViewImageColumn
-    Friend WithEvents Favorite As DataGridViewCheckBoxColumn
     Friend WithEvents CMClipActions As ContextMenuStrip
     Friend WithEvents CMICAUseClip As ToolStripMenuItem
     Friend WithEvents CMICAFavorite As ToolStripMenuItem
@@ -561,4 +583,13 @@ Partial Class ClipExplorer
     Friend WithEvents PicBox As PictureBox
     Friend WithEvents CMIUseClipAndToSetCurrentProfile As ToolStripMenuItem
     Friend WithEvents ChkBoxShowAll As CheckBox
+    Friend WithEvents ID As DataGridViewTextBoxColumn
+    Friend WithEvents ProfileID As DataGridViewTextBoxColumn
+    Friend WithEvents ProfileName As DataGridViewTextBoxColumn
+    Friend WithEvents Preview As DataGridViewTextBoxColumn
+    Friend WithEvents CreatedDate As DataGridViewTextBoxColumn
+    Friend WithEvents LastUsedDate As DataGridViewTextBoxColumn
+    Friend WithEvents SourceApp As DataGridViewTextBoxColumn
+    Friend WithEvents SourceAppImage As DataGridViewImageColumn
+    Friend WithEvents Favorite As DataGridViewCheckBoxColumn
 End Class
