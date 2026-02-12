@@ -204,13 +204,13 @@ Friend Module App
             Public Property ID As Integer ' unique identifier for the profile
             Public Property Order As Integer ' sort order of the profile, used only for registry storage and retrieval, do not use for display, rely on the natural sort order of the list.
             Public Property Name As String ' name of the profile
-            Public Property ThemeName As String ' the name of the theme associated with this profile, if any
-            Public Property ThemeAuto As Boolean ' whether this profile should auto-switch theme based on system settings
-            Public Property MaxClips As Integer ' maximum number of clipboard entries to show for this profile
-            Public Property MaxClipPreviewLength As Integer ' in characters, the maximum length of clipboard entry previews for this profile
-            Public Property BlinkOnNewClip As Boolean ' whether to blink the tray icon on new clipboard entry for this profile
-            Public Property NotifyOnNewClip As Boolean ' whether to show a notification on new clipboard entry for this profile
-            Public Property PlaySoundWithNotify As Boolean ' whether to play a sound with notification on new clipboard entry for this profile
+            Public Property ThemeName As String = "Light" ' the name of the theme associated with this profile, if any
+            Public Property ThemeAuto As Boolean = False ' whether this profile should auto-switch theme based on system settings
+            Public Property MaxClips As Integer = 30 ' maximum number of clipboard entries to show for this profile
+            Public Property MaxClipPreviewLength As Integer = 60 ' in characters, the maximum length of clipboard entry previews for this profile
+            Public Property BlinkOnNewClip As Boolean = True ' whether to blink the tray icon on new clipboard entry for this profile
+            Public Property NotifyOnNewClip As Boolean = True ' whether to show a notification on new clipboard entry for this profile
+            Public Property PlaySoundWithNotify As Boolean = False ' whether to play a sound with notification on new clipboard entry for this profile
         End Class
 
         Friend Shared Sub Load()

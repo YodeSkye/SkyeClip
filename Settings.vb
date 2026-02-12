@@ -515,6 +515,44 @@ Public Class Settings
         Next
         App.Settings.Save()
     End Sub
+    'Private Sub SaveProfiles()
+    '    Dim newList As New List(Of App.Settings.Profile)
+
+    '    For Each item As ListViewItem In LVProfiles.Items
+    '        Dim id As Integer = CInt(item.Tag)
+
+    '        ' Try to find an existing profile
+    '        Dim p = App.Settings.Profiles.FirstOrDefault(Function(x) x.ID = id)
+
+    '        If p Is Nothing Then
+    '            ' This is a NEW profile
+    '            p = New App.Settings.Profile With {
+    '            .ID = id,
+    '            .Name = item.Text
+    '        }
+
+    '            ' Initialize defaults for new profiles
+    '            p.MaxClips = App.Settings._MaxClips   ' or whatever your global default is
+    '            p.ThemeName = App.Settings._themeName
+    '            p.MaxClipPreviewLength = App.Settings._MaxClipPreviewLength
+    '            p.BlinkOnNewClip = App.Settings._BlinkOnNewClip
+    '            p.NotifyOnNewClip = App.Settings._NotifyOnNewClip
+    '            p.PlaySoundWithNotify = App.Settings._PlaySoundWithNotify
+    '        Else
+    '            ' Existing profile: update name in case it changed
+    '            p.Name = item.Text
+    '        End If
+
+    '        ' Add to the new ordered list
+    '        newList.Add(p)
+    '    Next
+
+    '    ' Replace the old list with the new ordered list
+    '    App.Settings.Profiles = newList
+
+    '    ' Save everything
+    '    App.Settings.Save()
+    'End Sub
     Private Sub CheckMove(ByRef location As Point)
         Dim wa As Rectangle = Screen.FromPoint(location).WorkingArea
         If location.X + Me.Width > wa.Right Then
