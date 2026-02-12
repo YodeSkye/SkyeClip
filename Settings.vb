@@ -1,4 +1,5 @@
 ﻿
+Imports System.ComponentModel.Design.ObjectSelectorEditor
 Imports Skye.UI
 
 Public Class Settings
@@ -450,6 +451,10 @@ Public Class Settings
         If App.FrmScratchPad IsNot Nothing Then App.FrmScratchPad?.SaveScratchPad()
         App.Settings.UseProfiles = Not App.Settings.UseProfiles
         If App.FrmScratchPad Is Nothing Then App.LoadScratchPadText()
+        If Not App.Settings.ThemeAuto Then
+            SetTheme(GetTheme(App.Settings.ThemeName))
+            ApplyThemeToAllOpenForms()
+        End If
     End Sub
 
     ' Methods

@@ -89,8 +89,40 @@ Friend Module App
 
     ' Settings
     Friend Class Settings
-        Friend Shared ThemeName As String ' the name of the current theme
-        Friend Shared ThemeAuto As Boolean ' whether to auto-switch theme based on system settings
+        Private Shared _themeName As String ' the name of the current theme
+        Friend Shared Property ThemeName As String
+            Get
+                If UseProfiles Then
+                    Return Profiles.First(Function(x) x.ID = CurrentProfileID).ThemeName
+                Else
+                    Return _themeName
+                End If
+            End Get
+            Set(value As String)
+                If UseProfiles Then
+                    Profiles.First(Function(x) x.ID = CurrentProfileID).ThemeName = value
+                Else
+                    _themeName = value
+                End If
+            End Set
+        End Property
+        Private Shared _themeAuto As Boolean ' whether to auto-switch theme based on system settings
+        Friend Shared Property ThemeAuto As Boolean
+            Get
+                If UseProfiles Then
+                    Return Profiles.First(Function(x) x.ID = CurrentProfileID).ThemeAuto
+                Else
+                    Return _themeAuto
+                End If
+            End Get
+            Set(value As Boolean)
+                If UseProfiles Then
+                    Profiles.First(Function(x) x.ID = CurrentProfileID).ThemeAuto = value
+                Else
+                    _themeAuto = value
+                End If
+            End Set
+        End Property
         Friend Shared AutoBackup As AutoBackupFrequency ' frequency of automatic backups
         Friend Shared LastAutoBackup As DateTime ' the last date when automatic backup was performed
         Friend Shared AutoBackupPurge As Boolean ' whether to auto-purge old backups
@@ -172,13 +204,20 @@ Friend Module App
             Public Property ID As Integer ' unique identifier for the profile
             Public Property Order As Integer ' sort order of the profile, used only for registry storage and retrieval, do not use for display, rely on the natural sort order of the list.
             Public Property Name As String ' name of the profile
+            Public Property ThemeName As String ' the name of the theme associated with this profile, if any
+            Public Property ThemeAuto As Boolean ' whether this profile should auto-switch theme based on system settings
+            Public Property MaxClips As Integer ' maximum number of clipboard entries to show for this profile
+            Public Property MaxClipPreviewLength As Integer ' in characters, the maximum length of clipboard entry previews for this profile
+            Public Property BlinkOnNewClip As Boolean ' whether to blink the tray icon on new clipboard entry for this profile
+            Public Property NotifyOnNewClip As Boolean ' whether to show a notification on new clipboard entry for this profile
+            Public Property PlaySoundWithNotify As Boolean ' whether to play a sound with notification on new clipboard entry for this profile
         End Class
 
         Friend Shared Sub Load()
             Dim starttime As TimeSpan = DateTime.Now.TimeOfDay
 
-            ThemeName = Skye.Common.RegistryHelper.GetString("ThemeName", "Dark")
-            ThemeAuto = Skye.Common.RegistryHelper.GetBool("ThemeAuto", False)
+            _themeName = Skye.Common.RegistryHelper.GetString("ThemeName", "Light")
+            _themeAuto = Skye.Common.RegistryHelper.GetBool("ThemeAuto", False)
             AutoBackup = CType(Skye.Common.RegistryHelper.GetInt("AutoBackup", CInt(AutoBackupFrequency.Never)), AutoBackupFrequency)
             LastAutoBackup = Skye.Common.RegistryHelper.GetDateTime("LastAutoBackup", DateTime.MinValue)
             AutoBackupPurge = Skye.Common.RegistryHelper.GetBool("AutoBackupPurge", True)
@@ -227,12 +266,20 @@ Friend Module App
                         Dim order = Skye.Common.RegistryHelper.GetInt(orderKey, 9999)
                         ' Load name
                         Dim nameKey = "Profile" & id & "Name"
-                        Dim name = Skye.Common.RegistryHelper.GetString(nameKey, "")
+                        Dim name = Skye.Common.RegistryHelper.GetString(nameKey, String.Empty)
+                        ' Load theme
+                        Dim themenameKey = "Profile" & id & "ThemeName"
+                        Dim themename = Skye.Common.RegistryHelper.GetString(themenameKey, "Light")
+                        ' Load theme auto setting
+                        Dim themeautoKey = "Profile" & id & "ThemeAuto"
+                        Dim themeauto = Skye.Common.RegistryHelper.GetBool(themeautoKey, False)
                         ' Reconstruct the profile object
                         Dim p As New Profile With {
                             .ID = id,
                             .Order = order,
-                            .Name = name
+                            .Name = name,
+                            .ThemeName = themename,
+                            .ThemeAuto = themeauto
                         }
                         profiles.Add(p)
                     End If
@@ -251,8 +298,8 @@ Friend Module App
         End Sub
         Friend Shared Sub Save()
             Dim starttime As TimeSpan = DateTime.Now.TimeOfDay
-            Skye.Common.RegistryHelper.SetString("ThemeName", ThemeName)
-            Skye.Common.RegistryHelper.SetBool("ThemeAuto", ThemeAuto)
+            Skye.Common.RegistryHelper.SetString("ThemeName", _themeName)
+            Skye.Common.RegistryHelper.SetBool("ThemeAuto", _themeAuto)
             Skye.Common.RegistryHelper.SetInt("AutoBackup", CInt(AutoBackup))
             Skye.Common.RegistryHelper.SetDateTime("LastAutoBackup", LastAutoBackup)
             Skye.Common.RegistryHelper.SetBool("AutoBackupPurge", AutoBackupPurge)
@@ -290,6 +337,8 @@ Friend Module App
                 Skye.Common.RegistryHelper.SetInt("Profile" & profile.ID & "ID", profile.ID)
                 Skye.Common.RegistryHelper.SetInt("Profile" & profile.ID & "Order", profile.Order)
                 Skye.Common.RegistryHelper.SetString("Profile" & profile.ID & "Name", profile.Name)
+                Skye.Common.RegistryHelper.SetString("Profile" & profile.ID & "ThemeName", profile.ThemeName)
+                Skye.Common.RegistryHelper.SetBool("Profile" & profile.ID & "ThemeAuto", profile.ThemeAuto)
                 order += 1
             Next
 

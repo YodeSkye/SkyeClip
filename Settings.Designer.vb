@@ -61,6 +61,8 @@ Partial Class Settings
         LVPageSelector = New ListView()
         ILPageSelector = New ImageList(components)
         PanelGeneral = New Panel()
+        LblThemeAutoBadge = New Skye.UI.Label()
+        LblThemeBadge = New Skye.UI.Label()
         PanelClips = New Panel()
         PanelHotKeys = New Panel()
         PanelBackup = New Panel()
@@ -72,6 +74,11 @@ Partial Class Settings
         ColProfileName = New ColumnHeader()
         ChkBoxUseProfiles = New CheckBox()
         LblProfiles = New Skye.UI.Label()
+        LblMaxClipsBadge = New Skye.UI.Label()
+        LbleMaxClipPreviewLengthBadge = New Skye.UI.Label()
+        LblBlinkOnNewClipBadge = New Skye.UI.Label()
+        LblNotifyOnNewClipBadge = New Skye.UI.Label()
+        LblPlaySoundWithNotifyBadge = New Skye.UI.Label()
         PanelPageSelector.SuspendLayout()
         PanelGeneral.SuspendLayout()
         PanelClips.SuspendLayout()
@@ -502,6 +509,8 @@ Partial Class Settings
         ' PanelGeneral
         ' 
         PanelGeneral.AutoSizeMode = AutoSizeMode.GrowAndShrink
+        PanelGeneral.Controls.Add(LblThemeAutoBadge)
+        PanelGeneral.Controls.Add(LblThemeBadge)
         PanelGeneral.Controls.Add(CoBoxTheme)
         PanelGeneral.Controls.Add(LblTheme)
         PanelGeneral.Controls.Add(ChkBoxThemeAuto)
@@ -509,14 +518,40 @@ Partial Class Settings
         PanelGeneral.Controls.Add(ChkBoxShowOpenSourceApp)
         PanelGeneral.Controls.Add(ChkBoxKeepScratchPadText)
         TipSettings.SetImage(PanelGeneral, Nothing)
-        PanelGeneral.Location = New Point(215, 92)
+        PanelGeneral.Location = New Point(320, 93)
         PanelGeneral.Name = "PanelGeneral"
-        PanelGeneral.Size = New Size(198, 65)
+        PanelGeneral.Size = New Size(145, 107)
         PanelGeneral.TabIndex = 1111
         TipSettings.SetText(PanelGeneral, Nothing)
         ' 
+        ' LblThemeAutoBadge
+        ' 
+        TipSettings.SetImage(LblThemeAutoBadge, My.Resources.Resources.ImageProfiles16)
+        LblThemeAutoBadge.Image = My.Resources.Resources.ImageProfiles16
+        LblThemeAutoBadge.ImageAlign = ContentAlignment.MiddleLeft
+        LblThemeAutoBadge.Location = New Point(212, 63)
+        LblThemeAutoBadge.Name = "LblThemeAutoBadge"
+        LblThemeAutoBadge.Size = New Size(30, 23)
+        LblThemeAutoBadge.TabIndex = 1106
+        TipSettings.SetText(LblThemeAutoBadge, "This setting is per-profile.")
+        ' 
+        ' LblThemeBadge
+        ' 
+        TipSettings.SetImage(LblThemeBadge, My.Resources.Resources.ImageProfiles16)
+        LblThemeBadge.Image = My.Resources.Resources.ImageProfiles16
+        LblThemeBadge.ImageAlign = ContentAlignment.MiddleLeft
+        LblThemeBadge.Location = New Point(232, 38)
+        LblThemeBadge.Name = "LblThemeBadge"
+        LblThemeBadge.Size = New Size(30, 23)
+        LblThemeBadge.TabIndex = 1105
+        TipSettings.SetText(LblThemeBadge, "This setting is per-profile.")
+        ' 
         ' PanelClips
         ' 
+        PanelClips.Controls.Add(LblPlaySoundWithNotifyBadge)
+        PanelClips.Controls.Add(LblNotifyOnNewClipBadge)
+        PanelClips.Controls.Add(LblBlinkOnNewClipBadge)
+        PanelClips.Controls.Add(LbleMaxClipPreviewLengthBadge)
         PanelClips.Controls.Add(TxtBoxMaxClipPreviewLength)
         PanelClips.Controls.Add(LblMaxClips)
         PanelClips.Controls.Add(TxtBoxMaxClips)
@@ -529,6 +564,7 @@ Partial Class Settings
         PanelClips.Controls.Add(ChkBoxPlaySoundWithNotify)
         PanelClips.Controls.Add(ChkBoxNotifyOnNewClip)
         PanelClips.Controls.Add(ChkBoxBlinkOnNewClip)
+        PanelClips.Controls.Add(LblMaxClipsBadge)
         TipSettings.SetImage(PanelClips, Nothing)
         PanelClips.Location = New Point(99, 163)
         PanelClips.Name = "PanelClips"
@@ -587,7 +623,7 @@ Partial Class Settings
         PanelProfiles.Controls.Add(ChkBoxUseProfiles)
         PanelProfiles.Controls.Add(LblProfiles)
         TipSettings.SetImage(PanelProfiles, Nothing)
-        PanelProfiles.Location = New Point(312, 171)
+        PanelProfiles.Location = New Point(341, 206)
         PanelProfiles.Name = "PanelProfiles"
         PanelProfiles.Size = New Size(157, 118)
         PanelProfiles.TabIndex = 1116
@@ -664,17 +700,72 @@ Partial Class Settings
         LblProfiles.Text = "Profiles"
         TipSettings.SetText(LblProfiles, Nothing)
         ' 
+        ' LblMaxClipsBadge
+        ' 
+        TipSettings.SetImage(LblMaxClipsBadge, My.Resources.Resources.ImageProfiles16)
+        LblMaxClipsBadge.Image = My.Resources.Resources.ImageProfiles16
+        LblMaxClipsBadge.ImageAlign = ContentAlignment.MiddleLeft
+        LblMaxClipsBadge.Location = New Point(90, 34)
+        LblMaxClipsBadge.Name = "LblMaxClipsBadge"
+        LblMaxClipsBadge.Size = New Size(30, 23)
+        LblMaxClipsBadge.TabIndex = 1106
+        TipSettings.SetText(LblMaxClipsBadge, "This setting is per-profile.")
+        ' 
+        ' LbleMaxClipPreviewLengthBadge
+        ' 
+        TipSettings.SetImage(LbleMaxClipPreviewLengthBadge, My.Resources.Resources.ImageProfiles16)
+        LbleMaxClipPreviewLengthBadge.Image = My.Resources.Resources.ImageProfiles16
+        LbleMaxClipPreviewLengthBadge.ImageAlign = ContentAlignment.MiddleLeft
+        LbleMaxClipPreviewLengthBadge.Location = New Point(188, 34)
+        LbleMaxClipPreviewLengthBadge.Name = "LbleMaxClipPreviewLengthBadge"
+        LbleMaxClipPreviewLengthBadge.Size = New Size(30, 23)
+        LbleMaxClipPreviewLengthBadge.TabIndex = 1107
+        TipSettings.SetText(LbleMaxClipPreviewLengthBadge, "This setting is per-profile.")
+        ' 
+        ' LblBlinkOnNewClipBadge
+        ' 
+        TipSettings.SetImage(LblBlinkOnNewClipBadge, My.Resources.Resources.ImageProfiles16)
+        LblBlinkOnNewClipBadge.Image = My.Resources.Resources.ImageProfiles16
+        LblBlinkOnNewClipBadge.ImageAlign = ContentAlignment.MiddleLeft
+        LblBlinkOnNewClipBadge.Location = New Point(161, 74)
+        LblBlinkOnNewClipBadge.Name = "LblBlinkOnNewClipBadge"
+        LblBlinkOnNewClipBadge.Size = New Size(30, 23)
+        LblBlinkOnNewClipBadge.TabIndex = 1108
+        TipSettings.SetText(LblBlinkOnNewClipBadge, "This setting is per-profile.")
+        ' 
+        ' LblNotifyOnNewClipBadge
+        ' 
+        TipSettings.SetImage(LblNotifyOnNewClipBadge, My.Resources.Resources.ImageProfiles16)
+        LblNotifyOnNewClipBadge.Image = My.Resources.Resources.ImageProfiles16
+        LblNotifyOnNewClipBadge.ImageAlign = ContentAlignment.MiddleLeft
+        LblNotifyOnNewClipBadge.Location = New Point(170, 98)
+        LblNotifyOnNewClipBadge.Name = "LblNotifyOnNewClipBadge"
+        LblNotifyOnNewClipBadge.Size = New Size(30, 23)
+        LblNotifyOnNewClipBadge.TabIndex = 1109
+        TipSettings.SetText(LblNotifyOnNewClipBadge, "This setting is per-profile.")
+        ' 
+        ' LblPlaySoundWithNotifyBadge
+        ' 
+        TipSettings.SetImage(LblPlaySoundWithNotifyBadge, My.Resources.Resources.ImageProfiles16)
+        LblPlaySoundWithNotifyBadge.Image = My.Resources.Resources.ImageProfiles16
+        LblPlaySoundWithNotifyBadge.ImageAlign = ContentAlignment.MiddleLeft
+        LblPlaySoundWithNotifyBadge.Location = New Point(197, 122)
+        LblPlaySoundWithNotifyBadge.Name = "LblPlaySoundWithNotifyBadge"
+        LblPlaySoundWithNotifyBadge.Size = New Size(30, 23)
+        LblPlaySoundWithNotifyBadge.TabIndex = 1110
+        TipSettings.SetText(LblPlaySoundWithNotifyBadge, "This setting is per-profile.")
+        ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(528, 446)
+        Controls.Add(PanelClips)
+        Controls.Add(PanelGeneral)
         Controls.Add(PanelProfiles)
         Controls.Add(PanelBackup)
         Controls.Add(PanelHotKeys)
-        Controls.Add(PanelGeneral)
         Controls.Add(PanelControls)
-        Controls.Add(PanelClips)
         Controls.Add(PanelPageSelector)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         FormBorderStyle = FormBorderStyle.FixedDialog
@@ -749,4 +840,11 @@ Partial Class Settings
     Friend WithEvents ColProfileName As ColumnHeader
     Friend WithEvents BtnAddProfile As Button
     Friend WithEvents BtnRemoveProfile As Button
+    Friend WithEvents LblThemeBadge As Skye.UI.Label
+    Friend WithEvents LblThemeAutoBadge As Skye.UI.Label
+    Friend WithEvents LblPlaySoundWithNotifyBadge As Skye.UI.Label
+    Friend WithEvents LblNotifyOnNewClipBadge As Skye.UI.Label
+    Friend WithEvents LblBlinkOnNewClipBadge As Skye.UI.Label
+    Friend WithEvents LbleMaxClipPreviewLengthBadge As Skye.UI.Label
+    Friend WithEvents LblMaxClipsBadge As Skye.UI.Label
 End Class
