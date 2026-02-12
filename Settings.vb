@@ -162,7 +162,10 @@ Public Class Settings
         ' Empty names are not allowed
         If trimmed = String.Empty Then
             item.SubItems(subItemIndex).Text = item.SubItems(subItemIndex).Tag.ToString()
-            'Show tooltip
+            'App.Tray.ShowToast("Profile names cannot be empty.")
+            TipSettings.HideDelay = 4000
+            TipSettings.ShowTooltipAtCursor("Profile names cannot be empty.", My.Resources.ImageProfiles16)
+            TipSettings.HideDelay = 500
             Exit Sub
         End If
 
@@ -172,7 +175,10 @@ Public Class Settings
                 If String.Equals(li.SubItems(0).Text.Trim(), trimmed, StringComparison.OrdinalIgnoreCase) Then
                     ' Restore old value (stored in Tag)
                     item.SubItems(subItemIndex).Text = item.SubItems(subItemIndex).Tag.ToString()
-                    'Show tooltip
+                    'App.Tray.ShowToast("Profile names must be unique.")
+                    TipSettings.HideDelay = 4000
+                    TipSettings.ShowTooltipAtCursor("Profile names must be unique.", My.Resources.ImageProfiles16)
+                    TipSettings.HideDelay = 500
                     Exit Sub
                 End If
             End If
@@ -180,7 +186,6 @@ Public Class Settings
 
         ' If valid, update the Tag to the new value
         item.SubItems(subItemIndex).Tag = trimmed
-
     End Sub
     Private Sub LVProfiles_AfterEdit(item As ListViewItem, subItemIndex As Integer, newValue As String) Handles LVProfiles.AfterEdit
         SaveProfiles()
