@@ -278,7 +278,9 @@ Friend Class TrayAppContext
                 Dim newprofileID As Integer = CInt(cmi.Tag)
                 'Debug.Print("Profile menu clicked: " & newprofileID.ToString)
                 If Not App.Settings.CurrentProfileID = newprofileID Then
+                    If App.FrmScratchPad IsNot Nothing Then App.FrmScratchPad?.SaveScratchPad()
                     App.Settings.CurrentProfileID = newprofileID
+                    If App.FrmScratchPad Is Nothing Then App.LoadScratchPadText()
                 End If
             Case MouseButtons.Right
         End Select

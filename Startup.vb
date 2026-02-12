@@ -42,12 +42,8 @@ Module Startup
             App.Settings.Save()
         End If
 
-        ' Load scratchpad text if setting enabled
-        If App.Settings.ScratchPadKeepText AndAlso IO.File.Exists(App.ScratchPadPath) Then
-            App.ScratchPadText = IO.File.ReadAllText(App.ScratchPadPath)
-        Else
-            App.ScratchPadText = String.Empty
-        End If
+        ' Scratch Pad
+        App.LoadScratchPadText()
         Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Scratch Pad Proper Case function.
 
         ' START APPLICATION

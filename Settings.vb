@@ -446,7 +446,9 @@ Public Class Settings
         App.Settings.ScratchPadKeepText = Not App.Settings.ScratchPadKeepText
     End Sub
     Private Sub ChkBoxUseProfiles_Click(sender As Object, e As EventArgs) Handles ChkBoxUseProfiles.Click
+        If App.FrmScratchPad IsNot Nothing Then App.FrmScratchPad?.SaveScratchPad()
         App.Settings.UseProfiles = Not App.Settings.UseProfiles
+        If App.FrmScratchPad Is Nothing Then App.LoadScratchPadText()
     End Sub
 
     ' Methods

@@ -340,7 +340,7 @@ Friend Module App
     Friend CMTray As ContextMenuStrip
     Private FrmClipExplorer As ClipExplorer
     Private FrmClipViewer As ClipViewer
-    Friend FmrScratchPad As ScratchPad
+    Friend FrmScratchPad As ScratchPad
     Private FrmAppView As AppView
     Private FrmSettings As SkyeClip.Settings
     Friend FrmLog As Log
@@ -453,14 +453,14 @@ Friend Module App
         End If
     End Sub
     Friend Sub ShowScratchPad(ClipID As Integer)
-        If FmrScratchPad Is Nothing OrElse FmrScratchPad.IsDisposed Then
-            FmrScratchPad = New ScratchPad
+        If FrmScratchPad Is Nothing OrElse FrmScratchPad.IsDisposed Then
+            FrmScratchPad = New ScratchPad
         End If
-        FmrScratchPad.Show(ClipID)
+        FrmScratchPad.Show(ClipID)
     End Sub
     Friend Sub HideScratchPad()
-        If FmrScratchPad IsNot Nothing AndAlso Not FmrScratchPad.IsDisposed Then
-            FmrScratchPad.Close()
+        If FrmScratchPad IsNot Nothing AndAlso Not FrmScratchPad.IsDisposed Then
+            FrmScratchPad.Close()
         End If
     End Sub
     Friend Sub ShowAppView()
@@ -1417,5 +1417,26 @@ Friend Module App
             Return False
         End Try
     End Function
+    Friend Function GetScratchPadProfiledPath() As String
+        Dim base As String = App.ScratchPadPath
+        Dim dir As String = IO.Path.GetDirectoryName(base)
+        Dim name As String = IO.Path.GetFileNameWithoutExtension(base)
+        Dim ext As String = IO.Path.GetExtension(base)
+
+        If App.Settings.UseProfiles Then
+            Return IO.Path.Combine(dir, $"{name}{App.Settings.CurrentProfileID}{ext}")
+        Else
+            Return base
+        End If
+
+    End Function
+    Friend Sub LoadScratchPadText()
+        Dim path = GetScratchPadProfiledPath()
+        If App.Settings.ScratchPadKeepText AndAlso IO.File.Exists(path) Then
+            App.ScratchPadText = IO.File.ReadAllText(path)
+        Else
+            App.ScratchPadText = String.Empty
+        End If
+    End Sub
 
 End Module

@@ -43,20 +43,12 @@ Friend Class ScratchPad
 
     End Sub
     Private Sub ScratchPad_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        If App.Settings.ScratchPadKeepText Then
-            App.ScratchPadText = RTB.Rtf
-            IO.File.WriteAllText(App.ScratchPadPath, RTB.Rtf)
-        Else
-            App.ScratchPadText = String.Empty
-            If IO.File.Exists(App.ScratchPadPath) Then
-                IO.File.Delete(App.ScratchPadPath)
-            End If
-        End If
+        SaveScratchPad()
         App.Settings.Save()
     End Sub
     Private Sub ScratchPad_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
-        App.FmrScratchPad?.Dispose()
-        App.FmrScratchPad = Nothing
+        App.FrmScratchPad?.Dispose()
+        App.FrmScratchPad = Nothing
     End Sub
     Private Sub ScratchPad_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown, PanelBottom.MouseDown
         Dim cSender As Control
@@ -261,6 +253,20 @@ Friend Class ScratchPad
     End Sub
 
     ' Methods
+    Friend Sub SaveScratchPad()
+        Dim path = App.GetScratchPadProfiledPath
+
+        If App.Settings.ScratchPadKeepText Then
+            App.ScratchPadText = RTB.Rtf
+            IO.File.WriteAllText(path, RTB.Rtf)
+        Else
+            App.ScratchPadText = String.Empty
+            If IO.File.Exists(path) Then
+                IO.File.Delete(path)
+            End If
+        End If
+
+    End Sub
     Private Sub Export()
         Dim uiSaveFile As New SaveFileDialog With {
             .Title = "Export Scratch Pad Content",
