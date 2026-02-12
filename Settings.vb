@@ -59,7 +59,7 @@ Public Class Settings
         ChkBoxNotifyOnNewClip.Checked = App.Settings.NotifyOnNewClip
         ChkBoxPlaySoundWithNotify.Checked = App.Settings.PlaySoundWithNotify
         ChkBoxShowOpenSourceApp.Checked = App.Settings.ShowOpenSourceApp
-        ChkBoxKeepScratchPadText.Checked = App.Settings.ScratchPadKeepText
+        SetKeepText()
         TxtBoxHotKeyToggleFavorite.Text = FormatHotKey(App.Settings.HotKeys.ToggleFavorite)
         TxtBoxHotKeyShowViewer.Text = FormatHotKey(App.Settings.HotKeys.ShowViewer)
         TxtBoxHotKeyShowScratchPad.Text = FormatHotKey(App.Settings.HotKeys.ShowScratchPad)
@@ -444,6 +444,7 @@ Public Class Settings
     End Sub
     Private Sub ChkBoxKeepScratchPadText_Click(sender As Object, e As EventArgs) Handles ChkBoxKeepScratchPadText.Click
         App.Settings.ScratchPadKeepText = Not App.Settings.ScratchPadKeepText
+        App.FrmScratchPad?.SetKeepText()
     End Sub
     Private Sub ChkBoxUseProfiles_Click(sender As Object, e As EventArgs) Handles ChkBoxUseProfiles.Click
         If App.FrmScratchPad IsNot Nothing Then App.FrmScratchPad?.SaveScratchPad()
@@ -488,6 +489,9 @@ Public Class Settings
 
         Return String.Join("+", parts)
     End Function
+    Friend Sub SetKeepText()
+        ChkBoxKeepScratchPadText.Checked = App.Settings.ScratchPadKeepText
+    End Sub
     Private Sub SetThemesList()
         If App.Settings.ThemeAuto Then
             CoBoxTheme.Enabled = False

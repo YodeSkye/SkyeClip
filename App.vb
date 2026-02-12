@@ -342,7 +342,7 @@ Friend Module App
     Private FrmClipViewer As ClipViewer
     Friend FrmScratchPad As ScratchPad
     Private FrmAppView As AppView
-    Private FrmSettings As SkyeClip.Settings
+    Friend FrmSettings As SkyeClip.Settings
     Friend FrmLog As Log
     Private FrmHelp As Help
     Private FrmAbout As About

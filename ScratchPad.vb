@@ -15,7 +15,6 @@ Friend Class ScratchPad
 
     ' Form Events
     Private Sub ScratchPad_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        App.HideSettings()
         Skye.UI.ThemeManager.ApplyTheme(Me)
         Skye.UI.ThemeManager.ApplyToTooltip(TipScratchPad)
         AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
@@ -24,8 +23,7 @@ Friend Class ScratchPad
         If App.Settings.ScratchPadSize.Height >= 0 Then Me.Size = App.Settings.ScratchPadSize
         If App.Settings.ScratchPadLocation.Y >= 0 Then Me.Location = App.Settings.ScratchPadLocation
         CMRTB.Font = App.MenuFont
-        ChkBoxKeepText.Checked = App.Settings.ScratchPadKeepText
-        SetOk()
+        SetKeepText()
         If Not String.IsNullOrWhiteSpace(App.ScratchPadText) Then
             RTB.Rtf = App.ScratchPadText
         End If
@@ -159,6 +157,7 @@ Friend Class ScratchPad
     Private Sub ChkBoxKeepText_Click(sender As Object, e As EventArgs) Handles ChkBoxKeepText.Click
         App.Settings.ScratchPadKeepText = ChkBoxKeepText.Checked
         SetOk()
+        App.FrmSettings?.SetKeepText()
     End Sub
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
@@ -480,6 +479,10 @@ Friend Class ScratchPad
     End Sub
     Private Sub SelectAll()
         RTB.SelectAll()
+    End Sub
+    Friend Sub SetKeepText()
+        ChkBoxKeepText.Checked = App.Settings.ScratchPadKeepText
+        SetOk()
     End Sub
     Private Sub SetOk()
         Select Case App.Settings.ScratchPadKeepText
