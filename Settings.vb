@@ -264,18 +264,30 @@ Public Class Settings
         If LVProfiles.SelectedItems.Count = 0 Then Exit Sub
         Dim lvi As ListViewItem = LVProfiles.SelectedItems(0)
         Dim profileID As Integer = CInt(lvi.Tag)
+
+        ' Delete profile's scratch pad text file if it exists
+        Dim filePath = App.GetScratchPadProfiledPath(profileID)
+        If IO.File.Exists(filePath) Then
+            IO.File.Delete(filePath)
+        End If
+
+        ' Delete the profile and refresh
         App.Settings.DeleteProfile(profileID)
         LVProfiles.Items.Remove(lvi)
-        SaveProfiles()
+
+        ' If the deleted profile was the last used one, reset last used profile ID to 0 (no profile)
         If App.Settings.LastUsedProfileID = profileID Then
             App.Settings.LastUsedProfileID = 0
         End If
+
+        ' If there are no profiles left, disable profile mode
         If App.Settings.Profiles.Count = 0 Then
             ChkBoxUseProfiles.Checked = False
             App.Settings.UseProfiles = False
             SetUseProfiles()
             App.Tray.RefreshMenu()
         End If
+
     End Sub
     Private Sub CoBoxAutoBackupFrequency_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxAutoBackupFrequency.SelectionChangeCommitted
         Dim item = CType(CoBoxAutoBackupFrequency.SelectedItem, App.AutoBackupFrequencyEnumItem)

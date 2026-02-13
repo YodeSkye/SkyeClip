@@ -1474,18 +1474,24 @@ Friend Module App
             Return False
         End Try
     End Function
-    Friend Function GetScratchPadProfiledPath() As String
+    Friend Function GetScratchPadProfiledPath(Optional profileID As Integer = -1) As String
         Dim base As String = App.ScratchPadPath
         Dim dir As String = IO.Path.GetDirectoryName(base)
         Dim name As String = IO.Path.GetFileNameWithoutExtension(base)
         Dim ext As String = IO.Path.GetExtension(base)
 
-        If App.Settings.UseProfiles Then
-            Return IO.Path.Combine(dir, $"{name}{App.Settings.CurrentProfileID}{ext}")
-        Else
-            Return base
+        ' If no profileID was passed, use the current profile
+        If profileID = -1 Then
+            profileID = App.Settings.CurrentProfileID
         End If
 
+        ' If profiles are enabled, return the profiled path
+        If App.Settings.UseProfiles Then
+            Return IO.Path.Combine(dir, $"{name}{profileID}{ext}")
+        End If
+
+        ' Otherwise return the global path
+        Return base
     End Function
     Friend Sub LoadScratchPadText()
         Dim path = GetScratchPadProfiledPath()

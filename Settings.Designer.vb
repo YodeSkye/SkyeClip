@@ -518,9 +518,9 @@ Partial Class Settings
         PanelGeneral.Controls.Add(ChkBoxShowOpenSourceApp)
         PanelGeneral.Controls.Add(ChkBoxKeepScratchPadText)
         TipSettings.SetImage(PanelGeneral, Nothing)
-        PanelGeneral.Location = New Point(320, 93)
+        PanelGeneral.Location = New Point(296, 92)
         PanelGeneral.Name = "PanelGeneral"
-        PanelGeneral.Size = New Size(145, 107)
+        PanelGeneral.Size = New Size(169, 108)
         PanelGeneral.TabIndex = 1111
         TipSettings.SetText(PanelGeneral, Nothing)
         ' 
@@ -760,8 +760,8 @@ Partial Class Settings
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(528, 446)
-        Controls.Add(PanelClips)
         Controls.Add(PanelGeneral)
+        Controls.Add(PanelClips)
         Controls.Add(PanelProfiles)
         Controls.Add(PanelBackup)
         Controls.Add(PanelHotKeys)
