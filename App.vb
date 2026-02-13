@@ -89,38 +89,44 @@ Friend Module App
 
     ' Settings
     Friend Class Settings
-        Private Shared _themeName As String ' the name of the current theme
-        Friend Shared Property ThemeName As String
+        Private Shared _themeName As String ' the name of the current theme (global)
+        Friend Shared Property ThemeName As String ' the name of the current theme (global, overridden by profile if enabled)
             Get
                 If UseProfiles Then
-                    Return Profiles.First(Function(x) x.ID = CurrentProfileID).ThemeName
-                Else
-                    Return _themeName
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then Return p.ThemeName
                 End If
+                Return _themeName
             End Get
             Set(value As String)
                 If UseProfiles Then
-                    Profiles.First(Function(x) x.ID = CurrentProfileID).ThemeName = value
-                Else
-                    _themeName = value
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then
+                        p.ThemeName = value
+                        Exit Property
+                    End If
                 End If
+                _themeName = value
             End Set
         End Property
-        Private Shared _themeAuto As Boolean ' whether to auto-switch theme based on system settings
-        Friend Shared Property ThemeAuto As Boolean
+        Private Shared _themeAuto As Boolean ' whether to auto-switch theme based on system settings (global)
+        Friend Shared Property ThemeAuto As Boolean ' whether to auto-switch theme based on system settings (global, overridden by profile if enabled)
             Get
                 If UseProfiles Then
-                    Return Profiles.First(Function(x) x.ID = CurrentProfileID).ThemeAuto
-                Else
-                    Return _themeAuto
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then Return p.ThemeAuto
                 End If
+                Return _themeAuto
             End Get
             Set(value As Boolean)
                 If UseProfiles Then
-                    Profiles.First(Function(x) x.ID = CurrentProfileID).ThemeAuto = value
-                Else
-                    _themeAuto = value
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then
+                        p.ThemeAuto = value
+                        Exit Property
+                    End If
                 End If
+                _themeAuto = value
             End Set
         End Property
         Friend Shared AutoBackup As AutoBackupFrequency ' frequency of automatic backups
@@ -191,7 +197,7 @@ Friend Module App
                 End If
             End Set
         End Property
-        Private Shared LastUsedProfileID As Integer
+        Friend Shared LastUsedProfileID As Integer
         Friend Shared Profiles As List(Of Profile) ' the list of profiles, used when profiles are enabled. The default profile with ID 0 is not stored in this list but is implicitly available.
 
         Friend Class HotKeys
@@ -365,6 +371,8 @@ Friend Module App
                 Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "ID")
                 Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "Order")
                 Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "Name")
+                Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "ThemeName")
+                Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "ThemeAuto")
                 ' Remove from in-memory list
                 Dim profileToRemove = Profiles.FirstOrDefault(Function(p) p.ID = profileID)
                 If profileToRemove IsNot Nothing Then

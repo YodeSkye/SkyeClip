@@ -64,6 +64,11 @@ Partial Class Settings
         LblThemeAutoBadge = New Skye.UI.Label()
         LblThemeBadge = New Skye.UI.Label()
         PanelClips = New Panel()
+        LblPlaySoundWithNotifyBadge = New Skye.UI.Label()
+        LblNotifyOnNewClipBadge = New Skye.UI.Label()
+        LblBlinkOnNewClipBadge = New Skye.UI.Label()
+        LblMaxClipPreviewLengthBadge = New Skye.UI.Label()
+        LblMaxClipsBadge = New Skye.UI.Label()
         PanelHotKeys = New Panel()
         PanelBackup = New Panel()
         PanelControls = New Panel()
@@ -74,11 +79,6 @@ Partial Class Settings
         ColProfileName = New ColumnHeader()
         ChkBoxUseProfiles = New CheckBox()
         LblProfiles = New Skye.UI.Label()
-        LblMaxClipsBadge = New Skye.UI.Label()
-        LbleMaxClipPreviewLengthBadge = New Skye.UI.Label()
-        LblBlinkOnNewClipBadge = New Skye.UI.Label()
-        LblNotifyOnNewClipBadge = New Skye.UI.Label()
-        LblPlaySoundWithNotifyBadge = New Skye.UI.Label()
         PanelPageSelector.SuspendLayout()
         PanelGeneral.SuspendLayout()
         PanelClips.SuspendLayout()
@@ -551,7 +551,7 @@ Partial Class Settings
         PanelClips.Controls.Add(LblPlaySoundWithNotifyBadge)
         PanelClips.Controls.Add(LblNotifyOnNewClipBadge)
         PanelClips.Controls.Add(LblBlinkOnNewClipBadge)
-        PanelClips.Controls.Add(LbleMaxClipPreviewLengthBadge)
+        PanelClips.Controls.Add(LblMaxClipPreviewLengthBadge)
         PanelClips.Controls.Add(TxtBoxMaxClipPreviewLength)
         PanelClips.Controls.Add(LblMaxClips)
         PanelClips.Controls.Add(TxtBoxMaxClips)
@@ -571,6 +571,61 @@ Partial Class Settings
         PanelClips.Size = New Size(170, 98)
         PanelClips.TabIndex = 1112
         TipSettings.SetText(PanelClips, Nothing)
+        ' 
+        ' LblPlaySoundWithNotifyBadge
+        ' 
+        TipSettings.SetImage(LblPlaySoundWithNotifyBadge, My.Resources.Resources.ImageProfiles16)
+        LblPlaySoundWithNotifyBadge.Image = My.Resources.Resources.ImageProfiles16
+        LblPlaySoundWithNotifyBadge.ImageAlign = ContentAlignment.MiddleLeft
+        LblPlaySoundWithNotifyBadge.Location = New Point(197, 122)
+        LblPlaySoundWithNotifyBadge.Name = "LblPlaySoundWithNotifyBadge"
+        LblPlaySoundWithNotifyBadge.Size = New Size(30, 23)
+        LblPlaySoundWithNotifyBadge.TabIndex = 1110
+        TipSettings.SetText(LblPlaySoundWithNotifyBadge, "This setting is per-profile.")
+        ' 
+        ' LblNotifyOnNewClipBadge
+        ' 
+        TipSettings.SetImage(LblNotifyOnNewClipBadge, My.Resources.Resources.ImageProfiles16)
+        LblNotifyOnNewClipBadge.Image = My.Resources.Resources.ImageProfiles16
+        LblNotifyOnNewClipBadge.ImageAlign = ContentAlignment.MiddleLeft
+        LblNotifyOnNewClipBadge.Location = New Point(170, 98)
+        LblNotifyOnNewClipBadge.Name = "LblNotifyOnNewClipBadge"
+        LblNotifyOnNewClipBadge.Size = New Size(30, 23)
+        LblNotifyOnNewClipBadge.TabIndex = 1109
+        TipSettings.SetText(LblNotifyOnNewClipBadge, "This setting is per-profile.")
+        ' 
+        ' LblBlinkOnNewClipBadge
+        ' 
+        TipSettings.SetImage(LblBlinkOnNewClipBadge, My.Resources.Resources.ImageProfiles16)
+        LblBlinkOnNewClipBadge.Image = My.Resources.Resources.ImageProfiles16
+        LblBlinkOnNewClipBadge.ImageAlign = ContentAlignment.MiddleLeft
+        LblBlinkOnNewClipBadge.Location = New Point(161, 74)
+        LblBlinkOnNewClipBadge.Name = "LblBlinkOnNewClipBadge"
+        LblBlinkOnNewClipBadge.Size = New Size(30, 23)
+        LblBlinkOnNewClipBadge.TabIndex = 1108
+        TipSettings.SetText(LblBlinkOnNewClipBadge, "This setting is per-profile.")
+        ' 
+        ' LblMaxClipPreviewLengthBadge
+        ' 
+        TipSettings.SetImage(LblMaxClipPreviewLengthBadge, My.Resources.Resources.ImageProfiles16)
+        LblMaxClipPreviewLengthBadge.Image = My.Resources.Resources.ImageProfiles16
+        LblMaxClipPreviewLengthBadge.ImageAlign = ContentAlignment.MiddleLeft
+        LblMaxClipPreviewLengthBadge.Location = New Point(188, 34)
+        LblMaxClipPreviewLengthBadge.Name = "LblMaxClipPreviewLengthBadge"
+        LblMaxClipPreviewLengthBadge.Size = New Size(30, 23)
+        LblMaxClipPreviewLengthBadge.TabIndex = 1107
+        TipSettings.SetText(LblMaxClipPreviewLengthBadge, "This setting is per-profile.")
+        ' 
+        ' LblMaxClipsBadge
+        ' 
+        TipSettings.SetImage(LblMaxClipsBadge, My.Resources.Resources.ImageProfiles16)
+        LblMaxClipsBadge.Image = My.Resources.Resources.ImageProfiles16
+        LblMaxClipsBadge.ImageAlign = ContentAlignment.MiddleLeft
+        LblMaxClipsBadge.Location = New Point(90, 34)
+        LblMaxClipsBadge.Name = "LblMaxClipsBadge"
+        LblMaxClipsBadge.Size = New Size(30, 23)
+        LblMaxClipsBadge.TabIndex = 1106
+        TipSettings.SetText(LblMaxClipsBadge, "This setting is per-profile.")
         ' 
         ' PanelHotKeys
         ' 
@@ -700,61 +755,6 @@ Partial Class Settings
         LblProfiles.Text = "Profiles"
         TipSettings.SetText(LblProfiles, Nothing)
         ' 
-        ' LblMaxClipsBadge
-        ' 
-        TipSettings.SetImage(LblMaxClipsBadge, My.Resources.Resources.ImageProfiles16)
-        LblMaxClipsBadge.Image = My.Resources.Resources.ImageProfiles16
-        LblMaxClipsBadge.ImageAlign = ContentAlignment.MiddleLeft
-        LblMaxClipsBadge.Location = New Point(90, 34)
-        LblMaxClipsBadge.Name = "LblMaxClipsBadge"
-        LblMaxClipsBadge.Size = New Size(30, 23)
-        LblMaxClipsBadge.TabIndex = 1106
-        TipSettings.SetText(LblMaxClipsBadge, "This setting is per-profile.")
-        ' 
-        ' LbleMaxClipPreviewLengthBadge
-        ' 
-        TipSettings.SetImage(LbleMaxClipPreviewLengthBadge, My.Resources.Resources.ImageProfiles16)
-        LbleMaxClipPreviewLengthBadge.Image = My.Resources.Resources.ImageProfiles16
-        LbleMaxClipPreviewLengthBadge.ImageAlign = ContentAlignment.MiddleLeft
-        LbleMaxClipPreviewLengthBadge.Location = New Point(188, 34)
-        LbleMaxClipPreviewLengthBadge.Name = "LbleMaxClipPreviewLengthBadge"
-        LbleMaxClipPreviewLengthBadge.Size = New Size(30, 23)
-        LbleMaxClipPreviewLengthBadge.TabIndex = 1107
-        TipSettings.SetText(LbleMaxClipPreviewLengthBadge, "This setting is per-profile.")
-        ' 
-        ' LblBlinkOnNewClipBadge
-        ' 
-        TipSettings.SetImage(LblBlinkOnNewClipBadge, My.Resources.Resources.ImageProfiles16)
-        LblBlinkOnNewClipBadge.Image = My.Resources.Resources.ImageProfiles16
-        LblBlinkOnNewClipBadge.ImageAlign = ContentAlignment.MiddleLeft
-        LblBlinkOnNewClipBadge.Location = New Point(161, 74)
-        LblBlinkOnNewClipBadge.Name = "LblBlinkOnNewClipBadge"
-        LblBlinkOnNewClipBadge.Size = New Size(30, 23)
-        LblBlinkOnNewClipBadge.TabIndex = 1108
-        TipSettings.SetText(LblBlinkOnNewClipBadge, "This setting is per-profile.")
-        ' 
-        ' LblNotifyOnNewClipBadge
-        ' 
-        TipSettings.SetImage(LblNotifyOnNewClipBadge, My.Resources.Resources.ImageProfiles16)
-        LblNotifyOnNewClipBadge.Image = My.Resources.Resources.ImageProfiles16
-        LblNotifyOnNewClipBadge.ImageAlign = ContentAlignment.MiddleLeft
-        LblNotifyOnNewClipBadge.Location = New Point(170, 98)
-        LblNotifyOnNewClipBadge.Name = "LblNotifyOnNewClipBadge"
-        LblNotifyOnNewClipBadge.Size = New Size(30, 23)
-        LblNotifyOnNewClipBadge.TabIndex = 1109
-        TipSettings.SetText(LblNotifyOnNewClipBadge, "This setting is per-profile.")
-        ' 
-        ' LblPlaySoundWithNotifyBadge
-        ' 
-        TipSettings.SetImage(LblPlaySoundWithNotifyBadge, My.Resources.Resources.ImageProfiles16)
-        LblPlaySoundWithNotifyBadge.Image = My.Resources.Resources.ImageProfiles16
-        LblPlaySoundWithNotifyBadge.ImageAlign = ContentAlignment.MiddleLeft
-        LblPlaySoundWithNotifyBadge.Location = New Point(197, 122)
-        LblPlaySoundWithNotifyBadge.Name = "LblPlaySoundWithNotifyBadge"
-        LblPlaySoundWithNotifyBadge.Size = New Size(30, 23)
-        LblPlaySoundWithNotifyBadge.TabIndex = 1110
-        TipSettings.SetText(LblPlaySoundWithNotifyBadge, "This setting is per-profile.")
-        ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
@@ -845,6 +845,6 @@ Partial Class Settings
     Friend WithEvents LblPlaySoundWithNotifyBadge As Skye.UI.Label
     Friend WithEvents LblNotifyOnNewClipBadge As Skye.UI.Label
     Friend WithEvents LblBlinkOnNewClipBadge As Skye.UI.Label
-    Friend WithEvents LbleMaxClipPreviewLengthBadge As Skye.UI.Label
+    Friend WithEvents LblMaxClipPreviewLengthBadge As Skye.UI.Label
     Friend WithEvents LblMaxClipsBadge As Skye.UI.Label
 End Class

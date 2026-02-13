@@ -1,4 +1,5 @@
 ﻿
+Imports System.ComponentModel.Design.ObjectSelectorEditor
 Imports System.IO
 Imports System.Runtime.InteropServices
 Imports Skye.UI
@@ -281,6 +282,13 @@ Friend Class TrayAppContext
                     If App.FrmScratchPad IsNot Nothing Then App.FrmScratchPad?.SaveScratchPad()
                     App.Settings.CurrentProfileID = newprofileID
                     If App.FrmScratchPad Is Nothing Then App.LoadScratchPadText()
+                    If App.Settings.ThemeAuto Then
+                        Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
+                    Else
+                        SetTheme(GetTheme(App.Settings.ThemeName))
+                        ApplyThemeToAllOpenForms()
+                    End If
+                    App.FrmSettings?.LoadSettings()
                 End If
             Case MouseButtons.Right
         End Select

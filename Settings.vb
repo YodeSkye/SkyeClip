@@ -46,45 +46,7 @@ Public Class Settings
         LVProfiles.Columns(0).Width = LVProfiles.Width - SystemInformation.VerticalScrollBarWidth
 
         'Settings
-        ChkBoxThemeAuto.Checked = App.Settings.ThemeAuto
-        CoBoxTheme.Items.Clear()
-        For Each theme In SkyeThemes.AllThemes
-            CoBoxTheme.Items.Add(theme.Name)
-        Next
-        CoBoxTheme.SelectedItem = App.Settings.ThemeName
-        SetThemesList()
-        ChkBoxAutoStartWithWindows.Checked = App.Settings.AutoStartWithWindows
-        TxtBoxMaxClips.Text = App.Settings.MaxClips.ToString
-        TxtBoxMaxClipPreviewLength.Text = App.Settings.MaxClipPreviewLength.ToString
-        ChkBoxBlinkOnNewClip.Checked = App.Settings.BlinkOnNewClip
-        ChkBoxNotifyOnNewClip.Checked = App.Settings.NotifyOnNewClip
-        ChkBoxPlaySoundWithNotify.Checked = App.Settings.PlaySoundWithNotify
-        ChkBoxShowOpenSourceApp.Checked = App.Settings.ShowOpenSourceApp
-        SetKeepText()
-        TxtBoxHotKeyToggleFavorite.Text = FormatHotKey(App.Settings.HotKeys.ToggleFavorite)
-        TxtBoxHotKeyShowViewer.Text = FormatHotKey(App.Settings.HotKeys.ShowViewer)
-        TxtBoxHotKeyShowScratchPad.Text = FormatHotKey(App.Settings.HotKeys.ShowScratchPad)
-        TxtBoxPurgeDays.Text = App.Settings.PurgeDays.ToString
-        ChkBoxAutoPurge.Checked = App.Settings.AutoPurge
-        CoBoxAutoBackupFrequency.Items.Clear()
-        For Each freq As AutoBackupFrequency In [Enum].GetValues(Of AutoBackupFrequency)()
-            CoBoxAutoBackupFrequency.Items.Add(New App.AutoBackupFrequencyEnumItem With {
-                .Value = freq,
-                .Text = freq.ToString().Replace("_", " ")
-            })
-        Next
-        For Each item As App.AutoBackupFrequencyEnumItem In CoBoxAutoBackupFrequency.Items
-            If item.Value = App.Settings.AutoBackup Then
-                CoBoxAutoBackupFrequency.SelectedItem = item
-                Exit For
-            End If
-        Next
-        ChkBoxAutoPurgeBackups.Checked = App.Settings.AutoBackupPurge
-        ChkBoxUseProfiles.Checked = App.Settings.UseProfiles
-        For Each p As App.Settings.Profile In App.Settings.Profiles
-            Dim lvi As New ListViewItem(p.Name) With {.Tag = p.ID}
-            LVProfiles.Items.Add(lvi)
-        Next
+        LoadSettings()
 
     End Sub
     Private Sub Settings_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
@@ -296,13 +258,24 @@ Public Class Settings
         Dim lvi As New ListViewItem("Profile " & newid.ToString) With {.Tag = newid}
         LVProfiles.Items.Add(lvi)
         SaveProfiles()
+        App.Tray.RefreshMenu()
     End Sub
     Private Sub BtnRemoveProfile_Click(sender As Object, e As EventArgs) Handles BtnRemoveProfile.Click
+        If LVProfiles.SelectedItems.Count = 0 Then Exit Sub
         Dim lvi As ListViewItem = LVProfiles.SelectedItems(0)
         Dim profileID As Integer = CInt(lvi.Tag)
         App.Settings.DeleteProfile(profileID)
         LVProfiles.Items.Remove(lvi)
         SaveProfiles()
+        If App.Settings.LastUsedProfileID = profileID Then
+            App.Settings.LastUsedProfileID = 0
+        End If
+        If App.Settings.Profiles.Count = 0 Then
+            ChkBoxUseProfiles.Checked = False
+            App.Settings.UseProfiles = False
+            SetUseProfiles()
+            App.Tray.RefreshMenu()
+        End If
     End Sub
     Private Sub CoBoxAutoBackupFrequency_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxAutoBackupFrequency.SelectionChangeCommitted
         Dim item = CType(CoBoxAutoBackupFrequency.SelectedItem, App.AutoBackupFrequencyEnumItem)
@@ -448,16 +421,83 @@ Public Class Settings
         App.FrmScratchPad?.SetKeepText()
     End Sub
     Private Sub ChkBoxUseProfiles_Click(sender As Object, e As EventArgs) Handles ChkBoxUseProfiles.Click
+        If ChkBoxUseProfiles.Checked Then
+            If App.Settings.Profiles Is Nothing OrElse App.Settings.Profiles.Count = 0 Then
+                TipSettings.HideDelay = 4000
+                TipSettings.ShowTooltipAtCursor("You must create at least one profile before enabling Profile Mode.", My.Resources.ImageProfiles16)
+                TipSettings.HideDelay = 500
+                ChkBoxUseProfiles.Checked = False
+                Exit Sub
+            End If
+        End If
         If App.FrmScratchPad IsNot Nothing Then App.FrmScratchPad?.SaveScratchPad()
         App.Settings.UseProfiles = Not App.Settings.UseProfiles
         If App.FrmScratchPad Is Nothing Then App.LoadScratchPadText()
-        If Not App.Settings.ThemeAuto Then
-            SetTheme(GetTheme(App.Settings.ThemeName))
-            ApplyThemeToAllOpenForms()
-        End If
+        SetUseProfiles()
     End Sub
 
     ' Methods
+    Friend Sub LoadSettings()
+        ChkBoxThemeAuto.Checked = App.Settings.ThemeAuto
+        CoBoxTheme.Items.Clear()
+        For Each theme In SkyeThemes.AllThemes
+            CoBoxTheme.Items.Add(theme.Name)
+        Next
+        CoBoxTheme.SelectedItem = App.Settings.ThemeName
+        SetThemesList()
+        ChkBoxAutoStartWithWindows.Checked = App.Settings.AutoStartWithWindows
+        TxtBoxMaxClips.Text = App.Settings.MaxClips.ToString
+        TxtBoxMaxClipPreviewLength.Text = App.Settings.MaxClipPreviewLength.ToString
+        ChkBoxBlinkOnNewClip.Checked = App.Settings.BlinkOnNewClip
+        ChkBoxNotifyOnNewClip.Checked = App.Settings.NotifyOnNewClip
+        ChkBoxPlaySoundWithNotify.Checked = App.Settings.PlaySoundWithNotify
+        ChkBoxShowOpenSourceApp.Checked = App.Settings.ShowOpenSourceApp
+        SetKeepText()
+        TxtBoxHotKeyToggleFavorite.Text = FormatHotKey(App.Settings.HotKeys.ToggleFavorite)
+        TxtBoxHotKeyShowViewer.Text = FormatHotKey(App.Settings.HotKeys.ShowViewer)
+        TxtBoxHotKeyShowScratchPad.Text = FormatHotKey(App.Settings.HotKeys.ShowScratchPad)
+        TxtBoxPurgeDays.Text = App.Settings.PurgeDays.ToString
+        ChkBoxAutoPurge.Checked = App.Settings.AutoPurge
+        CoBoxAutoBackupFrequency.Items.Clear()
+        For Each freq As AutoBackupFrequency In [Enum].GetValues(Of AutoBackupFrequency)()
+            CoBoxAutoBackupFrequency.Items.Add(New App.AutoBackupFrequencyEnumItem With {
+                .Value = freq,
+                .Text = freq.ToString().Replace("_", " ")
+            })
+        Next
+        For Each item As App.AutoBackupFrequencyEnumItem In CoBoxAutoBackupFrequency.Items
+            If item.Value = App.Settings.AutoBackup Then
+                CoBoxAutoBackupFrequency.SelectedItem = item
+                Exit For
+            End If
+        Next
+        ChkBoxAutoPurgeBackups.Checked = App.Settings.AutoBackupPurge
+        ChkBoxUseProfiles.Checked = App.Settings.UseProfiles
+        LVProfiles.Items.Clear()
+        For Each p As App.Settings.Profile In App.Settings.Profiles
+            Dim lvi As New ListViewItem(p.Name) With {.Tag = p.ID}
+            LVProfiles.Items.Add(lvi)
+        Next
+
+        If App.Settings.UseProfiles Then
+            LblThemeBadge.Visible = True
+            LblThemeAutoBadge.Visible = True
+            LblMaxClipsBadge.Visible = True
+            LblMaxClipPreviewLengthBadge.Visible = True
+            LblBlinkOnNewClipBadge.Visible = True
+            LblNotifyOnNewClipBadge.Visible = True
+            LblPlaySoundWithNotifyBadge.Visible = True
+        Else
+            LblThemeBadge.Visible = False
+            LblThemeAutoBadge.Visible = False
+            LblMaxClipsBadge.Visible = False
+            LblMaxClipPreviewLengthBadge.Visible = False
+            LblBlinkOnNewClipBadge.Visible = False
+            LblNotifyOnNewClipBadge.Visible = False
+            LblPlaySoundWithNotifyBadge.Visible = False
+        End If
+
+    End Sub
     Private Sub SetPage(page As String)
         PanelGeneral.Enabled = False
         PanelClips.Enabled = False
@@ -494,6 +534,15 @@ Public Class Settings
 
         Return String.Join("+", parts)
     End Function
+    Private Sub SetUseProfiles()
+        If App.Settings.ThemeAuto Then
+            Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
+        Else
+            SetTheme(GetTheme(App.Settings.ThemeName))
+            ApplyThemeToAllOpenForms()
+        End If
+        LoadSettings() 'Reload settings to update badges visibility
+    End Sub
     Friend Sub SetKeepText()
         ChkBoxKeepScratchPadText.Checked = App.Settings.ScratchPadKeepText
     End Sub
@@ -505,54 +554,28 @@ Public Class Settings
         End If
     End Sub
     Private Sub SaveProfiles()
-        App.Settings.Profiles = New List(Of App.Settings.Profile)
+        Dim newList As New List(Of App.Settings.Profile)
+
         For Each item As ListViewItem In LVProfiles.Items
-            Dim p As New App.Settings.Profile With {
-                .ID = CInt(item.Tag),
-                .Name = item.Text
-            }
-            App.Settings.Profiles.Add(p)
+            Dim id As Integer = CInt(item.Tag)
+            ' Try to find an existing profile
+            Dim p = App.Settings.Profiles.FirstOrDefault(Function(x) x.ID = id)
+            If p Is Nothing Then
+                ' This is a NEW profile
+                p = New App.Settings.Profile With {
+                    .ID = id,
+                    .Name = item.Text
+                }
+            Else
+                ' Existing profile: update name in case it changed
+                p.Name = item.Text
+            End If
+            newList.Add(p)
         Next
+
+        App.Settings.Profiles = newList
         App.Settings.Save()
     End Sub
-    'Private Sub SaveProfiles()
-    '    Dim newList As New List(Of App.Settings.Profile)
-
-    '    For Each item As ListViewItem In LVProfiles.Items
-    '        Dim id As Integer = CInt(item.Tag)
-
-    '        ' Try to find an existing profile
-    '        Dim p = App.Settings.Profiles.FirstOrDefault(Function(x) x.ID = id)
-
-    '        If p Is Nothing Then
-    '            ' This is a NEW profile
-    '            p = New App.Settings.Profile With {
-    '            .ID = id,
-    '            .Name = item.Text
-    '        }
-
-    '            ' Initialize defaults for new profiles
-    '            p.MaxClips = App.Settings._MaxClips   ' or whatever your global default is
-    '            p.ThemeName = App.Settings._themeName
-    '            p.MaxClipPreviewLength = App.Settings._MaxClipPreviewLength
-    '            p.BlinkOnNewClip = App.Settings._BlinkOnNewClip
-    '            p.NotifyOnNewClip = App.Settings._NotifyOnNewClip
-    '            p.PlaySoundWithNotify = App.Settings._PlaySoundWithNotify
-    '        Else
-    '            ' Existing profile: update name in case it changed
-    '            p.Name = item.Text
-    '        End If
-
-    '        ' Add to the new ordered list
-    '        newList.Add(p)
-    '    Next
-
-    '    ' Replace the old list with the new ordered list
-    '    App.Settings.Profiles = newList
-
-    '    ' Save everything
-    '    App.Settings.Save()
-    'End Sub
     Private Sub CheckMove(ByRef location As Point)
         Dim wa As Rectangle = Screen.FromPoint(location).WorkingArea
         If location.X + Me.Width > wa.Right Then
