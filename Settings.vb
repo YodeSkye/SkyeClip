@@ -430,7 +430,7 @@ Public Class Settings
     End Sub
     Private Sub ChkBoxKeepScratchPadText_Click(sender As Object, e As EventArgs) Handles ChkBoxKeepScratchPadText.Click
         App.Settings.ScratchPadKeepText = Not App.Settings.ScratchPadKeepText
-        App.FrmScratchPad?.SetKeepText()
+        App.FrmScratchPad?.UpdateUI()
     End Sub
     Private Sub ChkBoxUseProfiles_Click(sender As Object, e As EventArgs) Handles ChkBoxUseProfiles.Click
         If ChkBoxUseProfiles.Checked Then
@@ -446,6 +446,7 @@ Public Class Settings
         App.Settings.UseProfiles = Not App.Settings.UseProfiles
         If App.FrmScratchPad Is Nothing Then App.LoadScratchPadText()
         SetUseProfiles()
+        App.FrmScratchPad?.UpdateUI()
     End Sub
 
     ' Methods

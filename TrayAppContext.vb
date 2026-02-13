@@ -288,6 +288,7 @@ Friend Class TrayAppContext
                         SetTheme(GetTheme(App.Settings.ThemeName))
                         ApplyThemeToAllOpenForms()
                     End If
+                    App.FrmScratchPad?.UpdateUI()
                     App.FrmSettings?.LoadSettings()
                 End If
             Case MouseButtons.Right
