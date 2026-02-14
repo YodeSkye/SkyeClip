@@ -417,13 +417,13 @@ Public Class Settings
         App.Settings.AutoPurge = Not App.Settings.AutoPurge
     End Sub
     Private Sub ChkBoxBlinkOnNewClip_Click(sender As Object, e As EventArgs) Handles ChkBoxBlinkOnNewClip.Click
-        App.Settings.BlinkOnNewClip = Not App.Settings.BlinkOnNewClip
+        App.Settings.BlinkOnNewClip = ChkBoxBlinkOnNewClip.Checked
     End Sub
     Private Sub ChkBoxNotifyOnNewClip_Click(sender As Object, e As EventArgs) Handles ChkBoxNotifyOnNewClip.Click
-        App.Settings.NotifyOnNewClip = Not App.Settings.NotifyOnNewClip
+        App.Settings.NotifyOnNewClip = ChkBoxNotifyOnNewClip.Checked
     End Sub
     Private Sub ChkBoxPlaySoundWithNotify_Click(sender As Object, e As EventArgs) Handles ChkBoxPlaySoundWithNotify.Click
-        App.Settings.PlaySoundWithNotify = Not App.Settings.PlaySoundWithNotify
+        App.Settings.PlaySoundWithNotify = ChkBoxPlaySoundWithNotify.Checked
     End Sub
     Private Sub ChkBoxShowOpenSourceApp_Click(sender As Object, e As EventArgs) Handles ChkBoxShowOpenSourceApp.Click
         App.Settings.ShowOpenSourceApp = Not App.Settings.ShowOpenSourceApp

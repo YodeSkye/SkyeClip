@@ -133,11 +133,106 @@ Friend Module App
         Friend Shared LastAutoBackup As DateTime ' the last date when automatic backup was performed
         Friend Shared AutoBackupPurge As Boolean ' whether to auto-purge old backups
         Friend Shared AutoStartWithWindows As Boolean ' whether to auto-start with Windows
-        Friend Shared MaxClips As Integer ' maximum number of clipboard entries to show
-        Friend Shared MaxClipPreviewLength As Integer ' in characters
-        Friend Shared BlinkOnNewClip As Boolean ' whether to blink the tray icon on new clipboard entry
-        Friend Shared NotifyOnNewClip As Boolean ' whether to show a notification on new clipboard entry
-        Friend Shared PlaySoundWithNotify As Boolean ' whether to play a sound with notification
+        Private Shared _maxClips As Integer ' maximum number of clipboard entries to show
+        Friend Shared Property MaxClips As Integer ' maximum number of clipboard entries to show, overridden by profile if enabled
+            Get
+                If UseProfiles Then
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then Return p.MaxClips
+                End If
+                Return _maxClips
+            End Get
+            Set(value As Integer)
+                If UseProfiles Then
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then
+                        p.MaxClips = value
+                        Exit Property
+                    End If
+                End If
+                _maxClips = value
+            End Set
+        End Property
+        Private Shared _maxClipPreviewLength As Integer ' the maximum length of clipboard entry previews in characters
+        Friend Shared Property MaxClipPreviewLength As Integer  ' the maximum length of clipboard entry previews in characters, overridden by profile if enabled
+            Get
+                If UseProfiles Then
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then Return p.MaxClipPreviewLength
+                End If
+                Return _maxClipPreviewLength
+            End Get
+            Set(value As Integer)
+                If UseProfiles Then
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then
+                        p.MaxClipPreviewLength = value
+                        Exit Property
+                    End If
+                End If
+                _maxClipPreviewLength = value
+            End Set
+        End Property
+        Private Shared _blinkOnNewClip As Boolean ' whether to blink the tray icon on new clipboard entry
+        Friend Shared Property BlinkOnNewClip As Boolean ' whether to blink the tray icon on new clipboard entry, overridden by profile if enabled
+            Get
+                If UseProfiles Then
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then Return p.BlinkOnNewClip
+                End If
+                Return _blinkOnNewClip
+            End Get
+            Set(value As Boolean)
+                If UseProfiles Then
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then
+                        p.BlinkOnNewClip = value
+                        Exit Property
+                    End If
+                End If
+                _blinkOnNewClip = value
+            End Set
+        End Property
+        Private Shared _notifyOnNewClip As Boolean ' whether to show a notification on new clipboard entry
+        Friend Shared Property NotifyOnNewClip As Boolean ' whether to show a notification on new clipboard entry, overridden by profile if enabled
+            Get
+                If UseProfiles Then
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then Return p.NotifyOnNewClip
+                End If
+                Return _notifyOnNewClip
+            End Get
+            Set(value As Boolean)
+                If UseProfiles Then
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then
+                        p.NotifyOnNewClip = value
+                        Exit Property
+                    End If
+                End If
+                _notifyOnNewClip = value
+            End Set
+        End Property
+        Private Shared _playSoundWithNotify As Boolean ' whether to play a sound with notification
+        Friend Shared Property PlaySoundWithNotify As Boolean ' whether to play a sound with notification, overridden by profile if enabled
+            Get
+                If UseProfiles Then
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then Return p.PlaySoundWithNotify
+                End If
+                Return _playSoundWithNotify
+            End Get
+            Set(value As Boolean)
+                If UseProfiles Then
+                    Dim p = Profiles.FirstOrDefault(Function(x) x.ID = CurrentProfileID)
+                    If p IsNot Nothing Then
+                        p.PlaySoundWithNotify = value
+                        Exit Property
+                    End If
+                End If
+                _playSoundWithNotify = value
+            End Set
+        End Property
         Friend Shared AutoPurge As Boolean ' whether to automatically purge old clipboard entries when older than a certain date
         Friend Shared LastPurgeDate As DateTime ' the last date when automatic purge was performed
         Friend Shared PurgeDays As Integer ' number of days after which clipboard entries are purged
@@ -229,11 +324,11 @@ Friend Module App
             AutoBackupPurge = Skye.Common.RegistryHelper.GetBool("AutoBackupPurge", True)
             ChangeLogLastVersionShown = Skye.Common.RegistryHelper.GetString("ChangeLogLastVersionShown", String.Empty)
             AutoStartWithWindows = Skye.Common.RegistryHelper.GetBool("AutoStartWithWindows", False)
-            MaxClips = Skye.Common.RegistryHelper.GetInt("MaxClips", 30)
-            MaxClipPreviewLength = Skye.Common.RegistryHelper.GetInt("MaxClipPreviewLength", 60)
-            BlinkOnNewClip = Skye.Common.RegistryHelper.GetBool("BlinkOnNewClip", True)
-            NotifyOnNewClip = Skye.Common.RegistryHelper.GetBool("NotifyOnNewClip", True)
-            PlaySoundWithNotify = Skye.Common.RegistryHelper.GetBool("PlaySoundWithNotify", False)
+            _maxClips = Skye.Common.RegistryHelper.GetInt("MaxClips", 30)
+            _maxClipPreviewLength = Skye.Common.RegistryHelper.GetInt("MaxClipPreviewLength", 60)
+            _blinkOnNewClip = Skye.Common.RegistryHelper.GetBool("BlinkOnNewClip", True)
+            _notifyOnNewClip = Skye.Common.RegistryHelper.GetBool("NotifyOnNewClip", True)
+            _playSoundWithNotify = Skye.Common.RegistryHelper.GetBool("PlaySoundWithNotify", False)
             AutoPurge = Skye.Common.RegistryHelper.GetBool("AutoPurge", False)
             LastPurgeDate = Skye.Common.RegistryHelper.GetDateTime("LastPurgeDate", DateTime.MinValue)
             PurgeDays = Skye.Common.RegistryHelper.GetInt("PurgeDays", 30)
@@ -279,13 +374,33 @@ Friend Module App
                         ' Load theme auto setting
                         Dim themeautoKey = "Profile" & id & "ThemeAuto"
                         Dim themeauto = Skye.Common.RegistryHelper.GetBool(themeautoKey, False)
+                        ' Load MaxClips setting
+                        Dim maxClipsKey = "Profile" & id & "MaxClips"
+                        Dim maxClips = Skye.Common.RegistryHelper.GetInt(maxClipsKey, 30)
+                        ' Load MaxClipPreviewLength setting
+                        Dim maxClipPreviewLengthKey = "Profile" & id & "MaxClipPreviewLength"
+                        Dim maxClipPreviewLength = Skye.Common.RegistryHelper.GetInt(maxClipPreviewLengthKey, 60)
+                        ' Load BlinkOnNewClip setting
+                        Dim blinkOnNewClipKey = "Profile" & id & "BlinkOnNewClip"
+                        Dim blinkOnNewClip = Skye.Common.RegistryHelper.GetBool(blinkOnNewClipKey, True)
+                        ' Load NotifyOnNewClip setting
+                        Dim notifyOnNewClipKey = "Profile" & id & "NotifyOnNewClip"
+                        Dim notifyOnNewClip = Skye.Common.RegistryHelper.GetBool(notifyOnNewClipKey, True)
+                        ' Load PlaySoundWithNotify setting
+                        Dim playSoundWithNotifyKey = "Profile" & id & "PlaySoundWithNotify"
+                        Dim playSoundWithNotify = Skye.Common.RegistryHelper.GetBool(playSoundWithNotifyKey, False)
                         ' Reconstruct the profile object
                         Dim p As New Profile With {
                             .ID = id,
                             .Order = order,
                             .Name = name,
                             .ThemeName = themename,
-                            .ThemeAuto = themeauto
+                            .ThemeAuto = themeauto,
+                            .MaxClips = maxClips,
+                            .MaxClipPreviewLength = maxClipPreviewLength,
+                            .BlinkOnNewClip = blinkOnNewClip,
+                            .NotifyOnNewClip = notifyOnNewClip,
+                            .PlaySoundWithNotify = playSoundWithNotify
                         }
                         profiles.Add(p)
                     End If
@@ -311,11 +426,11 @@ Friend Module App
             Skye.Common.RegistryHelper.SetBool("AutoBackupPurge", AutoBackupPurge)
             Skye.Common.RegistryHelper.SetString("ChangeLogLastVersionShown", ChangeLogLastVersionShown)
             Skye.Common.RegistryHelper.SetBool("AutoStartWithWindows", AutoStartWithWindows)
-            Skye.Common.RegistryHelper.SetInt("MaxClips", MaxClips)
-            Skye.Common.RegistryHelper.SetInt("MaxClipPreviewLength", MaxClipPreviewLength)
-            Skye.Common.RegistryHelper.SetBool("BlinkOnNewClip", BlinkOnNewClip)
-            Skye.Common.RegistryHelper.SetBool("NotifyOnNewClip", NotifyOnNewClip)
-            Skye.Common.RegistryHelper.SetBool("PlaySoundWithNotify", PlaySoundWithNotify)
+            Skye.Common.RegistryHelper.SetInt("MaxClips", _maxClips)
+            Skye.Common.RegistryHelper.SetInt("MaxClipPreviewLength", _maxClipPreviewLength)
+            Skye.Common.RegistryHelper.SetBool("BlinkOnNewClip", _blinkOnNewClip)
+            Skye.Common.RegistryHelper.SetBool("NotifyOnNewClip", _notifyOnNewClip)
+            Skye.Common.RegistryHelper.SetBool("PlaySoundWithNotify", _playSoundWithNotify)
             Skye.Common.RegistryHelper.SetBool("AutoPurge", AutoPurge)
             Skye.Common.RegistryHelper.SetDateTime("LastPurgeDate", LastPurgeDate)
             Skye.Common.RegistryHelper.SetInt("PurgeDays", PurgeDays)
@@ -345,6 +460,11 @@ Friend Module App
                 Skye.Common.RegistryHelper.SetString("Profile" & profile.ID & "Name", profile.Name)
                 Skye.Common.RegistryHelper.SetString("Profile" & profile.ID & "ThemeName", profile.ThemeName)
                 Skye.Common.RegistryHelper.SetBool("Profile" & profile.ID & "ThemeAuto", profile.ThemeAuto)
+                Skye.Common.RegistryHelper.SetInt("Profile" & profile.ID & "MaxClips", profile.MaxClips)
+                Skye.Common.RegistryHelper.SetInt("Profile" & profile.ID & "MaxClipPreviewLength", profile.MaxClipPreviewLength)
+                Skye.Common.RegistryHelper.SetBool("Profile" & profile.ID & "BlinkOnNewClip", profile.BlinkOnNewClip)
+                Skye.Common.RegistryHelper.SetBool("Profile" & profile.ID & "NotifyOnNewClip", profile.NotifyOnNewClip)
+                Skye.Common.RegistryHelper.SetBool("Profile" & profile.ID & "PlaySoundWithNotify", profile.PlaySoundWithNotify)
                 order += 1
             Next
 
@@ -373,6 +493,11 @@ Friend Module App
                 Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "Name")
                 Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "ThemeName")
                 Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "ThemeAuto")
+                Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "MaxClips")
+                Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "MaxClipPreviewLength")
+                Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "BlinkOnNewClip")
+                Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "NotifyOnNewClip")
+                Skye.Common.RegistryHelper.DeleteValue("Profile" & profileID & "PlaySoundWithNotify")
                 ' Remove from in-memory list
                 Dim profileToRemove = Profiles.FirstOrDefault(Function(p) p.ID = profileID)
                 If profileToRemove IsNot Nothing Then
