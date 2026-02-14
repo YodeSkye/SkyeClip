@@ -36,6 +36,7 @@ Partial Class About
         LblSponsorMe = New Label()
         LLblIcons8 = New LinkLabel()
         LblUpdateAvailable = New Skye.UI.Label()
+        LLblSkye = New LinkLabel()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -72,7 +73,7 @@ Partial Class About
         LLblMicrosoft.Image = My.Resources.Resources.ImageAttributionMicrosoft16
         LLblMicrosoft.ImageAlign = ContentAlignment.MiddleLeft
         LLblMicrosoft.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblMicrosoft.Location = New Point(34, 150)
+        LLblMicrosoft.Location = New Point(35, 159)
         LLblMicrosoft.Name = "LLblMicrosoft"
         LLblMicrosoft.Size = New Size(94, 23)
         LLblMicrosoft.TabIndex = 3
@@ -122,7 +123,7 @@ Partial Class About
         TipAbout.SetImage(LLblSQLite, Nothing)
         LLblSQLite.Image = My.Resources.Resources.ImageAttributionSQLite
         LLblSQLite.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSQLite.Location = New Point(272, 147)
+        LLblSQLite.Location = New Point(273, 156)
         LLblSQLite.Name = "LLblSQLite"
         LLblSQLite.Size = New Size(79, 27)
         LLblSQLite.TabIndex = 103
@@ -135,7 +136,7 @@ Partial Class About
         TipAbout.SetImage(LLblSponsorGitHub, Nothing)
         LLblSponsorGitHub.ImageAlign = ContentAlignment.MiddleLeft
         LLblSponsorGitHub.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSponsorGitHub.Location = New Point(53, 291)
+        LLblSponsorGitHub.Location = New Point(53, 278)
         LLblSponsorGitHub.Name = "LLblSponsorGitHub"
         LLblSponsorGitHub.Size = New Size(164, 30)
         LLblSponsorGitHub.TabIndex = 105
@@ -150,7 +151,7 @@ Partial Class About
         TipAbout.SetImage(LLblSponsorPayPal, Nothing)
         LLblSponsorPayPal.ImageAlign = ContentAlignment.MiddleLeft
         LLblSponsorPayPal.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblSponsorPayPal.Location = New Point(245, 291)
+        LLblSponsorPayPal.Location = New Point(245, 278)
         LLblSponsorPayPal.Name = "LLblSponsorPayPal"
         LLblSponsorPayPal.Size = New Size(85, 30)
         LLblSponsorPayPal.TabIndex = 106
@@ -163,7 +164,7 @@ Partial Class About
         ' 
         LblSponsorMe.Font = New Font("Segoe UI", 15.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAbout.SetImage(LblSponsorMe, Nothing)
-        LblSponsorMe.Location = New Point(12, 256)
+        LblSponsorMe.Location = New Point(12, 243)
         LblSponsorMe.Name = "LblSponsorMe"
         LblSponsorMe.Size = New Size(360, 31)
         LblSponsorMe.TabIndex = 107
@@ -179,7 +180,7 @@ Partial Class About
         LLblIcons8.Image = My.Resources.Resources.ImageAttributionIcons816
         LLblIcons8.ImageAlign = ContentAlignment.MiddleLeft
         LLblIcons8.LinkBehavior = LinkBehavior.HoverUnderline
-        LLblIcons8.Location = New Point(163, 150)
+        LLblIcons8.Location = New Point(166, 159)
         LLblIcons8.Name = "LLblIcons8"
         LLblIcons8.Size = New Size(73, 23)
         LLblIcons8.TabIndex = 108
@@ -201,11 +202,29 @@ Partial Class About
         LblUpdateAvailable.TextAlign = ContentAlignment.MiddleCenter
         LblUpdateAvailable.Visible = False
         ' 
+        ' LLblSkye
+        ' 
+        LLblSkye.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        LLblSkye.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipAbout.SetImage(LLblSkye, Nothing)
+        LLblSkye.Image = My.Resources.Resources.ImageApp16
+        LLblSkye.ImageAlign = ContentAlignment.MiddleLeft
+        LLblSkye.LinkBehavior = LinkBehavior.HoverUnderline
+        LLblSkye.Location = New Point(136, 95)
+        LLblSkye.Name = "LLblSkye"
+        LLblSkye.Size = New Size(108, 23)
+        LLblSkye.TabIndex = 110
+        LLblSkye.TabStop = True
+        LLblSkye.Text = "Home Page"
+        TipAbout.SetText(LLblSkye, Nothing)
+        LLblSkye.TextAlign = ContentAlignment.TopRight
+        ' 
         ' About
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(384, 497)
+        Controls.Add(LLblSkye)
         Controls.Add(LLblIcons8)
         Controls.Add(LblSponsorMe)
         Controls.Add(LLblSponsorPayPal)
@@ -240,4 +259,5 @@ Partial Class About
     Friend WithEvents LblSponsorMe As Label
     Friend WithEvents LLblIcons8 As LinkLabel
     Friend WithEvents LblUpdateAvailable As Skye.UI.Label
+    Friend WithEvents LLblSkye As LinkLabel
 End Class

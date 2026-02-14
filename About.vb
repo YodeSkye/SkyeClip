@@ -62,6 +62,15 @@ Public Class About
     Private Sub BtnChangeLog_Click(sender As Object, e As EventArgs) Handles BtnChangeLog.Click
         App.ShowChangeLog()
     End Sub
+    Private Sub LLblSkye_MouseEnter(sender As Object, e As EventArgs) Handles LLblSkye.MouseEnter
+        Cursor = Cursors.Hand
+    End Sub
+    Private Sub LLblSkye_MouseLeave(sender As Object, e As EventArgs) Handles LLblSkye.MouseLeave
+        ResetCursor()
+    End Sub
+    Private Sub LLblSkye_MouseClick(sender As Object, e As MouseEventArgs) Handles LLblSkye.MouseClick
+        OpenLink(App.AttributionSkye)
+    End Sub
     Private Sub LLblMicrosoft_MouseEnter(sender As Object, e As EventArgs) Handles LLblMicrosoft.MouseEnter
         Cursor = Cursors.Hand
     End Sub
