@@ -481,7 +481,7 @@ Friend Class ScratchPad
         RTB.SelectAll()
     End Sub
     Friend Sub UpdateUI()
-        Text = App.GetAppTitle & " " & TitleText & If(App.Settings.UseProfiles, " (Profile " & App.Settings.Profiles.FirstOrDefault(Function(p) p.ID = App.Settings.CurrentProfileID)?.Name & ")", String.Empty)
+        Text = App.GetAppTitle & " " & TitleText & If(App.Settings.UseProfiles, " (" & App.Settings.Profiles.FirstOrDefault(Function(p) p.ID = App.Settings.CurrentProfileID)?.Name & " Profile)", String.Empty)
         ChkBoxKeepText.Checked = App.Settings.ScratchPadKeepText
         SetOk()
     End Sub

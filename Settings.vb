@@ -15,7 +15,6 @@ Public Class Settings
         Skye.UI.ThemeManager.ApplyTheme(Me)
         Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
         AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
-        Text = "Settings for " & GetAppTitle()
 
         ILPageSelector.Images.Add(My.Resources.ImageSettings48)
         ILPageSelector.Images.Add(My.Resources.ImageApp48)
@@ -451,6 +450,8 @@ Public Class Settings
 
     ' Methods
     Friend Sub LoadSettings()
+        Text = "Settings for " & GetAppTitle()
+        If App.Settings.UseProfiles Then Text &= " (" & App.Settings.GetProfileName(App.Settings.CurrentProfileID) & " Profile)"
         ChkBoxThemeAuto.Checked = App.Settings.ThemeAuto
         CoBoxTheme.Items.Clear()
         For Each theme In SkyeThemes.AllThemes

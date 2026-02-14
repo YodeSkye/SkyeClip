@@ -1,4 +1,4 @@
-{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}{\f2\fswiss Segoe UI;}{\f3\fnil\fcharset1 Cambria Math;}}
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}{\f2\fswiss Segoe UI;}{\f3\fnil\fcharset1 Cambria Math;}{\f4\fnil Segoe UI;}{\f5\fnil\fcharset0 Cambria Math;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont3\mwrapIndent1440 }\viewkind4\uc1 
 \pard\cf1\b\f0\fs28\lang9 SkyeClip Help\par
@@ -115,7 +115,76 @@ Filter by favorites, age, or text type\par
 \i When to Use Clip Explorer\i0\par
 Use Clip Explorer when you want a quick overview of your clipboard history without digging through menus. It\rquote s ideal for finding something you copied earlier today, comparing similar clips, or jumping back to a favorite you saved some time earlier.\par
 \par
-\cf2\b App View\cf0\b0\par
+\cf2\b Profiles\par
+\cf0\b0\f0 SkyeClip includes an optional Profile System that allows you to maintain completely separate clipboard environments within the same application. Profiles are ideal for users who switch between different workflows\f4\emdash\f0 such as personal use, development, work, or creative projects\f4\emdash\f0 and want each environment to feel clean, organized, and independent. Profiles affect how SkyeClip stores, displays, and manages your clipboard history, favorites, and certain settings.\par
+\par
+\i What Profiles Do\i0\par
+When Profiles are enabled:\par
+- Each profile has its own clipboard history\par
+- Each profile has its own Favorites\par
+- Each profile has its own settings, including:\par
+
+\pard\li720 - Theme / Theme Auto\par
+- Max Clips\par
+- Max Clip Preview Length\par
+- Blink on New Clip\par
+- Notify on New Clip\par
+- Play Sound with Notification\par
+
+\pard - The Scratch Pad saves its content separately per profile (if Scratch Pad Keep Text is enabled)\par
+- Switching profiles instantly changes the active environment\par
+This allows you to keep your personal and work/development clipboards completely separate.\par
+\par
+\i Enabling Profiles\i0\par
+Profiles can be enabled in Settings \f3\u8594?\f0  Profiles.\par
+Once enabled, SkyeClip will:\par
+- Allow switching between profiles from the Profile Tray Menu\par
+- Save and load profile\f4\_\f0 specific settings automatically\par
+\par
+\i Switching Profiles\i0\par
+You can switch profiles at any time using the Profile Tray Menu\par
+When switching profiles:\par
+- Your current clipboard list is saved\par
+- The new profile\f4\rquote\f0 s clipboard list is loaded\par
+- The theme and other per\f4\_\f0 profile settings update immediately\par
+- Scratch Pad content is saved per profile (if enabled)\par
+SkyeClip ensures switching is safe and does not lose data.\par
+\par
+\i Profile Settings\i0\par
+Some settings apply per profile. Each profile stores its own values for:\par
+- Theme\f5  / \f0 Theme\f5  \f0 Auto\f5 : \f0 Controls\f5  \f0 the\f5  \f0 visual\f5  \f0 appearance\f5  \f0 for\f5  \f0 this\f5  \f0 profile\par
+- Max\f5  \f0 Clips\f5 : \f0 Maximum\f5  \f0 number\f5  \f0 of\f5  \f0 clipboard\f5  \f0 entries\f5  \f0 shown\f5  \f0 for\f5  \f0 this\f5  \f0 profile\par
+- Max\f5  \f0 Clip\f5  \f0 Preview\f5  \f0 Length\f5 : \f0 Amount\f5  \f0 of\f5  \f0 text\f5  \f0 shown\f5  \f0 in\f5  \f0 each\f5  \f0 clip\f5  \f0 preview\par
+- Blink\f5  \f0 on\f5  \f0 New\f5  \f0 Clip\f5 : \f0 Whether\f5  \f0 the\f5  \f0 tray\f5  \f0 icon\f5  \f0 blinks\f5  \f0 when\f5  \f0 a\f5  \f0 new\f5  \f0 clip\f5  \f0 is\f5  \f0 captured\par
+- Notify\f5  \f0 on\f5  \f0 New\f5  \f0 Clip: Shows\f5  \f0 a\f5  \f0 notification\f5  \f0 when\f5  \f0 a\f5  \f0 new\f5  \f0 clip\f5  \f0 is\f5  \f0 captured\par
+- Play\f5  \f0 Sound\f5  \f0 with\f5  \f0 Notification: Plays\f5  \f0 a\f5  \f0 sound\f5  \f0 when\f5  \f0 a\f5  \f0 new\f5  \f0 clip\f5  \f0 arrives\par
+These settings override the global defaults whenever Profiles are enabled. Setting controls that are per-profile are marked with a small profile icon badge to indicate that changing them affects only the currently selected profile. A banner at the top of the Settings page shows which profile is being edited.\par
+\par
+\i Managing Profiles\i0\par
+You can:\par
+- Create new profiles\par
+- Rename profiles\par
+- Reorder profiles (drag to reorder)\par
+- Delete profiles\par
+SkyeClip automatically saves profile order, settings, and clipboard data.\par
+\par
+\i Clip Explorer and Profiles\i0\par
+Clip Explorer fully supports profiles:\par
+- You can view clips from the current profile\par
+- Or toggle to show all profiles\par
+- You can move clips between profiles (Favorites or regular clips)\par
+- Profile names appear in the Profile column when enabled\par
+This makes it easy to reorganize or migrate clips between environments.\par
+\par
+\i When Profiles Are Disabled\i0\par
+If Profiles are turned off:\par
+- SkyeClip uses the global settings\par
+- All clipboard data is stored in a single shared list\par
+- Scratch Pad uses a single shared text buffer\par
+- Profile\f4\_\f0 specific settings are ignored until Profiles are re\f4\_\f0 enabled\par
+Your profile data is preserved and will be restored when Profiles are turned back on\lang1033 .\cf2\b\lang9\par
+\f1\par
+App View\cf0\b0\par
 \par
 The App View is a compact control panel that provides quick access to SkyeClip\rquote s core features. It appears as a small window with buttons for common tasks, making it easy to navigate without opening a full application.\par
 \i Included functions:\i0\par
