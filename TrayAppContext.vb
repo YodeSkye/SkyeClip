@@ -357,7 +357,7 @@ Friend Class TrayAppContext
         If blinkState Then
             NIClipboard.Icon = My.Resources.IconAppNotify
         Else
-            NIClipboard.Icon = My.Resources.IconApp
+            NIClipboard.Icon = App.BuildProfiledTrayIcon(My.Resources.IconApp, Skye.UI.ThemeManager.CurrentTheme.TextFore)
         End If
 
         blinkCount += 1
