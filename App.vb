@@ -1627,5 +1627,33 @@ Friend Module App
             App.ScratchPadText = String.Empty
         End If
     End Sub
+    Friend Function BuildProfiledTrayIcon(baseIcon As Icon, themeColor As Color) As Icon
+        Dim bmp As New Bitmap(16, 16, Imaging.PixelFormat.Format32bppArgb)
+
+        Using g = Graphics.FromImage(bmp)
+            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+            g.Clear(Color.Transparent)
+
+            ' Draw the original icon
+            g.DrawImage(baseIcon.ToBitmap(), 0, 0, 16, 16)
+
+            ' === border ===
+            'Using pen As New Pen(themeColor, 1)
+            '    g.DrawRectangle(pen, 0, 0, 15, 15)
+            'End Using
+
+            ' === Dot in upper-left ===
+            Dim dotSize As Integer = 8
+            Dim dotRect As New Rectangle(0, 0, dotSize, dotSize)
+            Using brush As New SolidBrush(themeColor)
+                g.FillEllipse(brush, dotRect)
+            End Using
+
+        End Using
+
+        ' Convert bitmap → icon
+        Dim hIcon = bmp.GetHicon()
+        Return Icon.FromHandle(hIcon)
+    End Function
 
 End Module

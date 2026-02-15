@@ -81,9 +81,9 @@ Friend Class TrayAppContext
 
         ' Tray icon setup
         NIClipboard = New NotifyIcon With {
-            .Icon = My.Resources.IconApp,
             .Visible = True,
             .Text = App.GetAppTitle}
+        SetAppIcon()
 
         ' Blink Timer for Notifications
         blinkTimer = New Timer With {.Interval = 250} ' milliseconds per toggle
@@ -288,6 +288,7 @@ Friend Class TrayAppContext
                         SetTheme(GetTheme(App.Settings.ThemeName))
                         ApplyThemeToAllOpenForms()
                     End If
+                    SetAppIcon()
                     App.FrmScratchPad?.UpdateUI()
                     App.FrmSettings?.LoadSettings()
                 End If
@@ -354,7 +355,7 @@ Friend Class TrayAppContext
         blinkState = Not blinkState
 
         If blinkState Then
-            NIClipboard.Icon = My.Resources.IconAppNotify ' your highlight icon
+            NIClipboard.Icon = My.Resources.IconAppNotify
         Else
             NIClipboard.Icon = My.Resources.IconApp
         End If
@@ -482,6 +483,13 @@ Friend Class TrayAppContext
                              Skye.UI.Toast.ShowToast(t)
                          End Sub)
     End Sub
+    Friend Sub SetAppIcon()
+        If App.Settings.UseProfiles Then
+            NIClipboard.Icon = App.BuildProfiledTrayIcon(My.Resources.IconApp, Skye.UI.ThemeManager.CurrentTheme.TextFore)
+        Else
+            NIClipboard.Icon = My.Resources.IconApp
+        End If
+    End Sub
     Private Shared Function HotKeyMatches(e As KeyEventArgs, hotkey As Keys) As Boolean
         Dim mods = hotkey And Keys.Modifiers
         Dim key = hotkey And Not Keys.Modifiers
@@ -570,7 +578,7 @@ Friend Class TrayAppContext
     End Sub
     Private Sub StopBlink()
         blinkTimer.Stop()
-        NIClipboard.Icon = My.Resources.IconApp
+        SetAppIcon()
     End Sub
 
     Public Class MessageWindow

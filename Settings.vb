@@ -445,6 +445,7 @@ Public Class Settings
         App.Settings.UseProfiles = Not App.Settings.UseProfiles
         If App.FrmScratchPad Is Nothing Then App.LoadScratchPadText()
         SetUseProfiles()
+        App.Tray.SetAppIcon()
         App.FrmScratchPad?.UpdateUI()
     End Sub
 
