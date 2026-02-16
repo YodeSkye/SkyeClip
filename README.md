@@ -128,6 +128,10 @@ GPL-3.0 License
 
 # Using from the repo:
 
+### Requirements
+- Visual Studio 2022 or 2026
+- .NET 10 SDK
+
 ## 📥 Installing SkyeLibrary from a Local `.nupkg` File (included in the repo)
 
 SkyeClip depends on SkyeLibrary, which is included as a .nupkg file in this repository.
