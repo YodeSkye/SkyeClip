@@ -42,6 +42,7 @@ Friend Class TrayAppContext
     Private ReadOnly ClipCM As New ContextMenuStrip()
     Private ClipCMCurrentClipId As Integer
     Private ReadOnly uiInvoker As New Control ' for cross-thread invokes
+    Friend Event ProfileChanged As EventHandler
 
     ' Blink Notification
     Private ReadOnly blinkTimer As Timer
@@ -289,8 +290,7 @@ Friend Class TrayAppContext
                         ApplyThemeToAllOpenForms()
                     End If
                     SetAppIcon()
-                    App.FrmScratchPad?.UpdateUI()
-                    App.FrmSettings?.LoadSettings()
+                    RaiseEvent ProfileChanged(Me, EventArgs.Empty)
                 End If
             Case MouseButtons.Right
         End Select
@@ -467,6 +467,9 @@ Friend Class TrayAppContext
                 End If
             End If
         Next
+    End Sub
+    Friend Sub RaiseProfileChangedEvent()
+        RaiseEvent ProfileChanged(Me, EventArgs.Empty)
     End Sub
     Friend Sub ShowToast(message As String)
         App.Tray.RunOnUI(Sub()

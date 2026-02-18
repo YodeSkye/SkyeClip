@@ -33,6 +33,7 @@ Public Class ClipExplorer
         CMTxtBox.Font = App.MenuFont
         If App.Settings.ClipExplorerSize.Height >= 0 Then Size = App.Settings.ClipExplorerSize
         If App.Settings.ClipExplorerLocation.Y >= 0 Then Location = App.Settings.ClipExplorerLocation
+        AddHandler App.Tray.ProfileChanged, AddressOf OnProfileChanged
     End Sub
     Private Sub ClipExplorer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         App.Settings.Save()
@@ -79,6 +80,9 @@ Public Class ClipExplorer
     End Sub
 
     ' Handlers
+    Private Sub OnProfileChanged()
+        UpdateProfileUI()
+    End Sub
     Private Sub OnThemeChanged()
         Skye.UI.ThemeManager.ApplyToTooltip(TipClipExplorer)
     End Sub
@@ -172,14 +176,27 @@ Public Class ClipExplorer
 
         ' --- Profiles ---
         If App.Settings.UseProfiles Then
+            ' SINGLE CLIP
             ' Only show if the clip is NOT already in the current profile
             If clip.ProfileID <> App.Settings.CurrentProfileID Then
                 CMIUseClipAndToSetCurrentProfile.Visible = True
             Else
                 CMIUseClipAndToSetCurrentProfile.Visible = False
             End If
+            ' MULTIPLE CLIPS
+            Dim selectedIds = DGV.SelectedRows.Cast(Of DataGridViewRow)().
+                              Select(Function(r) CInt(r.Cells("Id").Value)).
+                              ToList()
+            Dim clips = selectedIds.Select(Function(id) App.Tray.repo.GetClipById(id)).ToList()
+            Dim anyOutside = clips.Any(Function(c) c.ProfileID <> App.Settings.CurrentProfileID)
+            If selectedIds.Count > 1 AndAlso anyOutside Then
+                CMIMoveClipsToCurrentProfile.Visible = True
+            Else
+                CMIMoveClipsToCurrentProfile.Visible = False
+            End If
         Else
             CMIUseClipAndToSetCurrentProfile.Visible = False
+            CMIMoveClipsToCurrentProfile.Visible = False
         End If
 
     End Sub
@@ -201,13 +218,40 @@ Public Class ClipExplorer
         Dim row = DGV.SelectedRows(0)
         Dim clipId = CInt(row.Cells("Id").Value)
 
-        ' Move clip to current profile
-        App.Tray.repo.MoveClipToProfile(clipId, App.Settings.CurrentProfileID)
+        Dim moved As Boolean = App.Tray.repo.MoveClipToProfile(clipId, App.Settings.CurrentProfileID)
+        If moved Then
+            ' Only restore if the move actually happened
+            App.Tray.repo.RestoreClip(clipId)
+            ' Refresh UI
+            LoadClips()
+            App.Tray.RefreshMenu()
+        Else
+            App.Tray.ShowToast("Clip already exists in this profile.")
+        End If
 
-        ' Promote it
-        App.Tray.repo.RestoreClip(clipId)
+    End Sub
+    Private Sub CMIMoveClipsToCurrentProfile_MouseDown(sender As Object, e As MouseEventArgs) Handles CMIMoveClipsToCurrentProfile.MouseDown
+        If DGV.SelectedRows.Count = 0 Then Return
 
-        ' Refresh UI
+        ' Collect all selected clip IDs
+        Dim ids As New List(Of Integer)
+        For Each row As DataGridViewRow In DGV.SelectedRows
+            ids.Add(CInt(row.Cells("Id").Value))
+        Next
+
+        Debug.WriteLine($"Attempting to move {ids.Count} clips to profile {App.Settings.CurrentProfileID}")
+        ' MULTI‑CLIP MOVE
+        Dim movedCount As Integer = 0
+        Dim skippedCount As Integer = 0
+        For Each cid In ids
+            If App.Tray.repo.MoveClipToProfile(cid, App.Settings.CurrentProfileID) Then
+                movedCount += 1
+            Else
+                skippedCount += 1
+            End If
+        Next
+
+        App.Tray.ShowToast($"Move Clips Result: Moved {movedCount}, Skipped {skippedCount}")
         LoadClips()
         App.Tray.RefreshMenu()
     End Sub

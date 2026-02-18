@@ -273,7 +273,6 @@ Friend Module App
                     'Debug.Print("UseProfiles changed from " & _useProfiles.ToString & " to " & value.ToString)
                     _useProfiles = value
                     Skye.Common.RegistryHelper.SetBool("UseProfiles", _useProfiles)
-                    ' Scratch Pad Saving Here if SP is open, to preserve text across profile changes and when toggling profiles on/off
                     If _useProfiles Then
                         ' Turning profiles ON
                         If LastUsedProfileID > 0 Then

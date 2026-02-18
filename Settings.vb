@@ -43,6 +43,7 @@ Public Class Settings
         bstr &= App.UserPath
         TipSettings.SetText(CoBoxAutoBackupFrequency, bstr)
         LVProfiles.Columns(0).Width = LVProfiles.Width - SystemInformation.VerticalScrollBarWidth
+        AddHandler App.Tray.ProfileChanged, AddressOf OnProfileChanged
 
         'Settings
         LoadSettings()
@@ -87,6 +88,9 @@ Public Class Settings
     End Sub
 
     ' Handlers
+    Private Sub OnProfileChanged()
+        LoadSettings()
+    End Sub
     Private Sub OnThemeChanged()
         Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
     End Sub
@@ -446,11 +450,11 @@ Public Class Settings
         If App.FrmScratchPad Is Nothing Then App.LoadScratchPadText()
         SetUseProfiles()
         App.Tray.SetAppIcon()
-        App.FrmScratchPad?.UpdateUI()
+        App.Tray.RaiseProfileChangedEvent
     End Sub
 
     ' Methods
-    Friend Sub LoadSettings()
+    Private Sub LoadSettings()
         Text = "Settings for " & GetAppTitle()
         If App.Settings.UseProfiles Then Text &= " (" & App.Settings.GetProfileName(App.Settings.CurrentProfileID) & " Profile)"
         ChkBoxThemeAuto.Checked = App.Settings.ThemeAuto

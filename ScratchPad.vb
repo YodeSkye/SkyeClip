@@ -27,6 +27,7 @@ Friend Class ScratchPad
         If Not String.IsNullOrWhiteSpace(App.ScratchPadText) Then
             RTB.Rtf = App.ScratchPadText
         End If
+        AddHandler App.Tray.ProfileChanged, AddressOf OnProfileChanged
     End Sub
     Friend Overloads Sub Show(clipID As Integer)
         _clipID = clipID
@@ -247,6 +248,9 @@ Friend Class ScratchPad
     End Sub
 
     ' Handlers
+    Private Sub OnProfileChanged()
+        UpdateUI()
+    End Sub
     Private Sub OnThemeChanged()
         Skye.UI.ThemeManager.ApplyToTooltip(TipScratchPad)
     End Sub

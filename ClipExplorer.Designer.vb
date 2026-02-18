@@ -52,6 +52,7 @@ Partial Class ClipExplorer
         CMClipActions = New ContextMenuStrip(components)
         CMICAUseClip = New ToolStripMenuItem()
         CMIUseClipAndToSetCurrentProfile = New ToolStripMenuItem()
+        CMIMoveClipsToCurrentProfile = New ToolStripMenuItem()
         ToolStripSeparator1 = New ToolStripSeparator()
         CMICAFavorite = New ToolStripMenuItem()
         CMICAClipViewer = New ToolStripMenuItem()
@@ -377,9 +378,9 @@ Partial Class ClipExplorer
         ' 
         CMClipActions.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.SetImage(CMClipActions, Nothing)
-        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, CMIUseClipAndToSetCurrentProfile, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICAExport, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
+        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, CMIUseClipAndToSetCurrentProfile, CMIMoveClipsToCurrentProfile, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICAExport, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
         CMClipActions.Name = "CMClipActions"
-        CMClipActions.Size = New Size(277, 192)
+        CMClipActions.Size = New Size(277, 236)
         TipClipExplorer.SetText(CMClipActions, Nothing)
         ' 
         ' CMICAUseClip
@@ -395,6 +396,13 @@ Partial Class ClipExplorer
         CMIUseClipAndToSetCurrentProfile.Name = "CMIUseClipAndToSetCurrentProfile"
         CMIUseClipAndToSetCurrentProfile.Size = New Size(276, 22)
         CMIUseClipAndToSetCurrentProfile.Text = "Set Clip to Current Profile and Use"
+        ' 
+        ' CMIMoveClipsToCurrentProfile
+        ' 
+        CMIMoveClipsToCurrentProfile.Image = My.Resources.Resources.ImageApp16
+        CMIMoveClipsToCurrentProfile.Name = "CMIMoveClipsToCurrentProfile"
+        CMIMoveClipsToCurrentProfile.Size = New Size(276, 22)
+        CMIMoveClipsToCurrentProfile.Text = "Move Clips To Current Profile"
         ' 
         ' ToolStripSeparator1
         ' 
@@ -592,4 +600,5 @@ Partial Class ClipExplorer
     Friend WithEvents SourceApp As DataGridViewTextBoxColumn
     Friend WithEvents SourceAppImage As DataGridViewImageColumn
     Friend WithEvents Favorite As DataGridViewCheckBoxColumn
+    Friend WithEvents CMIMoveClipsToCurrentProfile As ToolStripMenuItem
 End Class

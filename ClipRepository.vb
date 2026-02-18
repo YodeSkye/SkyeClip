@@ -213,15 +213,63 @@ Friend Class ClipRepository
         End Using
     End Sub
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
-    Public Sub MoveClipToProfile(clipId As Integer, newProfileId As Integer)
+    Public Function MoveClipToProfile(clipId As Integer, newProfileId As Integer) As Boolean
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
-            Dim cmd As New SQLiteCommand("UPDATE Clips SET ProfileID = @pid WHERE Id = @id", conn)
-            cmd.Parameters.AddWithValue("@pid", newProfileId)
-            cmd.Parameters.AddWithValue("@id", clipId)
-            cmd.ExecuteNonQuery()
+
+            ' 1. Load the clip's hash + version
+            Dim hash As String = Nothing
+            Dim hv As Integer = 0
+
+            Using cmd As New SQLiteCommand("
+                SELECT AggregateHash, HashVersion
+                FROM Clips
+                WHERE Id=@id", conn)
+
+                cmd.Parameters.AddWithValue("@id", clipId)
+
+                Using r = cmd.ExecuteReader()
+                    If r.Read() Then
+                        hash = r.GetString(0)
+                        hv = r.GetInt32(1)
+                    Else
+                        Return False ' clip not found
+                    End If
+                End Using
+            End Using
+
+            ' 2. Check if target profile already contains this clip
+            Using checkCmd As New SQLiteCommand("
+                SELECT COUNT(*)
+                FROM Clips
+                WHERE AggregateHash=@hash
+                  AND HashVersion=@hv
+                  AND ProfileID=@pid", conn)
+
+                checkCmd.Parameters.AddWithValue("@hash", hash)
+                checkCmd.Parameters.AddWithValue("@hv", hv)
+                checkCmd.Parameters.AddWithValue("@pid", newProfileId)
+
+                Dim exists As Boolean = (CInt(checkCmd.ExecuteScalar()) > 0)
+                If exists Then
+                    Return False ' duplicate → do not move
+                End If
+            End Using
+
+            ' 3. Safe to move
+            Using upd As New SQLiteCommand("
+                UPDATE Clips
+                SET ProfileID=@pid
+                WHERE Id=@id", conn)
+
+                upd.Parameters.AddWithValue("@pid", newProfileId)
+                upd.Parameters.AddWithValue("@id", clipId)
+                upd.ExecuteNonQuery()
+            End Using
+
+            Return True
         End Using
-    End Sub
+    End Function
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Sub RestoreClip(entryId As Integer)
 
