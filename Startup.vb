@@ -59,11 +59,9 @@ Module Startup
             .Mode = AppContextRule.ActivationMode.RunningProcess,
             .OnEnter = Sub(ctx)
                            App.Settings.CurrentProfileID = 63
-                           Debug.WriteLine("RULE FIRED: Firefox is active")
                        End Sub,
             .OnExit = Sub(ctx)
                           App.Settings.CurrentProfileID = 56
-                          Debug.WriteLine("RULE FIRED: Firefox is INactive")
                       End Sub
         })
         App.Rules.Add(New AppContextRule With {
@@ -76,6 +74,16 @@ Module Startup
                           ctx.BlockCapture = False
                       End Sub
         })
+        App.Rules.Add(New TimeRule With {
+            .StartTime = TimeSpan.FromHours(9),
+            .EndTime = TimeSpan.FromHours(20),
+            .TargetProfileID = 63,
+            .ApplyProfile = Sub(id)
+                                App.Settings.CurrentProfileID = id
+                                Debug.WriteLine("TimeRule Activated: " & id)
+                            End Sub
+        })
+
 
         App.AutomationTimer.Start()
         Application.Run(App.Tray)

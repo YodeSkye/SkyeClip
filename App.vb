@@ -539,10 +539,14 @@ Friend Module App
     Friend Class ClipContext
         Public Property LastClipID As Integer = -1
     End Class
+    Friend Class TimeContext
+        Public Property Now As DateTime
+    End Class
     Friend Class ContextEngine
         Public ReadOnly Property App As New AppContext
         Public ReadOnly Property Profile As New ProfileContext
         Public ReadOnly Property Clip As New ClipContext
+        Public ReadOnly Property Time As New TimeContext
         Public Property BlockCapture As Boolean = False
     End Class
     Public Class AppContextRule
@@ -576,6 +580,30 @@ Friend Module App
             End If
 
             _wasActive = isActive
+            Return False
+        End Function
+    End Class
+    Public Class TimeRule
+        Implements IRule
+
+        Public Property StartTime As TimeSpan
+        Public Property EndTime As TimeSpan
+        Public Property TargetProfileID As Integer
+
+        ' You wire this up when creating the rule
+        Public Property ApplyProfile As Action(Of Integer)
+
+        Private wasActive As Boolean = False
+
+        Public Function Matches(ctx As ContextEngine) As Boolean Implements IRule.Matches
+            Dim now = ctx.Time.Now.TimeOfDay
+            Dim active = (now >= StartTime AndAlso now <= EndTime)
+
+            If active AndAlso Not wasActive Then
+                ApplyProfile?.Invoke(TargetProfileID)
+            End If
+
+            wasActive = active
             Return False
         End Function
     End Class
@@ -642,6 +670,7 @@ Friend Module App
 
     End Sub
     Private Sub AutomationTimer_Tick(sender As Object, e As EventArgs) Handles AutomationTimer.Tick
+        App.Context.Time.Now = DateTime.Now
         UpdateAppContext()
         For Each rule In App.Rules
             rule.Matches(App.Context)
@@ -1212,9 +1241,6 @@ Friend Module App
         Catch
             Return String.Empty
         End Try
-    End Function
-    Friend Function IsProcessRunning(name As String) As Boolean
-        Return Process.GetProcessesByName(name).Length > 0
     End Function
 
     ' METHODS
