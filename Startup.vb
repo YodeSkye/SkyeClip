@@ -30,7 +30,7 @@ Module Startup
 
         ' Get Theme
         If App.Settings.ThemeAuto Then
-            Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
+            Skye.UI.ThemeManager.SetTheme(App.DetectWindowsTheme())
         Else
             Skye.UI.ThemeManager.CurrentTheme = Skye.UI.SkyeThemes.GetTheme(App.Settings.ThemeName)
         End If
