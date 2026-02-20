@@ -138,16 +138,6 @@ Friend Class TrayAppContext
             Return
         End If
 
-        'Debug.Print("=== CLIPBOARD EVENT === " & DateTime.Now.ToString("HH:mm:ss.fff"))
-        'Dim data = Clipboard.GetDataObject()
-        'If data Is Nothing Then
-        '    Debug.Print("Clipboard empty or unavailable")
-        'Else
-        '    For Each fmt In data.GetFormats()
-        '        Debug.Print("Format: " & fmt)
-        '    Next
-        'End If
-
         clipboardTimer.Stop()
         clipboardTimer.Start()
 
@@ -161,6 +151,8 @@ Friend Class TrayAppContext
         Dim now = DateTime.Now
         Dim signatureBytes = GetClipboardSignature()
         If ShouldIgnoreClip(signatureBytes, now) Then Return
+
+        If Context.BlockCapture Then Return
 
         ' Database
         repo.SaveClip()
@@ -283,13 +275,13 @@ Friend Class TrayAppContext
                     If App.FrmScratchPad IsNot Nothing Then App.FrmScratchPad?.SaveScratchPad()
                     App.Settings.CurrentProfileID = newprofileID
                     If App.FrmScratchPad Is Nothing Then App.LoadScratchPadText()
-                    If App.Settings.ThemeAuto Then
-                        Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
-                    Else
-                        SetTheme(GetTheme(App.Settings.ThemeName))
-                        ApplyThemeToAllOpenForms()
-                    End If
-                    SetAppIcon()
+                    'If App.Settings.ThemeAuto Then
+                    '    Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
+                    'Else
+                    '    SetTheme(GetTheme(App.Settings.ThemeName))
+                    '    ApplyThemeToAllOpenForms()
+                    'End If
+                    'SetAppIcon()
                     RaiseEvent ProfileChanged(Me, EventArgs.Empty)
                 End If
             Case MouseButtons.Right

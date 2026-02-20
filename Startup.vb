@@ -52,6 +52,32 @@ Module Startup
         App.Tray = New TrayAppContext()
         AddHandler Skye.UI.ThemeManager.ThemeChanged, AddressOf App.Tray.OnThemeChanged
         App.MaintenanceTimer.Start()
+
+
+        App.Rules.Add(New AppContextRule With {
+            .TargetProcess = "firefox",
+            .Mode = AppContextRule.ActivationMode.RunningProcess,
+            .OnEnter = Sub(ctx)
+                           App.Settings.CurrentProfileID = 63
+                           Debug.WriteLine("RULE FIRED: Firefox is active")
+                       End Sub,
+            .OnExit = Sub(ctx)
+                          App.Settings.CurrentProfileID = 56
+                          Debug.WriteLine("RULE FIRED: Firefox is INactive")
+                      End Sub
+        })
+        App.Rules.Add(New AppContextRule With {
+            .TargetProcess = "devenv",
+            .Mode = AppContextRule.ActivationMode.ForegroundWindow,
+            .OnEnter = Sub(ctx)
+                           ctx.BlockCapture = True
+                       End Sub,
+            .OnExit = Sub(ctx)
+                          ctx.BlockCapture = False
+                      End Sub
+        })
+
+        App.AutomationTimer.Start()
         Application.Run(App.Tray)
 
         ' APPLICATION IS CLOSING

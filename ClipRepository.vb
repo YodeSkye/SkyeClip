@@ -117,7 +117,10 @@ Friend Class ClipRepository
         Dim formats = CaptureTextFormats()
         formats.AddRange(CaptureFileDrop())
         formats.AddRange(CaptureImageFormats())
-        If formats Is Nothing OrElse formats.Count = 0 Then Exit Sub
+        If formats Is Nothing OrElse formats.Count = 0 Then
+            App.Context.Clip.LastClipID = -1
+            Exit Sub
+        End If
 
         ' 2) Build preview
         Dim preview As String = BuildPreviewFromFormats(formats)
@@ -143,7 +146,6 @@ Friend Class ClipRepository
             Dim existingIdObj = checkCmd.ExecuteScalar()
 
             Dim entryId As Integer
-
             If existingIdObj IsNot Nothing AndAlso Not DBNull.Value.Equals(existingIdObj) Then
                 ' Duplicate → promote
                 entryId = Convert.ToInt32(existingIdObj)
@@ -189,6 +191,7 @@ Friend Class ClipRepository
                     insertFmt.ExecuteNonQuery()
                 Next
             End If
+            App.Context.Clip.LastClipID = entryId
         End Using
     End Sub
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>

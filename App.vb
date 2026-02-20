@@ -259,6 +259,13 @@ Friend Module App
                     End If
                     Skye.Common.RegistryHelper.SetInt("CurrentProfileID", _currentProfileID)
                     Tray.RefreshMenu()
+                    If App.Settings.ThemeAuto Then
+                        Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
+                    Else
+                        Skye.UI.ThemeManager.SetTheme(GetTheme(App.Settings.ThemeName))
+                        ApplyThemeToAllOpenForms()
+                    End If
+                    Tray.SetAppIcon()
                 End If
             End Set
         End Property
@@ -517,7 +524,66 @@ Friend Module App
 
     End Class
 
-    ' WinForms
+    ' Rules & Automation
+    Public Interface IRule
+        Function Matches(ctx As ContextEngine) As Boolean
+    End Interface
+    Friend Class AppContext
+        Public Property ActiveProcessName As String = String.Empty
+        Public Property ActiveWindowTitle As String = String.Empty
+    End Class
+    Friend Class ProfileContext
+        Public Property CurrentProfileID As Integer
+        Public Property UseProfiles As Boolean
+    End Class
+    Friend Class ClipContext
+        Public Property LastClipID As Integer = -1
+    End Class
+    Friend Class ContextEngine
+        Public ReadOnly Property App As New AppContext
+        Public ReadOnly Property Profile As New ProfileContext
+        Public ReadOnly Property Clip As New ClipContext
+        Public Property BlockCapture As Boolean = False
+    End Class
+    Public Class AppContextRule
+        Implements IRule
+
+        Public Enum ActivationMode
+            ForegroundWindow
+            RunningProcess
+        End Enum
+        Public Property Mode As ActivationMode = ActivationMode.ForegroundWindow
+        Public Property TargetProcess As String
+        Public Property OnEnter As Action(Of ContextEngine)
+        Public Property OnExit As Action(Of ContextEngine)
+
+        Private _wasActive As Boolean = False
+
+        Public Function Matches(ctx As ContextEngine) As Boolean Implements IRule.Matches
+            Dim isActive As Boolean
+            If Mode = ActivationMode.ForegroundWindow Then
+                isActive = ctx.App.ActiveProcessName.Equals(TargetProcess, StringComparison.OrdinalIgnoreCase)
+            Else
+                isActive = Process.GetProcessesByName(TargetProcess).Length > 0
+            End If
+
+            If isActive AndAlso Not _wasActive Then
+                OnEnter?.Invoke(ctx)
+            End If
+
+            If Not isActive AndAlso _wasActive Then
+                OnExit?.Invoke(ctx)
+            End If
+
+            _wasActive = isActive
+            Return False
+        End Function
+    End Class
+    Friend Context As New ContextEngine
+    Friend Rules As New List(Of IRule)
+    Friend WithEvents AutomationTimer As New Timer With {.Interval = 250}
+
+    ' Tray & WinForms
     Friend Tray As TrayAppContext
     Friend CMTray As ContextMenuStrip
     Private FrmClipExplorer As ClipExplorer
@@ -574,6 +640,12 @@ Friend Module App
             App.WriteToLog("Auto Backup Execution Error: " & ex.Message)
         End Try
 
+    End Sub
+    Private Sub AutomationTimer_Tick(sender As Object, e As EventArgs) Handles AutomationTimer.Tick
+        UpdateAppContext()
+        For Each rule In App.Rules
+            rule.Matches(App.Context)
+        Next
     End Sub
 
     ' FORMS
@@ -1101,6 +1173,48 @@ Friend Module App
             Case Else
                 Return DateTime.MaxValue
         End Select
+    End Function
+
+    ' RULES & AUTOMATION
+    Private Sub UpdateAppContext()
+        Dim proc = GetActiveProcessName()
+        Dim title = GetActiveWindowTitle()
+        If proc <> Context.App.ActiveProcessName OrElse title <> Context.App.ActiveWindowTitle Then
+            Context.App.ActiveProcessName = proc
+            Context.App.ActiveWindowTitle = title
+            Debug.Print($"Context Updated: {Context.App.ActiveProcessName} ({Context.App.ActiveWindowTitle})")
+        End If
+    End Sub
+    Friend Function GetActiveProcessName() As String
+        Try
+            Dim hwnd = Skye.WinAPI.GetForegroundWindow()
+            If hwnd = IntPtr.Zero Then Return String.Empty
+
+            Dim pid As UInteger = 0
+            Dim result = Skye.WinAPI.GetWindowThreadProcessId(hwnd, pid)
+            If pid = 0 Then Return String.Empty
+            Dim p = Process.GetProcessById(CInt(pid))
+            Return p.ProcessName.ToLowerInvariant()
+
+        Catch
+            Return String.Empty
+        End Try
+    End Function
+    Friend Function GetActiveWindowTitle() As String
+        Try
+            Dim hwnd = Skye.WinAPI.GetForegroundWindow()
+            If hwnd = IntPtr.Zero Then Return String.Empty
+
+            Dim sb As New Text.StringBuilder(512)
+            Dim result = Skye.WinAPI.GetWindowText(hwnd, sb, sb.Capacity)
+            Return sb.ToString()
+
+        Catch
+            Return String.Empty
+        End Try
+    End Function
+    Friend Function IsProcessRunning(name As String) As Boolean
+        Return Process.GetProcessesByName(name).Length > 0
     End Function
 
     ' METHODS
