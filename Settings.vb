@@ -97,6 +97,9 @@ Public Class Settings
     Private Sub OnThemeChanged()
         Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
     End Sub
+    Private Sub OnRuleSaved(editor As UserControl)
+        RefreshRuleList()
+    End Sub
 
     ' Control Events
     Private Sub LVPageSelector_MouseDown(sender As Object, e As MouseEventArgs) Handles LVPageSelector.MouseDown
@@ -210,6 +213,16 @@ Public Class Settings
         LVProfiles.LineBefore = -1
         LVProfiles.LineAfter = -1
         LVProfiles.Invalidate()
+    End Sub
+    Private Sub lvRules_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVRules.SelectedIndexChanged
+        If LVRules.SelectedItems.Count = 0 Then
+            PanelRule.Controls.Clear()
+            Return
+        End If
+
+        Dim rule = CType(LVRules.SelectedItems(0).Tag, IRulePreview)
+        LoadEditorForRule(rule)
+
     End Sub
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
@@ -543,6 +556,39 @@ Public Class Settings
             item.Tag = r
             LVRules.Items.Add(item)
         Next
+
+    End Sub
+    Private Sub LoadEditorForRule(rule As IRulePreview)
+        PanelRule.Controls.Clear()
+
+        Select Case rule.RuleType
+            Case RuleType.KeywordRule
+                Dim editor As New KeywordRuleEditor()
+                AddHandler editor.RuleSaved, AddressOf OnRuleSaved
+                editor.LoadRule(CType(rule, KeywordRule))
+                PanelRule.Controls.Add(editor)
+                editor.Dock = DockStyle.Fill
+                'Case RuleType.SourceAppRule
+                '    Dim editor As New ucSourceAppRuleEditor()
+                '    editor.LoadRule(CType(rule, SourceAppRule))
+                '    pnlEditor.Controls.Add(editor)
+                '    editor.Dock = DockStyle.Fill
+                'Case RuleType.FormatRule
+                '    Dim editor As New ucFormatRuleEditor()
+                '    editor.LoadRule(CType(rule, FormatRule))
+                '    pnlEditor.Controls.Add(editor)
+                '    editor.Dock = DockStyle.Fill
+                'Case RuleType.TimeRule
+                '    Dim editor As New ucTimeRuleEditor()
+                '    editor.LoadRule(CType(rule, TimeRule))
+                '    pnlEditor.Controls.Add(editor)
+                '    editor.Dock = DockStyle.Fill
+                'Case RuleType.ActiveAppRule
+                '    Dim editor As New ucActiveAppRuleEditor()
+                '    editor.LoadRule(CType(rule, AppContextRule))
+                '    pnlEditor.Controls.Add(editor)
+                '    editor.Dock = DockStyle.Fill
+        End Select
 
     End Sub
     Private Sub SetPage(page As String)

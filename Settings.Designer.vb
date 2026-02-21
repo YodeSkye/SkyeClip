@@ -80,7 +80,7 @@ Partial Class Settings
         ChkBoxUseProfiles = New CheckBox()
         LblProfiles = New Skye.UI.Label()
         PanelAutomation = New Panel()
-        Panel1 = New Panel()
+        PanelRule = New Panel()
         BtnRuleDelete = New Button()
         BtnRuleNew = New Button()
         CoBoxRuleTypes = New Skye.UI.ComboBox()
@@ -769,7 +769,7 @@ Partial Class Settings
         ' PanelAutomation
         ' 
         PanelAutomation.AutoSizeMode = AutoSizeMode.GrowAndShrink
-        PanelAutomation.Controls.Add(Panel1)
+        PanelAutomation.Controls.Add(PanelRule)
         PanelAutomation.Controls.Add(BtnRuleDelete)
         PanelAutomation.Controls.Add(BtnRuleNew)
         PanelAutomation.Controls.Add(CoBoxRuleTypes)
@@ -782,14 +782,14 @@ Partial Class Settings
         PanelAutomation.TabIndex = 1117
         TipSettings.SetText(PanelAutomation, Nothing)
         ' 
-        ' Panel1
+        ' PanelRule
         ' 
-        TipSettings.SetImage(Panel1, Nothing)
-        Panel1.Location = New Point(10, 178)
-        Panel1.Name = "Panel1"
-        Panel1.Size = New Size(415, 253)
-        Panel1.TabIndex = 4
-        TipSettings.SetText(Panel1, Nothing)
+        TipSettings.SetImage(PanelRule, Nothing)
+        PanelRule.Location = New Point(10, 178)
+        PanelRule.Name = "PanelRule"
+        PanelRule.Size = New Size(415, 253)
+        PanelRule.TabIndex = 4
+        TipSettings.SetText(PanelRule, Nothing)
         ' 
         ' BtnRuleDelete
         ' 
@@ -965,5 +965,5 @@ Partial Class Settings
     Friend WithEvents CoBoxRuleTypes As Skye.UI.ComboBox
     Friend WithEvents BtnRuleNew As Button
     Friend WithEvents BtnRuleDelete As Button
-    Friend WithEvents Panel1 As Panel
+    Friend WithEvents PanelRule As Panel
 End Class

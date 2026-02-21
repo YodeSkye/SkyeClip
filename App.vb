@@ -739,19 +739,16 @@ Friend Module App
                 Return RuleType.KeywordRule
             End Get
         End Property
-
         Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
             Get
                 Return $"Keyword contains ""{Keyword}"""
             End Get
         End Property
-
         Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
             Get
                 Return Action.ToString()
             End Get
         End Property
-
         Public ReadOnly Property Summary As String Implements IRulePreview.Summary
             Get
                 Return $"If {ConditionText} → {ActionText}"
@@ -773,6 +770,7 @@ Friend Module App
                 End Select
             End If
         End Sub
+
     End Class
     Friend Class FormatRule
         Implements IContentRule, IRulePreview
