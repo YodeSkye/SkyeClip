@@ -525,8 +525,20 @@ Friend Module App
     End Class
 
     ' Rules & Automation
-    Public Interface IRule
+    Friend Interface IContextRule
         Function Matches(ctx As ContextEngine) As Boolean
+    End Interface
+    Friend Interface IContentRule
+        Sub Apply(clip As ClipRepository.FullClipInfo,
+              formats As List(Of ClipRepository.ClipData),
+              searchableText As String,
+              repo As ClipRepository)
+    End Interface
+    Friend Interface IRulePreview
+        ReadOnly Property RuleType As RuleType
+        ReadOnly Property ConditionText As String
+        ReadOnly Property ActionText As String
+        ReadOnly Property Summary As String
     End Interface
     Friend Class AppContext
         Public Property ActiveProcessName As String = String.Empty
@@ -549,8 +561,8 @@ Friend Module App
         Public ReadOnly Property Time As New TimeContext
         Public Property BlockCapture As Boolean = False
     End Class
-    Public Class AppContextRule
-        Implements IRule
+    Friend Class ActiveAppRule
+        Implements IContextRule, IRulePreview
 
         Public Enum ActivationMode
             ForegroundWindow
@@ -560,10 +572,48 @@ Friend Module App
         Public Property TargetProcess As String
         Public Property OnEnter As Action(Of ContextEngine)
         Public Property OnExit As Action(Of ContextEngine)
+        Public Property EnterDescription As String
+        Public Property ExitDescription As String
+
+        ' === UI Preview Properties ===
+        Public ReadOnly Property RuleType As RuleType Implements IRulePreview.RuleType
+            Get
+                Return RuleType.ActiveAppRule
+            End Get
+        End Property
+
+        Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
+            Get
+                Dim modeText = If(Mode = ActivationMode.ForegroundWindow,
+                          "Active App",
+                          "Running Process")
+                Return $"{modeText} = {TargetProcess}"
+            End Get
+        End Property
+
+        Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
+            Get
+                Dim enterPart = If(String.IsNullOrEmpty(EnterDescription),
+                           "OnEnter",
+                           EnterDescription)
+
+                Dim exitPart = If(String.IsNullOrEmpty(ExitDescription),
+                          "OnExit",
+                          ExitDescription)
+
+                Return $"{enterPart} / {exitPart}"
+            End Get
+        End Property
+
+        Public ReadOnly Property Summary As String Implements IRulePreview.Summary
+            Get
+                Return $"If {ConditionText} → {ActionText}"
+            End Get
+        End Property
 
         Private _wasActive As Boolean = False
 
-        Public Function Matches(ctx As ContextEngine) As Boolean Implements IRule.Matches
+        Public Function Matches(ctx As ContextEngine) As Boolean Implements IContextRule.Matches
             Dim isActive As Boolean
             If Mode = ActivationMode.ForegroundWindow Then
                 isActive = ctx.App.ActiveProcessName.Equals(TargetProcess, StringComparison.OrdinalIgnoreCase)
@@ -583,19 +633,42 @@ Friend Module App
             Return False
         End Function
     End Class
-    Public Class TimeRule
-        Implements IRule
+    Friend Class TimeRule
+        Implements IContextRule, IRulePreview
 
         Public Property StartTime As TimeSpan
         Public Property EndTime As TimeSpan
         Public Property TargetProfileID As Integer
-
-        ' You wire this up when creating the rule
         Public Property ApplyProfile As Action(Of Integer)
+
+        ' === UI Preview Properties ===
+        Public ReadOnly Property RuleType As RuleType Implements IRulePreview.RuleType
+            Get
+                Return RuleType.TimeRule
+            End Get
+        End Property
+
+        Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
+            Get
+                Return $"Time = {StartTime:hh\:mm}–{EndTime:hh\:mm}"
+            End Get
+        End Property
+
+        Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
+            Get
+                Return $"Switch to Profile {TargetProfileID}"
+            End Get
+        End Property
+
+        Public ReadOnly Property Summary As String Implements IRulePreview.Summary
+            Get
+                Return $"If {ConditionText} → {ActionText}"
+            End Get
+        End Property
 
         Private wasActive As Boolean = False
 
-        Public Function Matches(ctx As ContextEngine) As Boolean Implements IRule.Matches
+        Public Function Matches(ctx As ContextEngine) As Boolean Implements IContextRule.Matches
             Dim now = ctx.Time.Now.TimeOfDay
             Dim active = (now >= StartTime AndAlso now <= EndTime)
 
@@ -607,8 +680,161 @@ Friend Module App
             Return False
         End Function
     End Class
+    Friend Class SourceAppRule
+        Implements IContentRule, IRulePreview
+
+        Public Property AppName As String
+        Public Property Action As ContentAction
+
+        ' === UI Preview Properties ===
+        Public ReadOnly Property RuleType As RuleType Implements IRulePreview.RuleType
+            Get
+                Return RuleType.SourceAppRule
+            End Get
+        End Property
+
+        Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
+            Get
+                Return $"Source App = {AppName}"
+            End Get
+        End Property
+
+        Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
+            Get
+                Return Action.ToString()
+            End Get
+        End Property
+
+        Public ReadOnly Property Summary As String Implements IRulePreview.Summary
+            Get
+                Return $"If {ConditionText} → {ActionText}"
+            End Get
+        End Property
+
+        Public Sub Apply(clip As ClipRepository.FullClipInfo,
+                     formats As List(Of ClipRepository.ClipData),
+                     searchableText As String,
+                     repo As ClipRepository) _
+                     Implements IContentRule.Apply
+
+            If clip.SourceAppName.Equals(AppName, StringComparison.OrdinalIgnoreCase) Then
+                Select Case Action
+                    Case ContentAction.AutoFavorite
+                        repo.SetFavorite(clip.Id, True)
+                    Case ContentAction.AutoIgnore
+                        repo.DeleteClip(clip.Id)
+                End Select
+            End If
+        End Sub
+    End Class
+    Friend Class KeywordRule
+        Implements IContentRule, IRulePreview
+
+        Public Property Keyword As String
+        Public Property Action As ContentAction
+
+        ' === UI Preview Properties ===
+        Public ReadOnly Property RuleType As RuleType Implements IRulePreview.RuleType
+            Get
+                Return RuleType.KeywordRule
+            End Get
+        End Property
+
+        Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
+            Get
+                Return $"Keyword contains ""{Keyword}"""
+            End Get
+        End Property
+
+        Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
+            Get
+                Return Action.ToString()
+            End Get
+        End Property
+
+        Public ReadOnly Property Summary As String Implements IRulePreview.Summary
+            Get
+                Return $"If {ConditionText} → {ActionText}"
+            End Get
+        End Property
+
+        Public Sub Apply(clip As ClipRepository.FullClipInfo,
+                     formats As List(Of ClipRepository.ClipData),
+                     searchableText As String,
+                     repo As ClipRepository) _
+                     Implements IContentRule.Apply
+
+            If searchableText.Contains(Keyword, StringComparison.OrdinalIgnoreCase) Then
+                Select Case Action
+                    Case ContentAction.AutoFavorite
+                        repo.SetFavorite(clip.Id, True)
+                    Case ContentAction.AutoIgnore
+                        repo.DeleteClip(clip.Id)
+                End Select
+            End If
+        End Sub
+    End Class
+    Friend Class FormatRule
+        Implements IContentRule, IRulePreview
+
+        Public Property FormatId As UInteger
+        Public Property Action As ContentAction
+
+        ' === UI Preview Properties ===
+        Public ReadOnly Property RuleType As RuleType Implements IRulePreview.RuleType
+            Get
+                Return RuleType.FormatRule
+            End Get
+        End Property
+
+        Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
+            Get
+                Return $"Format ID = {FormatId}"
+            End Get
+        End Property
+
+        Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
+            Get
+                Return Action.ToString()
+            End Get
+        End Property
+
+        Public ReadOnly Property Summary As String Implements IRulePreview.Summary
+            Get
+                Return $"If {ConditionText} → {ActionText}"
+            End Get
+        End Property
+
+        Public Sub Apply(clip As ClipRepository.FullClipInfo,
+                     formats As List(Of ClipRepository.ClipData),
+                     searchableText As String,
+                     repo As ClipRepository) _
+                     Implements IContentRule.Apply
+
+            If formats.Any(Function(f) f.FormatId = FormatId) Then
+                Select Case Action
+                    Case ContentAction.AutoFavorite
+                        repo.SetFavorite(clip.Id, True)
+                    Case ContentAction.AutoIgnore
+                        repo.DeleteClip(clip.Id)
+                End Select
+            End If
+        End Sub
+    End Class
+    Friend Enum ContentAction
+        AutoFavorite
+        AutoIgnore
+    End Enum
+    Friend Enum RuleType
+        ActiveAppRule
+        TimeRule
+        SourceAppRule
+        KeywordRule
+        FormatRule
+    End Enum
     Friend Context As New ContextEngine
-    Friend Rules As New List(Of IRule)
+    Friend ContextRules As New List(Of IContextRule)
+    Friend ContentRules As New List(Of IContentRule)
     Friend WithEvents AutomationTimer As New Timer With {.Interval = 250}
 
     ' Tray & WinForms
@@ -672,7 +898,7 @@ Friend Module App
     Private Sub AutomationTimer_Tick(sender As Object, e As EventArgs) Handles AutomationTimer.Tick
         App.Context.Time.Now = DateTime.Now
         UpdateAppContext()
-        For Each rule In App.Rules
+        For Each rule In App.ContextRules
             rule.Matches(App.Context)
         Next
     End Sub

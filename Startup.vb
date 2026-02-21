@@ -54,27 +54,31 @@ Module Startup
         App.MaintenanceTimer.Start()
 
 
-        App.Rules.Add(New AppContextRule With {
+        App.ContextRules.Add(New ActiveAppRule With {
             .TargetProcess = "firefox",
-            .Mode = AppContextRule.ActivationMode.RunningProcess,
+            .Mode = ActiveAppRule.ActivationMode.RunningProcess,
             .OnEnter = Sub(ctx)
                            App.Settings.CurrentProfileID = 63
                        End Sub,
             .OnExit = Sub(ctx)
                           App.Settings.CurrentProfileID = 56
-                      End Sub
+                      End Sub,
+            .EnterDescription = "Firefox is running - Switch to Profile 63",
+            .ExitDescription = "Firefox is not running - Switch to Profile 56"
         })
-        App.Rules.Add(New AppContextRule With {
+        App.ContextRules.Add(New ActiveAppRule With {
             .TargetProcess = "devenv",
-            .Mode = AppContextRule.ActivationMode.ForegroundWindow,
+            .Mode = ActiveAppRule.ActivationMode.ForegroundWindow,
             .OnEnter = Sub(ctx)
                            ctx.BlockCapture = True
                        End Sub,
             .OnExit = Sub(ctx)
                           ctx.BlockCapture = False
-                      End Sub
+                      End Sub,
+            .EnterDescription = "Visual Studio is active - Block Capture",
+            .ExitDescription = "Visual Studio is not active - Unblock Capture"
         })
-        App.Rules.Add(New TimeRule With {
+        App.ContextRules.Add(New TimeRule With {
             .StartTime = TimeSpan.FromHours(9),
             .EndTime = TimeSpan.FromHours(20),
             .TargetProfileID = 63,
@@ -82,6 +86,14 @@ Module Startup
                                 App.Settings.CurrentProfileID = id
                                 Debug.WriteLine("TimeRule Activated: " & id)
                             End Sub
+        })
+        ContentRules.Add(New KeywordRule With {
+            .Keyword = "test",
+            .Action = ContentAction.AutoFavorite
+        })
+        ContentRules.Add(New SourceAppRule With {
+            .AppName = "notepad",
+            .Action = ContentAction.AutoIgnore
         })
 
 

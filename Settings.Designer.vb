@@ -79,6 +79,16 @@ Partial Class Settings
         ColProfileName = New ColumnHeader()
         ChkBoxUseProfiles = New CheckBox()
         LblProfiles = New Skye.UI.Label()
+        PanelAutomation = New Panel()
+        Panel1 = New Panel()
+        BtnRuleDelete = New Button()
+        BtnRuleNew = New Button()
+        CoBoxRuleTypes = New Skye.UI.ComboBox()
+        LVRules = New Skye.UI.ListViewEX()
+        ColType = New ColumnHeader()
+        ColCondition = New ColumnHeader()
+        ColAction = New ColumnHeader()
+        ColSummary = New ColumnHeader()
         PanelPageSelector.SuspendLayout()
         PanelGeneral.SuspendLayout()
         PanelClips.SuspendLayout()
@@ -86,6 +96,7 @@ Partial Class Settings
         PanelBackup.SuspendLayout()
         PanelControls.SuspendLayout()
         PanelProfiles.SuspendLayout()
+        PanelAutomation.SuspendLayout()
         SuspendLayout()
         ' 
         ' BtnOK
@@ -477,7 +488,7 @@ Partial Class Settings
         TipSettings.SetImage(PanelPageSelector, Nothing)
         PanelPageSelector.Location = New Point(0, 0)
         PanelPageSelector.Name = "PanelPageSelector"
-        PanelPageSelector.Size = New Size(93, 446)
+        PanelPageSelector.Size = New Size(93, 531)
         PanelPageSelector.TabIndex = 1110
         TipSettings.SetText(PanelPageSelector, Nothing)
         ' 
@@ -494,7 +505,7 @@ Partial Class Settings
         LVPageSelector.Name = "LVPageSelector"
         LVPageSelector.Scrollable = False
         LVPageSelector.ShowGroups = False
-        LVPageSelector.Size = New Size(93, 446)
+        LVPageSelector.Size = New Size(93, 531)
         LVPageSelector.TabIndex = 0
         LVPageSelector.TabStop = False
         TipSettings.SetText(LVPageSelector, Nothing)
@@ -566,7 +577,7 @@ Partial Class Settings
         PanelClips.Controls.Add(ChkBoxBlinkOnNewClip)
         PanelClips.Controls.Add(LblMaxClipsBadge)
         TipSettings.SetImage(PanelClips, Nothing)
-        PanelClips.Location = New Point(99, 163)
+        PanelClips.Location = New Point(99, 146)
         PanelClips.Name = "PanelClips"
         PanelClips.Size = New Size(170, 98)
         PanelClips.TabIndex = 1112
@@ -663,7 +674,7 @@ Partial Class Settings
         PanelControls.Controls.Add(BtnOK)
         PanelControls.Dock = DockStyle.Bottom
         TipSettings.SetImage(PanelControls, Nothing)
-        PanelControls.Location = New Point(93, 355)
+        PanelControls.Location = New Point(93, 440)
         PanelControls.Name = "PanelControls"
         PanelControls.Size = New Size(435, 91)
         PanelControls.TabIndex = 1115
@@ -678,9 +689,9 @@ Partial Class Settings
         PanelProfiles.Controls.Add(ChkBoxUseProfiles)
         PanelProfiles.Controls.Add(LblProfiles)
         TipSettings.SetImage(PanelProfiles, Nothing)
-        PanelProfiles.Location = New Point(341, 206)
+        PanelProfiles.Location = New Point(371, 208)
         PanelProfiles.Name = "PanelProfiles"
-        PanelProfiles.Size = New Size(157, 118)
+        PanelProfiles.Size = New Size(157, 100)
         PanelProfiles.TabIndex = 1116
         TipSettings.SetText(PanelProfiles, Nothing)
         ' 
@@ -755,11 +766,108 @@ Partial Class Settings
         LblProfiles.Text = "Profiles"
         TipSettings.SetText(LblProfiles, Nothing)
         ' 
+        ' PanelAutomation
+        ' 
+        PanelAutomation.AutoSizeMode = AutoSizeMode.GrowAndShrink
+        PanelAutomation.Controls.Add(Panel1)
+        PanelAutomation.Controls.Add(BtnRuleDelete)
+        PanelAutomation.Controls.Add(BtnRuleNew)
+        PanelAutomation.Controls.Add(CoBoxRuleTypes)
+        PanelAutomation.Controls.Add(LVRules)
+        PanelAutomation.Dock = DockStyle.Fill
+        TipSettings.SetImage(PanelAutomation, Nothing)
+        PanelAutomation.Location = New Point(93, 0)
+        PanelAutomation.Name = "PanelAutomation"
+        PanelAutomation.Size = New Size(435, 440)
+        PanelAutomation.TabIndex = 1117
+        TipSettings.SetText(PanelAutomation, Nothing)
+        ' 
+        ' Panel1
+        ' 
+        TipSettings.SetImage(Panel1, Nothing)
+        Panel1.Location = New Point(10, 178)
+        Panel1.Name = "Panel1"
+        Panel1.Size = New Size(415, 253)
+        Panel1.TabIndex = 4
+        TipSettings.SetText(Panel1, Nothing)
+        ' 
+        ' BtnRuleDelete
+        ' 
+        BtnRuleDelete.Image = My.Resources.Resources.ImageClearRemoveDelete16
+        TipSettings.SetImage(BtnRuleDelete, Nothing)
+        BtnRuleDelete.Location = New Point(387, 136)
+        BtnRuleDelete.Name = "BtnRuleDelete"
+        BtnRuleDelete.Size = New Size(36, 36)
+        BtnRuleDelete.TabIndex = 3
+        TipSettings.SetText(BtnRuleDelete, Nothing)
+        BtnRuleDelete.UseVisualStyleBackColor = True
+        ' 
+        ' BtnRuleNew
+        ' 
+        TipSettings.SetImage(BtnRuleNew, Nothing)
+        BtnRuleNew.Location = New Point(11, 136)
+        BtnRuleNew.Name = "BtnRuleNew"
+        BtnRuleNew.Size = New Size(53, 36)
+        BtnRuleNew.TabIndex = 2
+        TipSettings.SetText(BtnRuleNew, Nothing)
+        BtnRuleNew.Text = "New:"
+        BtnRuleNew.UseVisualStyleBackColor = True
+        ' 
+        ' CoBoxRuleTypes
+        ' 
+        CoBoxRuleTypes.DrawMode = DrawMode.OwnerDrawFixed
+        CoBoxRuleTypes.DropDownStyle = ComboBoxStyle.DropDownList
+        CoBoxRuleTypes.FormattingEnabled = True
+        TipSettings.SetImage(CoBoxRuleTypes, Nothing)
+        CoBoxRuleTypes.Location = New Point(62, 139)
+        CoBoxRuleTypes.Name = "CoBoxRuleTypes"
+        CoBoxRuleTypes.Size = New Size(146, 30)
+        CoBoxRuleTypes.TabIndex = 1
+        TipSettings.SetText(CoBoxRuleTypes, Nothing)
+        ' 
+        ' LVRules
+        ' 
+        LVRules.Columns.AddRange(New ColumnHeader() {ColType, ColCondition, ColAction, ColSummary})
+        LVRules.EditableColumns = CType(resources.GetObject("LVRules.EditableColumns"), List(Of Boolean))
+        LVRules.FullRowSelect = True
+        LVRules.HeaderStyle = ColumnHeaderStyle.Nonclickable
+        TipSettings.SetImage(LVRules, Nothing)
+        LVRules.InsertionLineColor = Color.Teal
+        LVRules.Location = New Point(10, 11)
+        LVRules.MultiSelect = False
+        LVRules.Name = "LVRules"
+        LVRules.Size = New Size(415, 122)
+        LVRules.TabIndex = 0
+        TipSettings.SetText(LVRules, Nothing)
+        LVRules.UseCompatibleStateImageBehavior = False
+        LVRules.View = View.Details
+        ' 
+        ' ColType
+        ' 
+        ColType.Text = "Type"
+        ColType.Width = 120
+        ' 
+        ' ColCondition
+        ' 
+        ColCondition.Text = "Condition"
+        ColCondition.Width = 260
+        ' 
+        ' ColAction
+        ' 
+        ColAction.Text = "Action"
+        ColAction.Width = 120
+        ' 
+        ' ColSummary
+        ' 
+        ColSummary.Text = "Summary"
+        ColSummary.Width = 350
+        ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(528, 446)
+        ClientSize = New Size(528, 531)
+        Controls.Add(PanelAutomation)
         Controls.Add(PanelGeneral)
         Controls.Add(PanelClips)
         Controls.Add(PanelProfiles)
@@ -789,6 +897,7 @@ Partial Class Settings
         PanelControls.ResumeLayout(False)
         PanelProfiles.ResumeLayout(False)
         PanelProfiles.PerformLayout()
+        PanelAutomation.ResumeLayout(False)
         ResumeLayout(False)
     End Sub
 
@@ -847,4 +956,14 @@ Partial Class Settings
     Friend WithEvents LblBlinkOnNewClipBadge As Skye.UI.Label
     Friend WithEvents LblMaxClipPreviewLengthBadge As Skye.UI.Label
     Friend WithEvents LblMaxClipsBadge As Skye.UI.Label
+    Friend WithEvents PanelAutomation As Panel
+    Friend WithEvents LVRules As Skye.UI.ListViewEX
+    Friend WithEvents ColType As ColumnHeader
+    Friend WithEvents ColCondition As ColumnHeader
+    Friend WithEvents ColAction As ColumnHeader
+    Friend WithEvents ColSummary As ColumnHeader
+    Friend WithEvents CoBoxRuleTypes As Skye.UI.ComboBox
+    Friend WithEvents BtnRuleNew As Button
+    Friend WithEvents BtnRuleDelete As Button
+    Friend WithEvents Panel1 As Panel
 End Class

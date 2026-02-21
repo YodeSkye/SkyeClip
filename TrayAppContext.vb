@@ -43,6 +43,7 @@ Friend Class TrayAppContext
     Private ClipCMCurrentClipId As Integer
     Private ReadOnly uiInvoker As New Control ' for cross-thread invokes
     Friend Event ProfileChanged As EventHandler
+    Private lastProcessedContentClipId As Integer = -1 ' Used to prevent re-processing the same clip for content rules when it becomes the active clip again
 
     ' Blink Notification
     Private ReadOnly blinkTimer As Timer
@@ -156,6 +157,8 @@ Friend Class TrayAppContext
 
         ' Database
         repo.SaveClip()
+
+        RunContentRulesForNewClip()
 
         UpdateUI()
 
@@ -368,6 +371,27 @@ Friend Class TrayAppContext
         NIClipboard.ContextMenuStrip = App.CMTray
         AddHandler NIClipboard.ContextMenuStrip.KeyDown, AddressOf OnMenuKeyDown
         AddHandler NIClipboard.ContextMenuStrip.Closing, AddressOf OnMenuClosing
+    End Sub
+    Private Sub RunContentRulesForNewClip()
+        Dim newId = Context.Clip.LastClipID
+        If newId <= 0 OrElse newId = lastProcessedContentClipId Then Exit Sub
+
+        ' Load clip metadata
+        Dim clip = repo.GetClipById(newId)
+        If clip Is Nothing Then Exit Sub
+
+        ' Load formats
+        Dim formats = repo.GetClipFormats(newId)
+
+        ' Load searchable text
+        Dim text = repo.GetSearchableText(newId, App.TextSearchMode.AllText)
+
+        ' Apply rules
+        For Each rule In ContentRules
+            rule.Apply(clip, formats, text, repo)
+        Next
+
+        lastProcessedContentClipId = newId
     End Sub
     Friend Sub RefreshMenu()
         BuildMenu()

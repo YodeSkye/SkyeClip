@@ -21,12 +21,14 @@ Public Class Settings
         ILPageSelector.Images.Add(My.Resources.ImageHotKeys48)
         ILPageSelector.Images.Add(My.Resources.ImageBackup48)
         ILPageSelector.Images.Add(My.Resources.ImageProfiles48)
+        ILPageSelector.Images.Add(My.Resources.ImageApp48)
 
         LVPageSelector.Items.Add(New ListViewItem("General", 0))
         LVPageSelector.Items.Add(New ListViewItem("Clips", 1))
         LVPageSelector.Items.Add(New ListViewItem("Hot Keys", 2))
         LVPageSelector.Items.Add(New ListViewItem("Backup", 3))
         LVPageSelector.Items.Add(New ListViewItem("Profiles", 4))
+        LVPageSelector.Items.Add(New ListViewItem("Automation", 5))
         LVPageSelector.Items(0).Selected = True
 
         PanelGeneral.Dock = DockStyle.Fill
@@ -34,6 +36,7 @@ Public Class Settings
         PanelHotKeys.Dock = DockStyle.Fill
         PanelBackup.Dock = DockStyle.Fill
         PanelProfiles.Dock = DockStyle.Fill
+        PanelAutomation.Dock = DockStyle.Fill
 
         CMTxtBox.Font = App.MenuFont
         Dim bstr As String = TipSettings.GetText(BtnBackupNow)
@@ -497,6 +500,7 @@ Public Class Settings
             Dim lvi As New ListViewItem(p.Name) With {.Tag = p.ID}
             LVProfiles.Items.Add(lvi)
         Next
+        RefreshRuleList()
 
         If App.Settings.UseProfiles Then
             LblThemeBadge.Visible = True
@@ -517,12 +521,37 @@ Public Class Settings
         End If
 
     End Sub
+    Private Sub RefreshRuleList()
+        LVRules.Items.Clear()
+
+        ' Context Rules (ActiveAppRule, TimeRule)
+        For Each r As App.IRulePreview In ContextRules
+            Dim item As New ListViewItem(r.RuleType.ToString())
+            item.SubItems.Add(r.ConditionText)
+            item.SubItems.Add(r.ActionText)
+            item.SubItems.Add(r.Summary)
+            item.Tag = r
+            LVRules.Items.Add(item)
+        Next
+
+        ' Content Rules (SourceAppRule, KeywordRule, FormatRule)
+        For Each r As App.IRulePreview In ContentRules
+            Dim item As New ListViewItem(r.RuleType.ToString())
+            item.SubItems.Add(r.ConditionText)
+            item.SubItems.Add(r.ActionText)
+            item.SubItems.Add(r.Summary)
+            item.Tag = r
+            LVRules.Items.Add(item)
+        Next
+
+    End Sub
     Private Sub SetPage(page As String)
         PanelGeneral.Enabled = False
         PanelClips.Enabled = False
         PanelHotKeys.Enabled = False
         PanelBackup.Enabled = False
         PanelProfiles.Enabled = False
+        PanelAutomation.Enabled = False
         Select Case page
             Case "General"
                 PanelGeneral.Enabled = True
@@ -539,6 +568,9 @@ Public Class Settings
             Case "Profiles"
                 PanelProfiles.Enabled = True
                 PanelProfiles.BringToFront()
+            Case "Automation"
+                PanelAutomation.Enabled = True
+                PanelAutomation.BringToFront()
         End Select
     End Sub
     Private Function FormatHotKey(k As Keys) As String
