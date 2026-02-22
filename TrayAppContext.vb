@@ -278,13 +278,6 @@ Friend Class TrayAppContext
                     If App.FrmScratchPad IsNot Nothing Then App.FrmScratchPad?.SaveScratchPad()
                     App.Settings.CurrentProfileID = newprofileID
                     If App.FrmScratchPad Is Nothing Then App.LoadScratchPadText()
-                    'If App.Settings.ThemeAuto Then
-                    '    Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
-                    'Else
-                    '    SetTheme(GetTheme(App.Settings.ThemeName))
-                    '    ApplyThemeToAllOpenForms()
-                    'End If
-                    'SetAppIcon()
                     RaiseEvent ProfileChanged(Me, EventArgs.Empty)
                 End If
             Case MouseButtons.Right
