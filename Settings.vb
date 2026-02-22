@@ -46,6 +46,7 @@ Public Class Settings
         bstr &= App.UserPath
         TipSettings.SetText(CoBoxAutoBackupFrequency, bstr)
         LVProfiles.Columns(0).Width = LVProfiles.Width - SystemInformation.VerticalScrollBarWidth
+        CoBoxRuleTypes.DataSource = [Enum].GetValues(Of App.RuleType)()
         AddHandler App.Tray.ProfileChanged, AddressOf OnProfileChanged
 
         'Settings
@@ -97,8 +98,19 @@ Public Class Settings
     Private Sub OnThemeChanged()
         Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
     End Sub
-    Private Sub OnRuleSaved(editor As UserControl)
+    Private Sub OnRuleSaved(editor As UserControl, rule As App.IRulePreview)
+        Select Case rule.RuleType
+            Case RuleType.ActiveAppRule, RuleType.TimeRule
+                If Not App.ContextRules.Contains(CType(rule, IContextRule)) Then
+                    App.ContextRules.Add(CType(rule, IContextRule))
+                End If
+            Case RuleType.SourceAppRule, RuleType.KeywordRule, RuleType.FormatRule
+                If Not App.ContentRules.Contains(CType(rule, IContentRule)) Then
+                    App.ContentRules.Add(CType(rule, IContentRule))
+                End If
+        End Select
         RefreshRuleList()
+        PanelRule.Controls.Clear()
     End Sub
 
     ' Control Events
@@ -214,7 +226,7 @@ Public Class Settings
         LVProfiles.LineAfter = -1
         LVProfiles.Invalidate()
     End Sub
-    Private Sub lvRules_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVRules.SelectedIndexChanged
+    Private Sub LVRules_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVRules.SelectedIndexChanged
         If LVRules.SelectedItems.Count = 0 Then
             PanelRule.Controls.Clear()
             Return
@@ -306,6 +318,43 @@ Public Class Settings
             SetUseProfiles()
             App.Tray.RefreshMenu()
         End If
+
+    End Sub
+    Private Sub BtnRuleNew_Click(sender As Object, e As EventArgs) Handles BtnRuleNew.Click
+        If CoBoxRuleTypes.SelectedItem Is Nothing Then Exit Sub
+
+        Dim selectedType As App.RuleType = CType(CoBoxRuleTypes.SelectedItem, App.RuleType)
+        Dim newRule As IRulePreview = Nothing
+        Select Case selectedType
+            Case App.RuleType.ActiveAppRule
+                newRule = New App.ActiveAppRule()
+            Case App.RuleType.TimeRule
+                newRule = New App.TimeRule()
+            Case App.RuleType.SourceAppRule
+                newRule = New App.SourceAppRule()
+            Case App.RuleType.KeywordRule
+                newRule = New App.KeywordRule()
+            Case App.RuleType.FormatRule
+                newRule = New App.FormatRule()
+        End Select
+
+        LoadEditorForRule(newRule)
+
+    End Sub
+    Private Sub BtnRuleDelete_Click(sender As Object, e As EventArgs) Handles BtnRuleDelete.Click
+        If LVRules.SelectedItems.Count = 0 Then Exit Sub
+
+        Dim item As ListViewItem = LVRules.SelectedItems(0)
+        Dim rule As App.IRulePreview = CType(item.Tag, App.IRulePreview)
+        Select Case rule.RuleType
+            Case RuleType.ActiveAppRule, RuleType.TimeRule
+                App.ContextRules.Remove(CType(rule, IContextRule))
+            Case RuleType.SourceAppRule, RuleType.KeywordRule, RuleType.FormatRule
+                App.ContentRules.Remove(CType(rule, IContentRule))
+        End Select
+
+        RefreshRuleList()
+        PanelRule.Controls.Clear()
 
     End Sub
     Private Sub CoBoxAutoBackupFrequency_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxAutoBackupFrequency.SelectionChangeCommitted
@@ -568,26 +617,6 @@ Public Class Settings
                 editor.LoadRule(CType(rule, KeywordRule))
                 PanelRule.Controls.Add(editor)
                 editor.Dock = DockStyle.Fill
-                'Case RuleType.SourceAppRule
-                '    Dim editor As New ucSourceAppRuleEditor()
-                '    editor.LoadRule(CType(rule, SourceAppRule))
-                '    pnlEditor.Controls.Add(editor)
-                '    editor.Dock = DockStyle.Fill
-                'Case RuleType.FormatRule
-                '    Dim editor As New ucFormatRuleEditor()
-                '    editor.LoadRule(CType(rule, FormatRule))
-                '    pnlEditor.Controls.Add(editor)
-                '    editor.Dock = DockStyle.Fill
-                'Case RuleType.TimeRule
-                '    Dim editor As New ucTimeRuleEditor()
-                '    editor.LoadRule(CType(rule, TimeRule))
-                '    pnlEditor.Controls.Add(editor)
-                '    editor.Dock = DockStyle.Fill
-                'Case RuleType.ActiveAppRule
-                '    Dim editor As New ucActiveAppRuleEditor()
-                '    editor.LoadRule(CType(rule, AppContextRule))
-                '    pnlEditor.Controls.Add(editor)
-                '    editor.Dock = DockStyle.Fill
         End Select
 
     End Sub

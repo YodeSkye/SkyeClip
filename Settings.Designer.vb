@@ -407,7 +407,6 @@ Partial Class Settings
         ' 
         ' CoBoxTheme
         ' 
-        CoBoxTheme.DrawMode = DrawMode.OwnerDrawFixed
         CoBoxTheme.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxTheme.FormattingEnabled = True
         TipSettings.SetImage(CoBoxTheme, Nothing)
@@ -419,7 +418,6 @@ Partial Class Settings
         ' 
         ' CoBoxAutoBackupFrequency
         ' 
-        CoBoxAutoBackupFrequency.DrawMode = DrawMode.OwnerDrawFixed
         CoBoxAutoBackupFrequency.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxAutoBackupFrequency.FormattingEnabled = True
         TipSettings.SetImage(CoBoxAutoBackupFrequency, My.Resources.Resources.ImageBackup16)
@@ -815,11 +813,10 @@ Partial Class Settings
         ' 
         ' CoBoxRuleTypes
         ' 
-        CoBoxRuleTypes.DrawMode = DrawMode.OwnerDrawFixed
         CoBoxRuleTypes.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxRuleTypes.FormattingEnabled = True
         TipSettings.SetImage(CoBoxRuleTypes, Nothing)
-        CoBoxRuleTypes.Location = New Point(62, 139)
+        CoBoxRuleTypes.Location = New Point(64, 139)
         CoBoxRuleTypes.Name = "CoBoxRuleTypes"
         CoBoxRuleTypes.Size = New Size(146, 30)
         CoBoxRuleTypes.TabIndex = 1
@@ -830,7 +827,6 @@ Partial Class Settings
         LVRules.Columns.AddRange(New ColumnHeader() {ColType, ColCondition, ColAction, ColSummary})
         LVRules.EditableColumns = CType(resources.GetObject("LVRules.EditableColumns"), List(Of Boolean))
         LVRules.FullRowSelect = True
-        LVRules.HeaderStyle = ColumnHeaderStyle.Nonclickable
         TipSettings.SetImage(LVRules, Nothing)
         LVRules.InsertionLineColor = Color.Teal
         LVRules.Location = New Point(10, 11)

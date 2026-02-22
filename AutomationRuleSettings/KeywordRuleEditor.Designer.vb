@@ -54,12 +54,12 @@ Partial Class KeywordRuleEditor
         ' 
         ' CoBoxAction
         ' 
-        CoBoxAction.DrawMode = DrawMode.OwnerDrawFixed
         CoBoxAction.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxAction.FormattingEnabled = True
+        CoBoxAction.ItemHeight = 26
         CoBoxAction.Location = New Point(75, 125)
         CoBoxAction.Name = "CoBoxAction"
-        CoBoxAction.Size = New Size(169, 30)
+        CoBoxAction.Size = New Size(169, 32)
         CoBoxAction.TabIndex = 3
         ' 
         ' BtnSave
