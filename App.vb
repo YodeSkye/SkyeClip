@@ -572,6 +572,8 @@ Friend Module App
         Public Property TargetProcess As String
         Public Property OnEnter As Action(Of ContextEngine)
         Public Property OnExit As Action(Of ContextEngine)
+        Public Property EnterProfileID As Integer
+        Public Property ExitProfileID As Integer
         Public Property EnterDescription As String
         Public Property ExitDescription As String
 
@@ -630,8 +632,9 @@ Friend Module App
             End If
 
             _wasActive = isActive
-            Return False
+            Return isActive
         End Function
+
     End Class
     Friend Class TimeRule
         Implements IContextRule, IRulePreview
@@ -899,6 +902,11 @@ Friend Module App
         For Each rule In App.ContextRules
             rule.Matches(App.Context)
         Next
+        If App.Settings.UseProfiles AndAlso App.Context.Profile.CurrentProfileID <> 0 Then
+            If App.Settings.CurrentProfileID <> App.Context.Profile.CurrentProfileID Then
+                App.Settings.CurrentProfileID = App.Context.Profile.CurrentProfileID
+            End If
+        End If
     End Sub
 
     ' FORMS

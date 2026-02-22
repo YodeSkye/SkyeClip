@@ -611,10 +611,16 @@ Public Class Settings
         PanelRule.Controls.Clear()
 
         Select Case rule.RuleType
+            Case RuleType.ActiveAppRule
+                Dim editor As New ActiveAppRuleEditor()
+                AddHandler editor.RuleSaved, AddressOf OnRuleSaved
+                editor.LoadRule(CType(rule, App.ActiveAppRule))
+                PanelRule.Controls.Add(editor)
+                editor.Dock = DockStyle.Fill
             Case RuleType.KeywordRule
                 Dim editor As New KeywordRuleEditor()
                 AddHandler editor.RuleSaved, AddressOf OnRuleSaved
-                editor.LoadRule(CType(rule, KeywordRule))
+                editor.LoadRule(CType(rule, App.KeywordRule))
                 PanelRule.Controls.Add(editor)
                 editor.Dock = DockStyle.Fill
         End Select

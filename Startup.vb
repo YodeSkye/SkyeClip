@@ -57,14 +57,16 @@ Module Startup
         App.ContextRules.Add(New ActiveAppRule With {
             .TargetProcess = "firefox",
             .Mode = ActiveAppRule.ActivationMode.RunningProcess,
-            .OnEnter = Sub(ctx)
-                           App.Settings.CurrentProfileID = 63
-                       End Sub,
-            .OnExit = Sub(ctx)
-                          App.Settings.CurrentProfileID = 56
-                      End Sub,
-            .EnterDescription = "Firefox is running - Switch to Profile 63",
-            .ExitDescription = "Firefox is not running - Switch to Profile 56"
+                .OnEnter = Sub(ctx)
+                               ctx.Profile.CurrentProfileID = 63
+                           End Sub,
+                .OnExit = Sub(ctx)
+                              ctx.Profile.CurrentProfileID = 56
+                          End Sub,
+                .EnterProfileID = 63,
+                .ExitProfileID = 56,
+                .EnterDescription = "Firefox is running - Switch to Profile 63",
+                .ExitDescription = "Firefox is not running - Switch to Profile 56"
         })
         App.ContextRules.Add(New ActiveAppRule With {
             .TargetProcess = "devenv",
