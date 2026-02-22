@@ -546,7 +546,6 @@ Friend Module App
     End Class
     Friend Class ProfileContext
         Public Property CurrentProfileID As Integer
-        Public Property UseProfiles As Boolean
     End Class
     Friend Class ClipContext
         Public Property LastClipID As Integer = -1
@@ -902,11 +901,6 @@ Friend Module App
         For Each rule In App.ContextRules
             rule.Matches(App.Context)
         Next
-        If App.Settings.UseProfiles AndAlso App.Context.Profile.CurrentProfileID <> 0 Then
-            If App.Settings.CurrentProfileID <> App.Context.Profile.CurrentProfileID Then
-                App.Settings.CurrentProfileID = App.Context.Profile.CurrentProfileID
-            End If
-        End If
     End Sub
 
     ' FORMS

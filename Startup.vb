@@ -59,9 +59,11 @@ Module Startup
             .Mode = ActiveAppRule.ActivationMode.RunningProcess,
                 .OnEnter = Sub(ctx)
                                ctx.Profile.CurrentProfileID = 63
+                               If App.Settings.UseProfiles Then App.Settings.CurrentProfileID = 63
                            End Sub,
                 .OnExit = Sub(ctx)
                               ctx.Profile.CurrentProfileID = 56
+                              If App.Settings.UseProfiles Then App.Settings.CurrentProfileID = 56
                           End Sub,
                 .EnterProfileID = 63,
                 .ExitProfileID = 56,

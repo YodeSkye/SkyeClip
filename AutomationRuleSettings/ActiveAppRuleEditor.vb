@@ -93,10 +93,12 @@ Public Class ActiveAppRuleEditor
         ' Actions
         _rule.OnEnter = Sub(ctx)
                             ctx.Profile.CurrentProfileID = enterItem.ID
+                            If App.Settings.UseProfiles Then App.Settings.CurrentProfileID = enterItem.ID
                         End Sub
 
         _rule.OnExit = Sub(ctx)
                            ctx.Profile.CurrentProfileID = exitItem.ID
+                           If App.Settings.UseProfiles Then App.Settings.CurrentProfileID = exitItem.ID
                        End Sub
 
     End Sub
