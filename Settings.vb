@@ -20,7 +20,7 @@ Public Class Settings
         ILPageSelector.Images.Add(My.Resources.ImageHotKeys48)
         ILPageSelector.Images.Add(My.Resources.ImageBackup48)
         ILPageSelector.Images.Add(My.Resources.ImageProfiles48)
-        ILPageSelector.Images.Add(My.Resources.ImageApp48)
+        ILPageSelector.Images.Add(My.Resources.ImageAutomation48)
 
         LVPageSelector.Items.Add(New ListViewItem("General", 0))
         LVPageSelector.Items.Add(New ListViewItem("Clips", 1))
