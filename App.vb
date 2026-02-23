@@ -567,6 +567,10 @@ Friend Module App
             ForegroundWindow
             RunningProcess
         End Enum
+        Public Enum Actions
+            SwitchProfile
+            BlockCapture
+        End Enum
         Public Property Mode As ActivationMode = ActivationMode.ForegroundWindow
         Public Property TargetProcess As String
         Public Property OnEnter As Action(Of ContextEngine)
@@ -575,6 +579,7 @@ Friend Module App
         Public Property ExitProfileID As Integer
         Public Property EnterDescription As String
         Public Property ExitDescription As String
+        Public Property Action As Actions
 
         ' === UI Preview Properties ===
         Public ReadOnly Property RuleType As RuleType Implements IRulePreview.RuleType
@@ -582,7 +587,6 @@ Friend Module App
                 Return RuleType.ActiveAppRule
             End Get
         End Property
-
         Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
             Get
                 Dim modeText = If(Mode = ActivationMode.ForegroundWindow,
@@ -591,7 +595,6 @@ Friend Module App
                 Return $"{modeText} = {TargetProcess}"
             End Get
         End Property
-
         Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
             Get
                 Dim enterPart = If(String.IsNullOrEmpty(EnterDescription),
@@ -605,7 +608,6 @@ Friend Module App
                 Return $"{enterPart} / {exitPart}"
             End Get
         End Property
-
         Public ReadOnly Property Summary As String Implements IRulePreview.Summary
             Get
                 Return $"If {ConditionText} → {ActionText}"
@@ -777,7 +779,7 @@ Friend Module App
     Friend Class FormatRule
         Implements IContentRule, IRulePreview
 
-        Public Property FormatId As UInteger
+        Public Property FormatName As String
         Public Property Action As ContentAction
 
         ' === UI Preview Properties ===
@@ -789,7 +791,7 @@ Friend Module App
 
         Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
             Get
-                Return $"Format ID = {FormatId}"
+                Return $"Format Name = {FormatName}"
             End Get
         End Property
 
@@ -811,7 +813,7 @@ Friend Module App
                      repo As ClipRepository) _
                      Implements IContentRule.Apply
 
-            If formats.Any(Function(f) f.FormatId = FormatId) Then
+            If formats.Any(Function(f) f.FormatName = FormatName) Then
                 Select Case Action
                     Case ContentAction.AutoFavorite
                         repo.SetFavorite(clip.Id, True)

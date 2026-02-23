@@ -1,7 +1,7 @@
 ﻿
 Imports System.Text
 
-Public Class ActiveAppRuleEditor
+Public Class ActiveAppRuleProfilesEditor
 
     ' Declarations
     Private _rule As App.ActiveAppRule
@@ -46,6 +46,7 @@ Public Class ActiveAppRuleEditor
     End Sub
 
     ' Methods
+    ' Interface method — just a wrapper
     Friend Sub LoadRule(rule As App.ActiveAppRule)
         _rule = rule
 

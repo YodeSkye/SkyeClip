@@ -612,9 +612,26 @@ Public Class Settings
 
         Select Case rule.RuleType
             Case RuleType.ActiveAppRule
-                Dim editor As New ActiveAppRuleEditor()
+                Dim activeRule = CType(rule, App.ActiveAppRule)
+                Dim editor As UserControl = Nothing
+                Select Case activeRule.Action
+                    Case App.ActiveAppRule.Actions.SwitchProfile
+                        Dim ed = New ActiveAppRuleProfilesEditor()
+                        AddHandler ed.RuleSaved, AddressOf OnRuleSaved
+                        ed.LoadRule(activeRule)
+                        editor = ed
+                    Case App.ActiveAppRule.Actions.BlockCapture
+                        Dim ed = New ActiveAppRuleBlockEditor()
+                        AddHandler ed.RuleSaved, AddressOf OnRuleSaved
+                        ed.LoadRule(activeRule)
+                        editor = ed
+                End Select
+                PanelRule.Controls.Add(editor)
+                editor.Dock = DockStyle.Fill
+            Case RuleType.TimeRule
+                Dim editor As New TimeRuleEditor()
                 AddHandler editor.RuleSaved, AddressOf OnRuleSaved
-                editor.LoadRule(CType(rule, App.ActiveAppRule))
+                editor.LoadRule(CType(rule, App.TimeRule))
                 PanelRule.Controls.Add(editor)
                 editor.Dock = DockStyle.Fill
             Case RuleType.KeywordRule
