@@ -549,6 +549,7 @@ Friend Module App
     End Class
     Friend Class ClipContext
         Public Property LastClipID As Integer = -1
+        Public Property IsNewClip As Boolean = False
     End Class
     Friend Class TimeContext
         Public Property Now As DateTime
@@ -696,19 +697,16 @@ Friend Module App
                 Return RuleType.SourceAppRule
             End Get
         End Property
-
         Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
             Get
                 Return $"Source App = {AppName}"
             End Get
         End Property
-
         Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
             Get
                 Return Action.ToString()
             End Get
         End Property
-
         Public ReadOnly Property Summary As String Implements IRulePreview.Summary
             Get
                 Return $"If {ConditionText} → {ActionText}"
@@ -726,10 +724,13 @@ Friend Module App
                     Case ContentAction.AutoFavorite
                         repo.SetFavorite(clip.Id, True)
                     Case ContentAction.AutoIgnore
-                        repo.DeleteClip(clip.Id)
+                        If Context.Clip.IsNewClip Then
+                            repo.DeleteClip(clip.Id)
+                        End If
                 End Select
             End If
         End Sub
+
     End Class
     Friend Class KeywordRule
         Implements IContentRule, IRulePreview
@@ -770,7 +771,9 @@ Friend Module App
                     Case ContentAction.AutoFavorite
                         repo.SetFavorite(clip.Id, True)
                     Case ContentAction.AutoIgnore
-                        repo.DeleteClip(clip.Id)
+                        If Context.Clip.IsNewClip Then
+                            repo.DeleteClip(clip.Id)
+                        End If
                 End Select
             End If
         End Sub
@@ -788,19 +791,16 @@ Friend Module App
                 Return RuleType.FormatRule
             End Get
         End Property
-
         Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
             Get
                 Return $"Format Name = {FormatName}"
             End Get
         End Property
-
         Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
             Get
                 Return Action.ToString()
             End Get
         End Property
-
         Public ReadOnly Property Summary As String Implements IRulePreview.Summary
             Get
                 Return $"If {ConditionText} → {ActionText}"
@@ -812,16 +812,18 @@ Friend Module App
                      searchableText As String,
                      repo As ClipRepository) _
                      Implements IContentRule.Apply
-
             If formats.Any(Function(f) f.FormatName = FormatName) Then
                 Select Case Action
                     Case ContentAction.AutoFavorite
                         repo.SetFavorite(clip.Id, True)
                     Case ContentAction.AutoIgnore
-                        repo.DeleteClip(clip.Id)
+                        If Context.Clip.IsNewClip Then
+                            repo.DeleteClip(clip.Id)
+                        End If
                 End Select
             End If
         End Sub
+
     End Class
     Friend Enum ContentAction
         AutoFavorite
@@ -1612,7 +1614,15 @@ Friend Module App
         RebuildDelegatesForAllRules()
     End Sub
     Friend Sub SaveAllRulesToRegistry()
-        ' === Context Rules ===
+
+        ' 1. Clear old entries
+        For Each name In Skye.Common.RegistryHelper.GetValueNames
+            If name.StartsWith("ContextRule") OrElse name.StartsWith("ContentRule") Then
+                Skye.Common.RegistryHelper.DeleteValue(name)
+            End If
+        Next
+
+        ' === Write Context Rules ===
         Skye.Common.RegistryHelper.SetInt("ContextRuleCount", ContextRules.Count)
 
         For i = 0 To ContextRules.Count - 1
@@ -1641,7 +1651,7 @@ Friend Module App
             End Select
         Next
 
-        ' === Content Rules ===
+        ' === Write Content Rules ===
         Skye.Common.RegistryHelper.SetInt("ContentRuleCount", ContentRules.Count)
 
         For i = 0 To ContentRules.Count - 1

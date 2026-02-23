@@ -1,5 +1,4 @@
 ﻿
-Imports System.ComponentModel.Design.ObjectSelectorEditor
 Imports Skye.UI
 
 Public Class Settings
@@ -351,12 +350,12 @@ Public Class Settings
         If LVRules.SelectedItems.Count = 0 Then Exit Sub
 
         Dim item As ListViewItem = LVRules.SelectedItems(0)
-        Dim rule As App.IRulePreview = CType(item.Tag, App.IRulePreview)
+        Dim rule = CType(item.Tag, App.IRulePreview)
         Select Case rule.RuleType
             Case RuleType.ActiveAppRule, RuleType.TimeRule
-                App.ContextRules.Remove(CType(rule, IContextRule))
+                App.DeleteContextRule(CType(rule, App.IContextRule))
             Case RuleType.SourceAppRule, RuleType.KeywordRule, RuleType.FormatRule
-                App.ContentRules.Remove(CType(rule, IContentRule))
+                App.DeleteContentRule(CType(rule, App.IContentRule))
         End Select
 
         RefreshRuleList()

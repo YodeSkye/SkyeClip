@@ -124,6 +124,7 @@ Friend Class ClipRepository
 
         ' 2) Build preview
         Dim preview As String = BuildPreviewFromFormats(formats)
+        Dim isNew As Boolean
 
         ' 3) Hash
         Dim formatsForHash = FilterFormatsForHash(formats)
@@ -154,8 +155,10 @@ Friend Class ClipRepository
                 updCmd.Parameters.AddWithValue("@now", nowVal)
                 updCmd.Parameters.AddWithValue("@id", entryId)
                 updCmd.ExecuteNonQuery()
+                isNew = False
             Else
                 ' New clip
+                isNew = True
                 Dim sourceInfo = GetSourceAppInfo()
                 Dim insertEntry As New SQLiteCommand("
                 INSERT INTO Clips
@@ -192,6 +195,8 @@ Friend Class ClipRepository
                 Next
             End If
             App.Context.Clip.LastClipID = entryId
+            App.Context.Clip.IsNewClip = isNew
+
         End Using
     End Sub
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>

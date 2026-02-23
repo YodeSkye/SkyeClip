@@ -53,61 +53,6 @@ Module Startup
         App.Tray = New TrayAppContext()
         AddHandler Skye.UI.ThemeManager.ThemeChanged, AddressOf App.Tray.OnThemeChanged
         App.MaintenanceTimer.Start()
-
-
-        'App.ContextRules.Add(New ActiveAppRule With {
-        '    .TargetProcess = "firefox",
-        '    .Mode = ActiveAppRule.ActivationMode.RunningProcess,
-        '        .OnEnter = Sub(ctx)
-        '                       ctx.Profile.CurrentProfileID = 63
-        '                       If App.Settings.UseProfiles Then App.Settings.CurrentProfileID = 63
-        '                   End Sub,
-        '        .OnExit = Sub(ctx)
-        '                      ctx.Profile.CurrentProfileID = 56
-        '                      If App.Settings.UseProfiles Then App.Settings.CurrentProfileID = 56
-        '                  End Sub,
-        '        .EnterProfileID = 63,
-        '        .ExitProfileID = 56,
-        '        .EnterDescription = "Firefox is running - Switch to Profile 63",
-        '        .ExitDescription = "Firefox is not running - Switch to Profile 56",
-        '        .Action = ActiveAppRule.Actions.SwitchProfile
-        '})
-        'App.ContextRules.Add(New ActiveAppRule With {
-        '    .TargetProcess = "devenv",
-        '    .Mode = ActiveAppRule.ActivationMode.ForegroundWindow,
-        '    .OnEnter = Sub(ctx)
-        '                   ctx.BlockCapture = True
-        '               End Sub,
-        '    .OnExit = Sub(ctx)
-        '                  ctx.BlockCapture = False
-        '              End Sub,
-        '    .EnterDescription = "Visual Studio is active - Block Capture",
-        '    .ExitDescription = "Visual Studio is not active - Unblock Capture",
-        '    .Action = ActiveAppRule.Actions.BlockCapture
-        '})
-        'App.ContextRules.Add(New TimeRule With {
-        '    .StartTime = TimeSpan.FromHours(9),
-        '    .EndTime = TimeSpan.FromHours(20),
-        '    .TargetProfileID = 63,
-        '    .ApplyProfile = Sub(id)
-        '                        App.Settings.CurrentProfileID = id
-        '                        Debug.WriteLine("TimeRule Activated: " & id)
-        '                    End Sub
-        '})
-        'ContentRules.Add(New SourceAppRule With {
-        '    .AppName = "notepad",
-        '    .Action = ContentAction.AutoIgnore
-        '})
-        'ContentRules.Add(New KeywordRule With {
-        '    .Keyword = "test",
-        '    .Action = ContentAction.AutoFavorite
-        '})
-        'ContentRules.Add(New FormatRule With {
-        '    .FormatName = "Rich Text Format",
-        '    .Action = ContentAction.AutoFavorite
-        '})
-
-
         App.AutomationTimer.Start()
         Application.Run(App.Tray)
 
