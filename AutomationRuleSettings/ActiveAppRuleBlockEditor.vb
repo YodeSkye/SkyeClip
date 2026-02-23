@@ -45,9 +45,6 @@ Public Class ActiveAppRuleBlockEditor
         _rule.EnterDescription = TxtBoxEnterDescription.Text
         _rule.ExitDescription = TxtBoxExitDescription.Text
 
-        _rule.OnEnter = Sub(ctx) ctx.BlockCapture = True
-        _rule.OnExit = Sub(ctx) ctx.BlockCapture = False
-
     End Sub
 
 End Class

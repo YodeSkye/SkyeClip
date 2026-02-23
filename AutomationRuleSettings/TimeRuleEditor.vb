@@ -64,11 +64,6 @@ Public Class TimeRuleEditor
         Dim item As ProfileItem = CType(CoBoxProfile.SelectedItem, ProfileItem)
         _rule.TargetProfileID = item.ID
 
-        ' Save action
-        _rule.ApplyProfile = Sub(id)
-                                 App.Settings.CurrentProfileID = id
-                             End Sub
-
     End Sub
 
 End Class

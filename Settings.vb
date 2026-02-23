@@ -103,12 +103,14 @@ Public Class Settings
             Case RuleType.ActiveAppRule, RuleType.TimeRule
                 If Not App.ContextRules.Contains(CType(rule, IContextRule)) Then
                     App.ContextRules.Add(CType(rule, IContextRule))
+                    App.RebuildDelegatesForRule(CType(rule, IContextRule))
                 End If
             Case RuleType.SourceAppRule, RuleType.KeywordRule, RuleType.FormatRule
                 If Not App.ContentRules.Contains(CType(rule, IContentRule)) Then
                     App.ContentRules.Add(CType(rule, IContentRule))
                 End If
         End Select
+        App.SaveAllRulesToRegistry()
         RefreshRuleList()
         PanelRule.Controls.Clear()
     End Sub
@@ -328,6 +330,10 @@ Public Class Settings
         Select Case selectedType
             Case App.RuleType.ActiveAppRule
                 newRule = New App.ActiveAppRule()
+                CType(newRule, App.ActiveAppRule).Action = App.ActiveAppRule.Actions.SwitchProfile
+            Case App.RuleType.BlockRule
+                newRule = New App.ActiveAppRule()
+                CType(newRule, App.ActiveAppRule).Action = App.ActiveAppRule.Actions.BlockCapture
             Case App.RuleType.TimeRule
                 newRule = New App.TimeRule()
             Case App.RuleType.SourceAppRule
@@ -588,7 +594,7 @@ Public Class Settings
 
         ' Context Rules (ActiveAppRule, TimeRule)
         For Each r As App.IRulePreview In ContextRules
-            Dim item As New ListViewItem(r.RuleType.ToString())
+            Dim item As New ListViewItem(GetDisplayRuleType(r))
             item.SubItems.Add(r.ConditionText)
             item.SubItems.Add(r.ActionText)
             item.SubItems.Add(r.Summary)
@@ -634,10 +640,22 @@ Public Class Settings
                 editor.LoadRule(CType(rule, App.TimeRule))
                 PanelRule.Controls.Add(editor)
                 editor.Dock = DockStyle.Fill
+            Case RuleType.SourceAppRule
+                Dim editor As New SourceAppRuleEditor()
+                AddHandler editor.RuleSaved, AddressOf OnRuleSaved
+                editor.LoadRule(CType(rule, App.SourceAppRule))
+                PanelRule.Controls.Add(editor)
+                editor.Dock = DockStyle.Fill
             Case RuleType.KeywordRule
                 Dim editor As New KeywordRuleEditor()
                 AddHandler editor.RuleSaved, AddressOf OnRuleSaved
                 editor.LoadRule(CType(rule, App.KeywordRule))
+                PanelRule.Controls.Add(editor)
+                editor.Dock = DockStyle.Fill
+            Case RuleType.FormatRule
+                Dim editor As New FormatRuleEditor()
+                AddHandler editor.RuleSaved, AddressOf OnRuleSaved
+                editor.LoadRule(CType(rule, App.FormatRule))
                 PanelRule.Controls.Add(editor)
                 editor.Dock = DockStyle.Fill
         End Select
@@ -725,6 +743,16 @@ Public Class Settings
         App.Settings.Profiles = newList
         App.Settings.Save()
     End Sub
+    Private Function GetDisplayRuleType(r As App.IRulePreview) As String
+        If r.RuleType = RuleType.ActiveAppRule Then
+            Dim ar = TryCast(r, ActiveAppRule)
+            If ar IsNot Nothing AndAlso ar.Action = ActiveAppRule.Actions.BlockCapture Then
+                Return "BlockAppRule"
+            End If
+        End If
+
+        Return r.RuleType.ToString()
+    End Function
     Private Sub CheckMove(ByRef location As Point)
         Dim wa As Rectangle = Screen.FromPoint(location).WorkingArea
         If location.X + Me.Width > wa.Right Then

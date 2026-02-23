@@ -829,6 +829,7 @@ Friend Module App
     End Enum
     Friend Enum RuleType
         ActiveAppRule
+        BlockRule
         TimeRule
         SourceAppRule
         KeywordRule
@@ -1470,6 +1471,212 @@ Friend Module App
             Return String.Empty
         End Try
     End Function
+    Friend Sub RebuildDelegatesForRule(r As IContextRule)
+        Dim preview = DirectCast(r, IRulePreview)
+
+        Select Case preview.RuleType
+
+            Case RuleType.ActiveAppRule
+                Dim ar = DirectCast(r, ActiveAppRule)
+
+                ar.OnEnter = Sub(ctx)
+                                 Select Case ar.Action
+                                     Case ActiveAppRule.Actions.SwitchProfile
+                                         ctx.Profile.CurrentProfileID = ar.EnterProfileID
+                                         App.Settings.CurrentProfileID = ar.EnterProfileID
+                                     Case ActiveAppRule.Actions.BlockCapture
+                                         ctx.BlockCapture = True
+                                 End Select
+                             End Sub
+
+                ar.OnExit = Sub(ctx)
+                                Select Case ar.Action
+                                    Case ActiveAppRule.Actions.SwitchProfile
+                                        ctx.Profile.CurrentProfileID = ar.ExitProfileID
+                                        App.Settings.CurrentProfileID = ar.ExitProfileID
+                                    Case ActiveAppRule.Actions.BlockCapture
+                                        ctx.BlockCapture = False
+                                End Select
+                            End Sub
+
+            Case RuleType.TimeRule
+                Dim tr = DirectCast(r, TimeRule)
+
+                tr.ApplyProfile = Sub(profileId As Integer)
+                                      Context.Profile.CurrentProfileID = profileId
+                                      App.Settings.CurrentProfileID = profileId
+                                  End Sub
+
+        End Select
+    End Sub
+    Friend Sub RebuildDelegatesForAllRules()
+        For Each r In ContextRules
+            RebuildDelegatesForRule(r)
+        Next
+    End Sub
+    Friend Sub LoadAllRulesFromRegistry()
+        ContextRules.Clear()
+        ContentRules.Clear()
+
+        ' === Context Rules ===
+        Dim ctxCount = Skye.Common.RegistryHelper.GetInt("ContextRuleCount", 0)
+
+        For i = 0 To ctxCount - 1
+            Dim keyPrefix = $"ContextRule{i}_"
+            Dim rt = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "RuleType", -1), RuleType)
+
+            Select Case rt
+                Case RuleType.ActiveAppRule
+                    Dim ar As New ActiveAppRule()
+                    ar.Mode = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Mode", 0), ActiveAppRule.ActivationMode)
+                    ar.TargetProcess = Skye.Common.RegistryHelper.GetString(keyPrefix & "TargetProcess", String.Empty)
+                    ar.Action = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Action", 0), ActiveAppRule.Actions)
+                    ar.EnterProfileID = Skye.Common.RegistryHelper.GetInt(keyPrefix & "EnterProfileID", 0)
+                    ar.ExitProfileID = Skye.Common.RegistryHelper.GetInt(keyPrefix & "ExitProfileID", 0)
+                    ar.EnterDescription = Skye.Common.RegistryHelper.GetString(keyPrefix & "EnterDescription", String.Empty)
+                    ar.ExitDescription = Skye.Common.RegistryHelper.GetString(keyPrefix & "ExitDescription", String.Empty)
+
+                    ' Re‑wire delegates
+                    ar.OnEnter = Sub(ctx As ContextEngine)
+                                     Select Case ar.Action
+                                         Case ActiveAppRule.Actions.SwitchProfile
+                                             ' Switch into the target profile when rule becomes active
+                                             ctx.Profile.CurrentProfileID = ar.EnterProfileID
+                                             App.Settings.CurrentProfileID = ar.EnterProfileID
+                                         Case ActiveAppRule.Actions.BlockCapture
+                                             ' Block capture while this rule is active
+                                             ctx.BlockCapture = True
+                                     End Select
+                                 End Sub
+
+                    ar.OnExit = Sub(ctx As ContextEngine)
+                                    Select Case ar.Action
+                                        Case ActiveAppRule.Actions.SwitchProfile
+                                            ' Optionally switch back on exit (if ExitProfileID is meaningful)
+                                            If ar.ExitProfileID <> 0 Then
+                                                ctx.Profile.CurrentProfileID = ar.ExitProfileID
+                                                App.Settings.CurrentProfileID = ar.ExitProfileID
+                                            End If
+                                        Case ActiveAppRule.Actions.BlockCapture
+                                            ' Restore capture when rule is no longer active
+                                            ctx.BlockCapture = False
+                                    End Select
+                                End Sub
+
+                    ContextRules.Add(ar)
+                Case RuleType.TimeRule
+                    Dim tr As New TimeRule()
+                    Dim startStr = Skye.Common.RegistryHelper.GetString(keyPrefix & "StartTime", "00:00:00")
+                    Dim endStr = Skye.Common.RegistryHelper.GetString(keyPrefix & "EndTime", "00:00:00")
+                    tr.StartTime = TimeSpan.Parse(startStr)
+                    tr.EndTime = TimeSpan.Parse(endStr)
+                    tr.TargetProfileID = Skye.Common.RegistryHelper.GetInt(keyPrefix & "TargetProfileID", 0)
+
+                    ' Re‑wire delegate
+                    tr.ApplyProfile = Sub(profileId As Integer)
+                                          Context.Profile.CurrentProfileID = profileId
+                                          App.Settings.CurrentProfileID = profileId
+                                      End Sub
+
+                    ContextRules.Add(tr)
+            End Select
+        Next
+
+        ' === Content Rules ===
+        Dim cntCount = Skye.Common.RegistryHelper.GetInt("ContentRuleCount", 0)
+
+        For i = 0 To cntCount - 1
+            Dim keyPrefix = $"ContentRule{i}_"
+            Dim rt = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "RuleType", -1), RuleType)
+
+            Select Case rt
+                Case RuleType.SourceAppRule
+                    Dim sr As New SourceAppRule()
+                    sr.AppName = Skye.Common.RegistryHelper.GetString(keyPrefix & "AppName", String.Empty)
+                    sr.Action = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Action", 0), ContentAction)
+                    ContentRules.Add(sr)
+
+                Case RuleType.KeywordRule
+                    Dim kr As New KeywordRule()
+                    kr.Keyword = Skye.Common.RegistryHelper.GetString(keyPrefix & "Keyword", String.Empty)
+                    kr.Action = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Action", 0), ContentAction)
+                    ContentRules.Add(kr)
+
+                Case RuleType.FormatRule
+                    Dim fr As New FormatRule()
+                    fr.FormatName = Skye.Common.RegistryHelper.GetString(keyPrefix & "FormatName", String.Empty)
+                    fr.Action = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Action", 0), ContentAction)
+                    ContentRules.Add(fr)
+            End Select
+        Next
+        RebuildDelegatesForAllRules()
+    End Sub
+    Friend Sub SaveAllRulesToRegistry()
+        ' === Context Rules ===
+        Skye.Common.RegistryHelper.SetInt("ContextRuleCount", ContextRules.Count)
+
+        For i = 0 To ContextRules.Count - 1
+            Dim r = ContextRules(i)
+            Dim keyPrefix = $"ContextRule{i}_"
+
+            Dim preview = DirectCast(r, IRulePreview)
+            Skye.Common.RegistryHelper.SetInt(keyPrefix & "RuleType", CInt(preview.RuleType))
+
+            Select Case preview.RuleType
+                Case RuleType.ActiveAppRule
+                    Dim ar = DirectCast(r, ActiveAppRule)
+                    Skye.Common.RegistryHelper.SetInt(keyPrefix & "Mode", CInt(ar.Mode))
+                    Skye.Common.RegistryHelper.SetString(keyPrefix & "TargetProcess", ar.TargetProcess)
+                    Skye.Common.RegistryHelper.SetInt(keyPrefix & "Action", CInt(ar.Action))
+                    Skye.Common.RegistryHelper.SetInt(keyPrefix & "EnterProfileID", ar.EnterProfileID)
+                    Skye.Common.RegistryHelper.SetInt(keyPrefix & "ExitProfileID", ar.ExitProfileID)
+                    Skye.Common.RegistryHelper.SetString(keyPrefix & "EnterDescription", ar.EnterDescription)
+                    Skye.Common.RegistryHelper.SetString(keyPrefix & "ExitDescription", ar.ExitDescription)
+
+                Case RuleType.TimeRule
+                    Dim tr = DirectCast(r, TimeRule)
+                    Skye.Common.RegistryHelper.SetString(keyPrefix & "StartTime", tr.StartTime.ToString())
+                    Skye.Common.RegistryHelper.SetString(keyPrefix & "EndTime", tr.EndTime.ToString())
+                    Skye.Common.RegistryHelper.SetInt(keyPrefix & "TargetProfileID", tr.TargetProfileID)
+            End Select
+        Next
+
+        ' === Content Rules ===
+        Skye.Common.RegistryHelper.SetInt("ContentRuleCount", ContentRules.Count)
+
+        For i = 0 To ContentRules.Count - 1
+            Dim r = ContentRules(i)
+            Dim keyPrefix = $"ContentRule{i}_"
+
+            Dim preview = DirectCast(r, IRulePreview)
+            Skye.Common.RegistryHelper.SetInt(keyPrefix & "RuleType", CInt(preview.RuleType))
+
+            Select Case preview.RuleType
+                Case RuleType.SourceAppRule
+                    Dim sr = DirectCast(r, SourceAppRule)
+                    Skye.Common.RegistryHelper.SetString(keyPrefix & "AppName", sr.AppName)
+                    Skye.Common.RegistryHelper.SetInt(keyPrefix & "Action", CInt(sr.Action))
+
+                Case RuleType.KeywordRule
+                    Dim kr = DirectCast(r, KeywordRule)
+                    Skye.Common.RegistryHelper.SetString(keyPrefix & "Keyword", kr.Keyword)
+                    Skye.Common.RegistryHelper.SetInt(keyPrefix & "Action", CInt(kr.Action))
+
+                Case RuleType.FormatRule
+                    Dim fr = DirectCast(r, FormatRule)
+                    Skye.Common.RegistryHelper.SetString(keyPrefix & "FormatName", fr.FormatName)
+                    Skye.Common.RegistryHelper.SetInt(keyPrefix & "Action", CInt(fr.Action))
+            End Select
+        Next
+    End Sub
+    Friend Sub DeleteContextRule(rule As IContextRule)
+        ContextRules.Remove(rule)
+        SaveAllRulesToRegistry()
+    End Sub
+    Friend Sub DeleteContentRule(rule As IContentRule)
+        ContentRules.Remove(rule)
+        SaveAllRulesToRegistry()
+    End Sub
 
     ' METHODS
     Friend Function BuildLiveClipboardPreview() As String
