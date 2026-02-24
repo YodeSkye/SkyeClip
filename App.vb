@@ -427,6 +427,7 @@ Friend Module App
             HotKeys.ShowScratchPad = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowScratchPad", CInt(Keys.S)), Keys)
 
             ' Automation, Recent Network Names
+            LoadAllRulesFromRegistry()
             Context.Network.RecentNames = RegistryHelper.GetStringArray("RecentNetworks", Array.Empty(Of String)()).ToList()
 
             WriteToLog("Settings Loaded (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")

@@ -27,7 +27,6 @@ Module Startup
         Skye.Common.RegistryHelper.BaseKey = "Software\" + App.GetAssemblyName 'Use standard registry key for release builds
 #End If
         App.Settings.Load()
-        App.LoadAllRulesFromRegistry()
 
         ' Get Theme
         If App.Settings.ThemeAuto Then
