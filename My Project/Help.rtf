@@ -184,6 +184,61 @@ If Profiles are turned off:\par
 - Profile\f4\_\f0 specific settings are ignored until Profiles are re\f4\_\f0 enabled\par
 Your profile data is preserved and will be restored when Profiles are turned back on\lang1033 .\cf2\b\lang9\par
 \f1\par
+Rules Overview\cf0\b0\par
+Rules let SkyeClip react automatically to your current context. Each rule watches for a specific condition\f2\emdash such as the app you\rquote re using, the network you\rquote re connected to, the time of day, or the content of the clipboard\emdash and performs an action when that condition becomes true. Rules help SkyeClip stay out of your way, protect your privacy, and switch profiles automatically when needed.\par
+SkyeClip supports \f1\lang1033 six\f2\lang9  types of rules: App Rules, Location Rules, Time Rules,\f1\lang1033  Source\f2\lang9  Rules\f1\lang1033 , Keyword Rules, and Format Rules\f2\lang9 . Each rule type has its own condition and can trigger actions such as switching profiles or blocking clipboard capture.\par
+\par
+\i App Rules\i0\par
+App Rules trigger when a specific application becomes active.\f1\lang1033  \f2\lang9 These are useful when different apps require different clipboard behavior.\par
+Examples:\par
+- Switch to a \ldblquote Work\rdblquote  profile when Outlook or Teams is active.\par
+- Block clipboard capture when using a password manager.\par
+- Switch to a \ldblquote Creative\rdblquote  profile when Photoshop is active.\par
+App Rules activate as soon as the chosen app \f1\lang1033 is started or stopped, or \f2\lang9 becomes the foreground window.\par
+\par
+\i Location Rules\i0\par
+Location Rules trigger based on the network you\rquote re currently connected to.\f1\lang1033  \f2\lang9 SkyeClip detects your Wi\_Fi SSID or network name and applies the rule when it matches.\par
+Examples:\par
+- Switch to a \ldblquote Home\rdblquote  profile when connected to your home Wi\_Fi.\par
+- Switch to a \ldblquote Work\rdblquote  profile when connected to your office network.\par
+- Block clipboard capture automatically on public Wi\_Fi.\par
+Location Rules update whenever your network connection changes.\par
+\par
+\i Time Rules\i0\par
+Time Rules trigger based on the current time of day\f1\lang1033 . \f2\lang9 They\rquote re useful for predictable routines or scheduled behavior changes.\par
+Examples:\par
+- Switch to a \ldblquote Work\rdblquote  profile during work hours.\par
+- Switch to a \ldblquote Personal\rdblquote  profile in the evening.\par
+- Block clipboard capture overnight.\par
+Time Rules activate when the system clock enters the defined time range.\par
+\par
+\i Content Rules\i0\par
+Content Rules\f1\lang1033  based on Source, Keyword, or Format\f2\lang9  trigger based on what\rquote s currently in the clipboard.\f1\lang1033  \f2\lang9 They can match \f1\lang1033 the sending app, \f2\lang9 keywords, detect formats, or react to specific types of content.\par
+Examples:\par
+- Auto\_favorite clips containing certain keywords.\par
+- Block clipboard capture when sensitive content is detected.\par
+- \f1\lang1033 Auto-ignore \f2\lang9 when copying specific types of data.\par
+Content Rules activate whenever the clipboard changes and the content matches the rule.\par
+\par
+\i Actions\i0\par
+Each rule can perform one or more actions when its condition becomes true:\par
+- Switch Profile\f1\lang1033 , \f2\lang9 chang\f1\lang1033 ing\f2\lang9  SkyeClip\rquote s active profile automatically.\par
+- Block Clipboard Capture\f1\lang1033 , \f2\lang9 prevent\f1\lang1033 ing\f2\lang9  SkyeClip from saving clipboard history while still showing the live clipboard preview.\par
+- Auto\_Favorite\f1\lang1033 , \f2\lang9 mark\f1\lang1033 ing\f2\lang9  matching clips as favorites for quick access.\par
+\f1\lang1033 - Auto-Ignore, preventing capture based on the content of the clip.\f2\lang9\par
+Actions remain in effect until the rule\rquote s condition is no longer true.\par
+\par
+\i How Rules Work Together\par
+\i0 Multiple rules can be active at the same time.\par
+If more than one rule applies, SkyeClip uses the most recent rule that became active. When a rule stops matching, SkyeClip returns to the previous state or profile.\f1\lang1033  \f2\lang9 Rules are evaluated continuously as your context changes\emdash apps, networks, time, and clipboard content.\par
+\par
+Tips for Using Rules\par
+- Keep rules simple and focused on one behavior.\par
+- Use profiles to group settings and let rules switch between them.\par
+- Use Location Rules for privacy and safety on public networks.\par
+- Use App Rules to tailor SkyeClip to your workflow.\par
+- Use Content Rules to automate repetitive tasks or protect sensitive data.\par
+\cf2\b\f1\par
 App View\cf0\b0\par
 \par
 The App View is a compact control panel that provides quick access to SkyeClip\rquote s core features. It appears as a small window with buttons for common tasks, making it easy to navigate without opening a full application.\par
