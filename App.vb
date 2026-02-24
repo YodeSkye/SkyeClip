@@ -262,7 +262,7 @@ Friend Module App
                         _currentProfileID = 0
                     End If
                     Skye.Common.RegistryHelper.SetInt("CurrentProfileID", _currentProfileID)
-                    Tray.RefreshMenu()
+                    Tray.UpdateUI(False)
                     If App.Settings.ThemeAuto Then
                         Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
                     Else

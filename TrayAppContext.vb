@@ -153,7 +153,10 @@ Friend Class TrayAppContext
         Dim signatureBytes = GetClipboardSignature()
         If ShouldIgnoreClip(signatureBytes, now) Then Return
 
-        If Context.BlockCapture Then Return
+        If Context.BlockCapture Then
+            UpdateUI(False)
+            Return
+        End If
 
         ' Database
         repo.SaveClip()
@@ -410,7 +413,8 @@ Friend Class TrayAppContext
         End If
 
         ' Tray text
-        NIClipboard.Text = App.GetAppTitle & vbCrLf & App.CBLivePreview
+        'NIClipboard.Text = App.GetAppTitle & vbCrLf & App.CBLivePreview
+        NIClipboard.Text = GetAppTitle() & If(App.Settings.UseProfiles, " (" & App.Settings.GetProfileName(App.Settings.CurrentProfileID) & ")", String.Empty) & vbCrLf & App.CBLivePreview
 
     End Sub
     Friend Shared Sub RefreshFavoritesMenu(menu As ContextMenuStrip, repo As ClipRepository, clickHandler As MouseEventHandler, keyHandler As KeyEventHandler)
