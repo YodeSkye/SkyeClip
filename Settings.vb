@@ -27,7 +27,7 @@ Public Class Settings
         LVPageSelector.Items.Add(New ListViewItem("Hot Keys", 2))
         LVPageSelector.Items.Add(New ListViewItem("Backup", 3))
         LVPageSelector.Items.Add(New ListViewItem("Profiles", 4))
-        LVPageSelector.Items.Add(New ListViewItem("Automation", 5))
+        LVPageSelector.Items.Add(New ListViewItem("Rules", 5))
         LVPageSelector.Items(0).Selected = True
 
         PanelGeneral.Dock = DockStyle.Fill
@@ -699,7 +699,7 @@ Public Class Settings
             Case "Profiles"
                 PanelProfiles.Enabled = True
                 PanelProfiles.BringToFront()
-            Case "Automation"
+            Case "Rules"
                 PanelAutomation.Enabled = True
                 PanelAutomation.BringToFront()
         End Select
