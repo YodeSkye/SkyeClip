@@ -2,12 +2,16 @@
 Imports System.IO
 Imports System.IO.Compression
 Imports System.Linq.Expressions
+Imports System.Net.NetworkInformation
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 Imports System.Text
 Imports System.Text.RegularExpressions
+Imports Microsoft.VisualBasic.Devices
 Imports Microsoft.Win32
+Imports Skye.Common
 Imports Skye.UI
+Imports SkyeClip.App
 Imports SkyeClip.ClipRepository
 
 Friend Module App
@@ -422,6 +426,9 @@ Friend Module App
             HotKeys.ShowViewer = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowViewer", CInt(Keys.V)), Keys)
             HotKeys.ShowScratchPad = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowScratchPad", CInt(Keys.S)), Keys)
 
+            ' Automation, Recent Network Names
+            Context.Network.RecentNames = RegistryHelper.GetStringArray("RecentNetworks", Array.Empty(Of String)()).ToList()
+
             WriteToLog("Settings Loaded (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
         End Sub
         Friend Shared Sub Save()
@@ -479,6 +486,10 @@ Friend Module App
             Skye.Common.RegistryHelper.SetInt("HotKeyToggleFavorite", CInt(HotKeys.ToggleFavorite))
             Skye.Common.RegistryHelper.SetInt("HotKeyShowViewer", CInt(HotKeys.ShowViewer))
             Skye.Common.RegistryHelper.SetInt("HotKeyShowScratchPad", CInt(HotKeys.ShowScratchPad))
+
+            ' Automation, Recent Network Names
+            RegistryHelper.SetStringArray("RecentNetworks", Context.Network.RecentNames.ToArray())
+
             WriteToLog("Settings Saved (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
         End Sub
         Friend Shared Function GetNextProfileID() As Integer
@@ -544,6 +555,12 @@ Friend Module App
         Public Property ActiveProcessName As String = String.Empty
         Public Property ActiveWindowTitle As String = String.Empty
     End Class
+    Friend Class NetworkContext
+        Public Property CurrentName As String
+        Public Property LastName As String
+        Public Property LastChangedAt As DateTime
+        Public Property RecentNames As New List(Of String)
+    End Class
     Friend Class ProfileContext
         Public Property CurrentProfileID As Integer
     End Class
@@ -556,6 +573,7 @@ Friend Module App
     End Class
     Friend Class ContextEngine
         Public ReadOnly Property App As New AppContext
+        Public ReadOnly Property Network As New NetworkContext
         Public ReadOnly Property Profile As New ProfileContext
         Public ReadOnly Property Clip As New ClipContext
         Public ReadOnly Property Time As New TimeContext
@@ -635,6 +653,109 @@ Friend Module App
 
             _wasActive = isActive
             Return isActive
+        End Function
+
+    End Class
+    Friend Class LocationProfileRule
+        Implements IContextRule, IRulePreview
+
+        Public Property TargetName As String
+        Public Property EnterProfileID As Integer
+        Public Property EnterDescription As String
+
+        Private wasActive As Boolean = False
+
+        Public ReadOnly Property RuleType As RuleType Implements IRulePreview.RuleType
+            Get
+                Return RuleType.LocationProfileRule
+            End Get
+        End Property
+
+        Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
+            Get
+                Return $"Network = ""{TargetName}"""
+            End Get
+        End Property
+
+        Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
+            Get
+                Dim desc = If(String.IsNullOrEmpty(EnterDescription),
+                          $"Switch to Profile {EnterProfileID}",
+                          EnterDescription)
+                Return desc
+            End Get
+        End Property
+
+        Public ReadOnly Property Summary As String Implements IRulePreview.Summary
+            Get
+                Return $"If {ConditionText} → {ActionText}"
+            End Get
+        End Property
+
+        Public Function Matches(ctx As ContextEngine) As Boolean Implements IContextRule.Matches
+            Dim name = ctx.Network.CurrentName
+            Dim active = Not String.IsNullOrEmpty(name) AndAlso
+                     name.Equals(TargetName, StringComparison.OrdinalIgnoreCase)
+
+            If active AndAlso Not wasActive Then
+                ctx.Profile.CurrentProfileID = EnterProfileID
+                App.Settings.CurrentProfileID = EnterProfileID
+            End If
+
+            wasActive = active
+            Return active
+        End Function
+
+    End Class
+    Friend Class LocationBlockRule
+        Implements IContextRule, IRulePreview
+
+        Public Property TargetName As String
+        Public Property Description As String
+
+        Private wasActive As Boolean = False
+
+        Public ReadOnly Property RuleType As RuleType Implements IRulePreview.RuleType
+            Get
+                Return RuleType.LocationBlockRule
+            End Get
+        End Property
+
+        Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
+            Get
+                Return $"Network = ""{TargetName}"""
+            End Get
+        End Property
+
+        Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
+            Get
+                Return If(String.IsNullOrEmpty(Description),
+                      "Block Capture",
+                      Description)
+            End Get
+        End Property
+
+        Public ReadOnly Property Summary As String Implements IRulePreview.Summary
+            Get
+                Return $"If {ConditionText} → {ActionText}"
+            End Get
+        End Property
+
+        Public Function Matches(ctx As ContextEngine) As Boolean Implements IContextRule.Matches
+            Dim name = ctx.Network.CurrentName
+            Dim active = Not String.IsNullOrEmpty(name) AndAlso
+                     name.Equals(TargetName, StringComparison.OrdinalIgnoreCase)
+
+            If active AndAlso Not wasActive Then
+                ctx.BlockCapture = True
+            End If
+
+            If Not active AndAlso wasActive Then
+                ctx.BlockCapture = False
+            End If
+
+            wasActive = active
+            Return active
         End Function
 
     End Class
@@ -831,7 +952,9 @@ Friend Module App
     End Enum
     Friend Enum RuleType
         ActiveAppRule
-        BlockRule
+        ActiveAppBlockRule
+        LocationProfileRule
+        LocationBlockRule
         TimeRule
         SourceAppRule
         KeywordRule
@@ -903,6 +1026,7 @@ Friend Module App
     Private Sub AutomationTimer_Tick(sender As Object, e As EventArgs) Handles AutomationTimer.Tick
         App.Context.Time.Now = DateTime.Now
         UpdateAppContext()
+        UpdateNetwork()
         For Each rule In App.ContextRules
             rule.Matches(App.Context)
         Next
@@ -1473,6 +1597,122 @@ Friend Module App
             Return String.Empty
         End Try
     End Function
+    Public Sub UpdateNetwork()
+        Dim newName As String = GetActiveNetworkName()
+
+        If newName <> Context.Network.CurrentName Then
+            Context.Network.LastName = Context.Network.CurrentName
+            Context.Network.CurrentName = newName
+            Context.Network.LastChangedAt = DateTime.UtcNow
+
+            AddToRecentNetworks(newName)
+            Settings.Save()
+
+            Debug.WriteLine("NETWORK: " & App.Context.Network.CurrentName)
+
+        End If
+    End Sub
+    Private Sub AddToRecentNetworks(name As String)
+        If String.IsNullOrWhiteSpace(name) Then Exit Sub
+
+        Dim list = Context.Network.RecentNames
+
+        If Not list.Contains(name) Then
+            list.Insert(0, name)
+            If list.Count > 10 Then list.RemoveAt(list.Count - 1)
+        End If
+    End Sub
+    Private Function GetActiveNetworkName() As String
+        Dim ssid = TryGetWifiSSID()
+        If Not String.IsNullOrEmpty(ssid) Then Return ssid
+
+        Return TryGetNetworkProfileName()
+    End Function
+    Private Function TryGetNetworkProfileName() As String
+        Try
+            For Each ni In NetworkInterface.GetAllNetworkInterfaces()
+                If ni.OperationalStatus = OperationalStatus.Up Then
+                    Return ni.Name
+                End If
+            Next
+        Catch
+        End Try
+
+        Return String.Empty
+    End Function
+    Public Function TryGetWifiSSID() As String
+        Try
+            Dim clientHandle As IntPtr = IntPtr.Zero
+            Dim negotiatedVersion As UInteger = 0
+
+            ' Open WLAN client
+            If Skye.WinAPI.WlanOpenHandle(2UI, IntPtr.Zero, negotiatedVersion, clientHandle) <> 0 Then
+                Return String.Empty
+            End If
+
+            ' Enumerate interfaces
+            Dim ifaceListPtr As IntPtr = IntPtr.Zero
+            If Skye.WinAPI.WlanEnumInterfaces(clientHandle, IntPtr.Zero, ifaceListPtr) <> 0 Then
+                Dim result = Skye.WinAPI.WlanCloseHandle(clientHandle, IntPtr.Zero)
+                Return String.Empty
+            End If
+
+            ' Parse interface list header
+            Dim header As Skye.WinAPI.WLAN_INTERFACE_INFO_LIST =
+            Marshal.PtrToStructure(Of Skye.WinAPI.WLAN_INTERFACE_INFO_LIST)(ifaceListPtr)
+
+            If header.dwNumberOfItems = 0 Then
+                Skye.WinAPI.WlanFreeMemory(ifaceListPtr)
+                Dim result = Skye.WinAPI.WlanCloseHandle(clientHandle, IntPtr.Zero)
+                Return String.Empty
+            End If
+
+            ' First interface
+            Dim firstInterfacePtr As IntPtr =
+            CType(ifaceListPtr.ToInt64() + Marshal.SizeOf(header), IntPtr)
+
+            Dim iface As Skye.WinAPI.WLAN_INTERFACE_INFO =
+            Marshal.PtrToStructure(Of Skye.WinAPI.WLAN_INTERFACE_INFO)(firstInterfacePtr)
+
+            ' Query current connection
+            Dim dataPtr As IntPtr = IntPtr.Zero
+            Dim dataSize As UInteger = 0
+
+            If Skye.WinAPI.WlanQueryInterface(
+            clientHandle,
+            iface.InterfaceGuid,
+            Skye.WinAPI.WLAN_INTF_OPCODE.wlan_intf_opcode_current_connection,
+            IntPtr.Zero,
+            dataSize,
+            dataPtr,
+            0UI) <> 0 Then
+
+                Skye.WinAPI.WlanFreeMemory(ifaceListPtr)
+                Dim result = Skye.WinAPI.WlanCloseHandle(clientHandle, IntPtr.Zero)
+                Return String.Empty
+            End If
+
+            ' Parse connection attributes
+            Dim conn As Skye.WinAPI.WLAN_CONNECTION_ATTRIBUTES =
+            Marshal.PtrToStructure(Of Skye.WinAPI.WLAN_CONNECTION_ATTRIBUTES)(dataPtr)
+
+            ' Extract SSID bytes
+            Dim ssidBytes = conn.wlanAssociationAttributes.dot11Ssid.ucSSID
+            Dim ssidLen = CInt(conn.wlanAssociationAttributes.dot11Ssid.uSSIDLength)
+
+            Dim ssid As String = System.Text.Encoding.ASCII.GetString(ssidBytes, 0, ssidLen)
+
+            ' Cleanup
+            Skye.WinAPI.WlanFreeMemory(dataPtr)
+            Skye.WinAPI.WlanFreeMemory(ifaceListPtr)
+            Dim hresult = Skye.WinAPI.WlanCloseHandle(clientHandle, IntPtr.Zero)
+
+            Return ssid
+
+        Catch
+            Return String.Empty
+        End Try
+    End Function
     Friend Sub RebuildDelegatesForRule(r As IContextRule)
         Dim preview = DirectCast(r, IRulePreview)
 
@@ -1529,14 +1769,15 @@ Friend Module App
 
             Select Case rt
                 Case RuleType.ActiveAppRule
-                    Dim ar As New ActiveAppRule()
-                    ar.Mode = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Mode", 0), ActiveAppRule.ActivationMode)
-                    ar.TargetProcess = Skye.Common.RegistryHelper.GetString(keyPrefix & "TargetProcess", String.Empty)
-                    ar.Action = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Action", 0), ActiveAppRule.Actions)
-                    ar.EnterProfileID = Skye.Common.RegistryHelper.GetInt(keyPrefix & "EnterProfileID", 0)
-                    ar.ExitProfileID = Skye.Common.RegistryHelper.GetInt(keyPrefix & "ExitProfileID", 0)
-                    ar.EnterDescription = Skye.Common.RegistryHelper.GetString(keyPrefix & "EnterDescription", String.Empty)
-                    ar.ExitDescription = Skye.Common.RegistryHelper.GetString(keyPrefix & "ExitDescription", String.Empty)
+                    Dim ar As New ActiveAppRule With {
+                        .Mode = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Mode", 0), ActiveAppRule.ActivationMode),
+                        .TargetProcess = Skye.Common.RegistryHelper.GetString(keyPrefix & "TargetProcess", String.Empty),
+                        .Action = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Action", 0), ActiveAppRule.Actions),
+                        .EnterProfileID = Skye.Common.RegistryHelper.GetInt(keyPrefix & "EnterProfileID", 0),
+                        .ExitProfileID = Skye.Common.RegistryHelper.GetInt(keyPrefix & "ExitProfileID", 0),
+                        .EnterDescription = Skye.Common.RegistryHelper.GetString(keyPrefix & "EnterDescription", String.Empty),
+                        .ExitDescription = Skye.Common.RegistryHelper.GetString(keyPrefix & "ExitDescription", String.Empty)
+                    }
 
                     ' Re‑wire delegates
                     ar.OnEnter = Sub(ctx As ContextEngine)
@@ -1593,21 +1834,24 @@ Friend Module App
 
             Select Case rt
                 Case RuleType.SourceAppRule
-                    Dim sr As New SourceAppRule()
-                    sr.AppName = Skye.Common.RegistryHelper.GetString(keyPrefix & "AppName", String.Empty)
-                    sr.Action = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Action", 0), ContentAction)
+                    Dim sr As New SourceAppRule With {
+                        .AppName = Skye.Common.RegistryHelper.GetString(keyPrefix & "AppName", String.Empty),
+                        .Action = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Action", 0), ContentAction)
+                    }
                     ContentRules.Add(sr)
 
                 Case RuleType.KeywordRule
-                    Dim kr As New KeywordRule()
-                    kr.Keyword = Skye.Common.RegistryHelper.GetString(keyPrefix & "Keyword", String.Empty)
-                    kr.Action = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Action", 0), ContentAction)
+                    Dim kr As New KeywordRule With {
+                        .Keyword = Skye.Common.RegistryHelper.GetString(keyPrefix & "Keyword", String.Empty),
+                        .Action = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Action", 0), ContentAction)
+                    }
                     ContentRules.Add(kr)
 
                 Case RuleType.FormatRule
-                    Dim fr As New FormatRule()
-                    fr.FormatName = Skye.Common.RegistryHelper.GetString(keyPrefix & "FormatName", String.Empty)
-                    fr.Action = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Action", 0), ContentAction)
+                    Dim fr As New FormatRule With {
+                        .FormatName = Skye.Common.RegistryHelper.GetString(keyPrefix & "FormatName", String.Empty),
+                        .Action = CType(Skye.Common.RegistryHelper.GetInt(keyPrefix & "Action", 0), ContentAction)
+                    }
                     ContentRules.Add(fr)
             End Select
         Next

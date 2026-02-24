@@ -330,7 +330,7 @@ Public Class Settings
             Case App.RuleType.ActiveAppRule
                 newRule = New App.ActiveAppRule()
                 CType(newRule, App.ActiveAppRule).Action = App.ActiveAppRule.Actions.SwitchProfile
-            Case App.RuleType.BlockRule
+            Case App.RuleType.ActiveAppBlockRule
                 newRule = New App.ActiveAppRule()
                 CType(newRule, App.ActiveAppRule).Action = App.ActiveAppRule.Actions.BlockCapture
             Case App.RuleType.TimeRule
@@ -520,7 +520,7 @@ Public Class Settings
         If App.FrmScratchPad Is Nothing Then App.LoadScratchPadText()
         SetUseProfiles()
         App.Tray.SetAppIcon()
-        App.Tray.RaiseProfileChangedEvent
+        App.Tray.RaiseProfileChangedEvent()
     End Sub
 
     ' Methods
