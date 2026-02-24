@@ -99,7 +99,7 @@ Public Class Settings
     End Sub
     Private Sub OnRuleSaved(editor As UserControl, rule As App.IRulePreview)
         Select Case rule.RuleType
-            Case RuleType.ActiveAppRule, RuleType.TimeRule
+            Case RuleType.ActiveAppRule, RuleType.LocationProfileRule, RuleType.LocationBlockRule, RuleType.TimeRule
                 If Not App.ContextRules.Contains(CType(rule, IContextRule)) Then
                     App.ContextRules.Add(CType(rule, IContextRule))
                     App.RebuildDelegatesForRule(CType(rule, IContextRule))
@@ -333,6 +333,10 @@ Public Class Settings
             Case App.RuleType.ActiveAppBlockRule
                 newRule = New App.ActiveAppRule()
                 CType(newRule, App.ActiveAppRule).Action = App.ActiveAppRule.Actions.BlockCapture
+            Case App.RuleType.LocationProfileRule
+                newRule = New App.LocationProfileRule()
+            Case App.RuleType.LocationBlockRule
+                newRule = New App.LocationBlockRule()
             Case App.RuleType.TimeRule
                 newRule = New App.TimeRule()
             Case App.RuleType.SourceAppRule
@@ -352,7 +356,7 @@ Public Class Settings
         Dim item As ListViewItem = LVRules.SelectedItems(0)
         Dim rule = CType(item.Tag, App.IRulePreview)
         Select Case rule.RuleType
-            Case RuleType.ActiveAppRule, RuleType.TimeRule
+            Case RuleType.ActiveAppRule, RuleType.LocationProfileRule, RuleType.LocationBlockRule, RuleType.TimeRule
                 App.DeleteContextRule(CType(rule, App.IContextRule))
             Case RuleType.SourceAppRule, RuleType.KeywordRule, RuleType.FormatRule
                 App.DeleteContentRule(CType(rule, App.IContentRule))
@@ -631,6 +635,18 @@ Public Class Settings
                         ed.LoadRule(activeRule)
                         editor = ed
                 End Select
+                PanelRule.Controls.Add(editor)
+                editor.Dock = DockStyle.Fill
+            Case RuleType.LocationProfileRule
+                Dim editor As New LocationProfilesRuleEditor()
+                AddHandler editor.RuleSaved, AddressOf OnRuleSaved
+                editor.LoadRule(CType(rule, App.LocationProfileRule))
+                PanelRule.Controls.Add(editor)
+                editor.Dock = DockStyle.Fill
+            Case RuleType.LocationBlockRule
+                Dim editor As New LocationBlockRuleEditor()
+                AddHandler editor.RuleSaved, AddressOf OnRuleSaved
+                editor.LoadRule(CType(rule, App.LocationBlockRule))
                 PanelRule.Controls.Add(editor)
                 editor.Dock = DockStyle.Fill
             Case RuleType.TimeRule

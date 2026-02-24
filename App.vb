@@ -661,8 +661,8 @@ Friend Module App
         Implements IContextRule, IRulePreview
 
         Public Property TargetName As String
-        Public Property EnterProfileID As Integer
-        Public Property EnterDescription As String
+        Public Property ProfileID As Integer
+        Public Property Description As String
 
         Private wasActive As Boolean = False
 
@@ -680,9 +680,9 @@ Friend Module App
 
         Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
             Get
-                Dim desc = If(String.IsNullOrEmpty(EnterDescription),
-                          $"Switch to Profile {EnterProfileID}",
-                          EnterDescription)
+                Dim desc = If(String.IsNullOrEmpty(Description),
+                          $"Switch to Profile {ProfileID}",
+                          Description)
                 Return desc
             End Get
         End Property
@@ -699,8 +699,8 @@ Friend Module App
                      name.Equals(TargetName, StringComparison.OrdinalIgnoreCase)
 
             If active AndAlso Not wasActive Then
-                ctx.Profile.CurrentProfileID = EnterProfileID
-                App.Settings.CurrentProfileID = EnterProfileID
+                ctx.Profile.CurrentProfileID = ProfileID
+                App.Settings.CurrentProfileID = ProfileID
             End If
 
             wasActive = active
@@ -1779,35 +1779,20 @@ Friend Module App
                         .EnterDescription = Skye.Common.RegistryHelper.GetString(keyPrefix & "EnterDescription", String.Empty),
                         .ExitDescription = Skye.Common.RegistryHelper.GetString(keyPrefix & "ExitDescription", String.Empty)
                     }
-
-                    ' Re‑wire delegates
-                    ar.OnEnter = Sub(ctx As ContextEngine)
-                                     Select Case ar.Action
-                                         Case ActiveAppRule.Actions.SwitchProfile
-                                             ' Switch into the target profile when rule becomes active
-                                             ctx.Profile.CurrentProfileID = ar.EnterProfileID
-                                             App.Settings.CurrentProfileID = ar.EnterProfileID
-                                         Case ActiveAppRule.Actions.BlockCapture
-                                             ' Block capture while this rule is active
-                                             ctx.BlockCapture = True
-                                     End Select
-                                 End Sub
-
-                    ar.OnExit = Sub(ctx As ContextEngine)
-                                    Select Case ar.Action
-                                        Case ActiveAppRule.Actions.SwitchProfile
-                                            ' Optionally switch back on exit (if ExitProfileID is meaningful)
-                                            If ar.ExitProfileID <> 0 Then
-                                                ctx.Profile.CurrentProfileID = ar.ExitProfileID
-                                                App.Settings.CurrentProfileID = ar.ExitProfileID
-                                            End If
-                                        Case ActiveAppRule.Actions.BlockCapture
-                                            ' Restore capture when rule is no longer active
-                                            ctx.BlockCapture = False
-                                    End Select
-                                End Sub
-
                     ContextRules.Add(ar)
+                Case RuleType.LocationProfileRule
+                    Dim lr As New LocationProfileRule With {
+                        .TargetName = Skye.Common.RegistryHelper.GetString(keyPrefix & "TargetName", String.Empty),
+                        .ProfileID = Skye.Common.RegistryHelper.GetInt(keyPrefix & "ProfileID", 0),
+                        .Description = Skye.Common.RegistryHelper.GetString(keyPrefix & "Description", String.Empty)
+                    }
+                    ContextRules.Add(lr)
+                Case RuleType.LocationBlockRule
+                    Dim br As New LocationBlockRule With {
+                        .TargetName = Skye.Common.RegistryHelper.GetString(keyPrefix & "TargetName", String.Empty),
+                        .Description = Skye.Common.RegistryHelper.GetString(keyPrefix & "Description", String.Empty)
+                    }
+                    ContextRules.Add(br)
                 Case RuleType.TimeRule
                     Dim tr As New TimeRule()
                     Dim startStr = Skye.Common.RegistryHelper.GetString(keyPrefix & "StartTime", "00:00:00")
@@ -1815,13 +1800,6 @@ Friend Module App
                     tr.StartTime = TimeSpan.Parse(startStr)
                     tr.EndTime = TimeSpan.Parse(endStr)
                     tr.TargetProfileID = Skye.Common.RegistryHelper.GetInt(keyPrefix & "TargetProfileID", 0)
-
-                    ' Re‑wire delegate
-                    tr.ApplyProfile = Sub(profileId As Integer)
-                                          Context.Profile.CurrentProfileID = profileId
-                                          App.Settings.CurrentProfileID = profileId
-                                      End Sub
-
                     ContextRules.Add(tr)
             End Select
         Next
@@ -1887,7 +1865,15 @@ Friend Module App
                     Skye.Common.RegistryHelper.SetInt(keyPrefix & "ExitProfileID", ar.ExitProfileID)
                     Skye.Common.RegistryHelper.SetString(keyPrefix & "EnterDescription", ar.EnterDescription)
                     Skye.Common.RegistryHelper.SetString(keyPrefix & "ExitDescription", ar.ExitDescription)
-
+                Case RuleType.LocationProfileRule
+                    Dim lr = DirectCast(r, LocationProfileRule)
+                    Skye.Common.RegistryHelper.SetString(keyPrefix & "TargetName", lr.TargetName)
+                    Skye.Common.RegistryHelper.SetInt(keyPrefix & "ProfileID", lr.ProfileID)
+                    Skye.Common.RegistryHelper.SetString(keyPrefix & "Description", lr.Description)
+                Case RuleType.LocationBlockRule
+                    Dim br = DirectCast(r, LocationBlockRule)
+                    Skye.Common.RegistryHelper.SetString(keyPrefix & "TargetName", br.TargetName)
+                    Skye.Common.RegistryHelper.SetString(keyPrefix & "Description", br.Description)
                 Case RuleType.TimeRule
                     Dim tr = DirectCast(r, TimeRule)
                     Skye.Common.RegistryHelper.SetString(keyPrefix & "StartTime", tr.StartTime.ToString())
