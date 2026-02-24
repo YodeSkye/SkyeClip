@@ -1,4 +1,5 @@
 ﻿
+Imports System.ComponentModel
 Imports System.IO
 Imports System.IO.Compression
 Imports System.Linq.Expressions
@@ -952,13 +953,21 @@ Friend Module App
         AutoIgnore
     End Enum
     Friend Enum RuleType
+        <Description("Active App (Profile Switch)")>
         ActiveAppRule
+        <Description("Active App (Block Capture)")>
         ActiveAppBlockRule
+        <Description("Location (Profile Switch)")>
         LocationProfileRule
+        <Description("Location (Block Capture)")>
         LocationBlockRule
+        <Description("Time Schedule Rule")>
         TimeRule
+        <Description("Clipboard Source Rule")>
         SourceAppRule
+        <Description("Clipboard Keyword Rule")>
         KeywordRule
+        <Description("Clipboard Format Rule")>
         FormatRule
     End Enum
     Friend Context As New ContextEngine
@@ -2138,6 +2147,16 @@ Friend Module App
         End Try
 
         Return total
+    End Function
+    Friend Function GetEnumDescription(value As [Enum]) As String
+        Dim fi = value.GetType().GetField(value.ToString())
+        Dim attributes = CType(fi.GetCustomAttributes(GetType(DescriptionAttribute), False), DescriptionAttribute())
+
+        If attributes IsNot Nothing AndAlso attributes.Length > 0 Then
+            Return attributes(0).Description
+        End If
+
+        Return value.ToString()
     End Function
     Friend Function GetSourceAppInfo() As (AppName As String, IconBytes As Byte(), ExePath As String)
         Dim hwnd = Skye.WinAPI.GetForegroundWindow()

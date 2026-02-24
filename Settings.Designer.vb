@@ -82,7 +82,6 @@ Partial Class Settings
         PanelAutomation = New Panel()
         PanelRule = New Panel()
         BtnRuleDelete = New Button()
-        BtnRuleNew = New Button()
         CoBoxRuleTypes = New Skye.UI.ComboBox()
         LVRules = New Skye.UI.ListViewEX()
         ColType = New ColumnHeader()
@@ -769,7 +768,6 @@ Partial Class Settings
         PanelAutomation.AutoSizeMode = AutoSizeMode.GrowAndShrink
         PanelAutomation.Controls.Add(PanelRule)
         PanelAutomation.Controls.Add(BtnRuleDelete)
-        PanelAutomation.Controls.Add(BtnRuleNew)
         PanelAutomation.Controls.Add(CoBoxRuleTypes)
         PanelAutomation.Controls.Add(LVRules)
         PanelAutomation.Dock = DockStyle.Fill
@@ -791,6 +789,7 @@ Partial Class Settings
         ' 
         ' BtnRuleDelete
         ' 
+        BtnRuleDelete.Enabled = False
         BtnRuleDelete.Image = My.Resources.Resources.ImageClearRemoveDelete16
         TipSettings.SetImage(BtnRuleDelete, Nothing)
         BtnRuleDelete.Location = New Point(387, 136)
@@ -800,25 +799,15 @@ Partial Class Settings
         TipSettings.SetText(BtnRuleDelete, Nothing)
         BtnRuleDelete.UseVisualStyleBackColor = True
         ' 
-        ' BtnRuleNew
-        ' 
-        TipSettings.SetImage(BtnRuleNew, Nothing)
-        BtnRuleNew.Location = New Point(11, 136)
-        BtnRuleNew.Name = "BtnRuleNew"
-        BtnRuleNew.Size = New Size(53, 36)
-        BtnRuleNew.TabIndex = 2
-        TipSettings.SetText(BtnRuleNew, Nothing)
-        BtnRuleNew.Text = "New:"
-        BtnRuleNew.UseVisualStyleBackColor = True
-        ' 
         ' CoBoxRuleTypes
         ' 
         CoBoxRuleTypes.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxRuleTypes.FormattingEnabled = True
         TipSettings.SetImage(CoBoxRuleTypes, Nothing)
-        CoBoxRuleTypes.Location = New Point(64, 139)
+        CoBoxRuleTypes.Location = New Point(10, 139)
+        CoBoxRuleTypes.MaxDropDownItems = 10
         CoBoxRuleTypes.Name = "CoBoxRuleTypes"
-        CoBoxRuleTypes.Size = New Size(146, 30)
+        CoBoxRuleTypes.Size = New Size(239, 30)
         CoBoxRuleTypes.TabIndex = 1
         TipSettings.SetText(CoBoxRuleTypes, Nothing)
         ' 
@@ -959,7 +948,6 @@ Partial Class Settings
     Friend WithEvents ColAction As ColumnHeader
     Friend WithEvents ColSummary As ColumnHeader
     Friend WithEvents CoBoxRuleTypes As Skye.UI.ComboBox
-    Friend WithEvents BtnRuleNew As Button
     Friend WithEvents BtnRuleDelete As Button
     Friend WithEvents PanelRule As Panel
 End Class

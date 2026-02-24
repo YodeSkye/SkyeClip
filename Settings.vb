@@ -1,5 +1,4 @@
-﻿
-Imports Skye.UI
+﻿Imports Skye.UI
 
 Public Class Settings
 
@@ -8,6 +7,13 @@ Public Class Settings
     Private mOffset, mPosition As Point
     Private suppressPageSelection As Boolean = False
     Private ProfileItemMove As ListViewItem 'Item being moved in the profile list
+    Private Class RuleTypeItem
+        Public Property Value As App.RuleType?
+        Public Property Text As String
+        Public Overrides Function ToString() As String
+            Return Text
+        End Function
+    End Class
 
     ' Form Events
     Private Sub Settings_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -45,10 +51,26 @@ Public Class Settings
         bstr &= App.UserPath
         TipSettings.SetText(CoBoxAutoBackupFrequency, bstr)
         LVProfiles.Columns(0).Width = LVProfiles.Width - SystemInformation.VerticalScrollBarWidth
-        CoBoxRuleTypes.DataSource = [Enum].GetValues(Of App.RuleType)()
-        AddHandler App.Tray.ProfileChanged, AddressOf OnProfileChanged
 
-        'Settings
+        ' New Rule Combobox
+        Dim items As New List(Of RuleTypeItem) From {
+            New RuleTypeItem With {
+                .Value = Nothing,
+                .Text = "Create New Rule…"
+            }
+        }
+        For Each v As App.RuleType In [Enum].GetValues(Of RuleType)()
+            items.Add(New RuleTypeItem With {
+                .Value = v,
+                .Text = GetEnumDescription(v)
+            })
+        Next
+        CoBoxRuleTypes.DisplayMember = "Text"
+        CoBoxRuleTypes.ValueMember = "Value"
+        CoBoxRuleTypes.DataSource = items
+        CoBoxRuleTypes.SelectedIndex = 0
+
+        AddHandler App.Tray.ProfileChanged, AddressOf OnProfileChanged
         LoadSettings()
 
     End Sub
@@ -229,12 +251,14 @@ Public Class Settings
     End Sub
     Private Sub LVRules_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVRules.SelectedIndexChanged
         If LVRules.SelectedItems.Count = 0 Then
+            BtnRuleDelete.Enabled = False
             PanelRule.Controls.Clear()
             Return
         End If
 
         Dim rule = CType(LVRules.SelectedItems(0).Tag, IRulePreview)
         LoadEditorForRule(rule)
+        BtnRuleDelete.Enabled = True
 
     End Sub
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
@@ -321,35 +345,6 @@ Public Class Settings
         End If
 
     End Sub
-    Private Sub BtnRuleNew_Click(sender As Object, e As EventArgs) Handles BtnRuleNew.Click
-        If CoBoxRuleTypes.SelectedItem Is Nothing Then Exit Sub
-
-        Dim selectedType As App.RuleType = CType(CoBoxRuleTypes.SelectedItem, App.RuleType)
-        Dim newRule As IRulePreview = Nothing
-        Select Case selectedType
-            Case App.RuleType.ActiveAppRule
-                newRule = New App.ActiveAppRule()
-                CType(newRule, App.ActiveAppRule).Action = App.ActiveAppRule.Actions.SwitchProfile
-            Case App.RuleType.ActiveAppBlockRule
-                newRule = New App.ActiveAppRule()
-                CType(newRule, App.ActiveAppRule).Action = App.ActiveAppRule.Actions.BlockCapture
-            Case App.RuleType.LocationProfileRule
-                newRule = New App.LocationProfileRule()
-            Case App.RuleType.LocationBlockRule
-                newRule = New App.LocationBlockRule()
-            Case App.RuleType.TimeRule
-                newRule = New App.TimeRule()
-            Case App.RuleType.SourceAppRule
-                newRule = New App.SourceAppRule()
-            Case App.RuleType.KeywordRule
-                newRule = New App.KeywordRule()
-            Case App.RuleType.FormatRule
-                newRule = New App.FormatRule()
-        End Select
-
-        LoadEditorForRule(newRule)
-
-    End Sub
     Private Sub BtnRuleDelete_Click(sender As Object, e As EventArgs) Handles BtnRuleDelete.Click
         If LVRules.SelectedItems.Count = 0 Then Exit Sub
 
@@ -365,13 +360,6 @@ Public Class Settings
         RefreshRuleList()
         PanelRule.Controls.Clear()
 
-    End Sub
-    Private Sub CoBoxAutoBackupFrequency_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxAutoBackupFrequency.SelectionChangeCommitted
-        Dim item = CType(CoBoxAutoBackupFrequency.SelectedItem, App.AutoBackupFrequencyEnumItem)
-        App.Settings.AutoBackup = item.Value
-    End Sub
-    Private Sub ChkBoxAutoPurgeBackups_Click(sender As Object, e As EventArgs) Handles ChkBoxAutoPurgeBackups.Click
-        App.Settings.AutoBackupPurge = ChkBoxAutoPurgeBackups.Checked
     End Sub
     Private Sub TxtBox_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxMaxClips.KeyDown, TxtBoxMaxClipPreviewLength.KeyDown, TxtBoxPurgeDays.KeyDown
         If e.KeyCode = Keys.Enter Then
@@ -475,6 +463,41 @@ Public Class Settings
             ApplyThemeToAllOpenForms()
         End If
     End Sub
+    Private Sub CoBoxAutoBackupFrequency_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxAutoBackupFrequency.SelectionChangeCommitted
+        Dim item = CType(CoBoxAutoBackupFrequency.SelectedItem, App.AutoBackupFrequencyEnumItem)
+        App.Settings.AutoBackup = item.Value
+    End Sub
+    Private Sub CoBoxRuleTypes_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxRuleTypes.SelectedIndexChanged
+        Dim selected = CoBoxRuleTypes.SelectedValue
+        If selected Is Nothing Then Return
+
+        Dim selectedType As App.RuleType = CType(selected, App.RuleType)
+        Dim newRule As IRulePreview = Nothing
+        Select Case selectedType
+            Case App.RuleType.ActiveAppRule
+                newRule = New App.ActiveAppRule()
+                CType(newRule, App.ActiveAppRule).Action = App.ActiveAppRule.Actions.SwitchProfile
+            Case App.RuleType.ActiveAppBlockRule
+                newRule = New App.ActiveAppRule()
+                CType(newRule, App.ActiveAppRule).Action = App.ActiveAppRule.Actions.BlockCapture
+            Case App.RuleType.LocationProfileRule
+                newRule = New App.LocationProfileRule()
+            Case App.RuleType.LocationBlockRule
+                newRule = New App.LocationBlockRule()
+            Case App.RuleType.TimeRule
+                newRule = New App.TimeRule()
+            Case App.RuleType.SourceAppRule
+                newRule = New App.SourceAppRule()
+            Case App.RuleType.KeywordRule
+                newRule = New App.KeywordRule()
+            Case App.RuleType.FormatRule
+                newRule = New App.FormatRule()
+        End Select
+
+        LoadEditorForRule(newRule)
+
+        CoBoxRuleTypes.SelectedIndex = 0
+    End Sub
     Private Sub ChkBoxThemeAuto_Click(sender As Object, e As EventArgs) Handles ChkBoxThemeAuto.Click
         App.Settings.ThemeAuto = ChkBoxThemeAuto.Checked
         SetThemesList()
@@ -508,6 +531,9 @@ Public Class Settings
     Private Sub ChkBoxKeepScratchPadText_Click(sender As Object, e As EventArgs) Handles ChkBoxKeepScratchPadText.Click
         App.Settings.ScratchPadKeepText = Not App.Settings.ScratchPadKeepText
         App.FrmScratchPad?.UpdateUI()
+    End Sub
+    Private Sub ChkBoxAutoPurgeBackups_Click(sender As Object, e As EventArgs) Handles ChkBoxAutoPurgeBackups.Click
+        App.Settings.AutoBackupPurge = ChkBoxAutoPurgeBackups.Checked
     End Sub
     Private Sub ChkBoxUseProfiles_Click(sender As Object, e As EventArgs) Handles ChkBoxUseProfiles.Click
         If ChkBoxUseProfiles.Checked Then
@@ -613,6 +639,12 @@ Public Class Settings
             item.SubItems.Add(r.Summary)
             item.Tag = r
             LVRules.Items.Add(item)
+        Next
+
+        ' Auto-resize all columns to fit both content and headers
+        For i As Integer = 0 To LVRules.Columns.Count - 1
+            LVRules.AutoResizeColumn(i, ColumnHeaderAutoResizeStyle.ColumnContent)
+            LVRules.AutoResizeColumn(i, ColumnHeaderAutoResizeStyle.HeaderSize)
         Next
 
     End Sub
