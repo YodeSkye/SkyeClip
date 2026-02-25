@@ -461,6 +461,7 @@ Public Class Settings
         If Not App.Settings.ThemeAuto Then
             SetTheme(GetTheme(selected))
             ApplyThemeToAllOpenForms()
+            App.Tray.SetAppIcon()
         End If
     End Sub
     Private Sub CoBoxAutoBackupFrequency_SelectionChangeCommitted(sender As Object, e As EventArgs) Handles CoBoxAutoBackupFrequency.SelectionChangeCommitted
@@ -707,6 +708,7 @@ Public Class Settings
                 editor.Dock = DockStyle.Fill
         End Select
 
+        Skye.UI.ThemeManager.ApplyTheme(Me)
     End Sub
     Private Sub SetPage(page As String)
         PanelGeneral.Enabled = False

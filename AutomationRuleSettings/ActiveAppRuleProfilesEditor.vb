@@ -35,8 +35,8 @@ Public Class ActiveAppRuleProfilesEditor
         CoBoxExitProfile.ValueMember = "ID"
 
     End Sub
-    Private Sub KeywordRuleEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+    Private Sub ActiveAppRuleProfilesEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
     End Sub
 
     ' Control Events

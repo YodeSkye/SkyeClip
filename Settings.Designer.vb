@@ -802,6 +802,7 @@ Partial Class Settings
         ' CoBoxRuleTypes
         ' 
         CoBoxRuleTypes.DropDownStyle = ComboBoxStyle.DropDownList
+        CoBoxRuleTypes.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         CoBoxRuleTypes.FormattingEnabled = True
         TipSettings.SetImage(CoBoxRuleTypes, Nothing)
         CoBoxRuleTypes.Location = New Point(10, 139)

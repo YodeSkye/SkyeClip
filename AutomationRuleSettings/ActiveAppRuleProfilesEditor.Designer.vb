@@ -141,7 +141,7 @@ Partial Class ActiveAppRuleProfilesEditor
         Label6.TabIndex = 13
         Label6.Text = "Exit Description"
         ' 
-        ' ActiveAppRuleEditor
+        ' ActiveAppRuleProfilesEditor
         ' 
         AutoScaleMode = AutoScaleMode.None
         Controls.Add(TxtBoxExitDescription)
@@ -158,7 +158,7 @@ Partial Class ActiveAppRuleProfilesEditor
         Controls.Add(Label1)
         Controls.Add(Label6)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Name = "ActiveAppRuleEditor"
+        Name = "ActiveAppRuleProfilesEditor"
         Size = New Size(415, 253)
         ResumeLayout(False)
         PerformLayout()
