@@ -383,7 +383,7 @@ Friend Class TrayAppContext
         Dim text = repo.GetSearchableText(newId, App.TextSearchMode.AllText)
 
         ' Apply rules
-        For Each rule In ContentRules
+        For Each rule In Rules.OfType(Of IContentRule)
             rule.Apply(clip, formats, text, repo)
         Next
 

@@ -31,19 +31,12 @@ Public Class ActiveAppRuleBlockEditor
         ' Target process
         TxtBoxTargetProcess.Text = _rule.TargetProcess
 
-        ' Descriptions
-        TxtBoxEnterDescription.Text = _rule.EnterDescription
-        TxtBoxExitDescription.Text = _rule.ExitDescription
-
     End Sub
     Friend Sub SaveRule()
 
         _rule.Mode = App.ActiveAppRule.ActivationMode.ForegroundWindow
         _rule.Action = App.ActiveAppRule.Actions.BlockCapture
         _rule.TargetProcess = TxtBoxTargetProcess.Text
-
-        _rule.EnterDescription = TxtBoxEnterDescription.Text
-        _rule.ExitDescription = TxtBoxExitDescription.Text
 
     End Sub
 

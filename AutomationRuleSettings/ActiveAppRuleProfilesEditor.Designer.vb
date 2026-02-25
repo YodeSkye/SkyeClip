@@ -32,17 +32,13 @@ Partial Class ActiveAppRuleProfilesEditor
         Label4 = New Skye.UI.Label()
         CoBoxExitProfile = New Skye.UI.ComboBox()
         Label5 = New Skye.UI.Label()
-        Label2 = New Skye.UI.Label()
-        TxtBoxEnterDescription = New TextBox()
-        TxtBoxExitDescription = New TextBox()
-        Label6 = New Skye.UI.Label()
         Tip = New Skye.UI.ToolTipEX(components)
         SuspendLayout()
         ' 
         ' Label1
         ' 
         Tip.SetImage(Label1, Nothing)
-        Label1.Location = New Point(3, 58)
+        Label1.Location = New Point(3, 103)
         Label1.Name = "Label1"
         Label1.Size = New Size(123, 23)
         Label1.TabIndex = 0
@@ -52,7 +48,7 @@ Partial Class ActiveAppRuleProfilesEditor
         ' TxtBoxTargetProcess
         ' 
         Tip.SetImage(TxtBoxTargetProcess, Nothing)
-        TxtBoxTargetProcess.Location = New Point(3, 80)
+        TxtBoxTargetProcess.Location = New Point(3, 125)
         TxtBoxTargetProcess.Name = "TxtBoxTargetProcess"
         TxtBoxTargetProcess.Size = New Size(197, 29)
         TxtBoxTargetProcess.TabIndex = 1
@@ -76,7 +72,7 @@ Partial Class ActiveAppRuleProfilesEditor
         CoBoxMode.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxMode.FormattingEnabled = True
         Tip.SetImage(CoBoxMode, Nothing)
-        CoBoxMode.Location = New Point(3, 25)
+        CoBoxMode.Location = New Point(3, 70)
         CoBoxMode.Name = "CoBoxMode"
         CoBoxMode.Size = New Size(197, 30)
         CoBoxMode.TabIndex = 5
@@ -85,7 +81,7 @@ Partial Class ActiveAppRuleProfilesEditor
         ' Label3
         ' 
         Tip.SetImage(Label3, Nothing)
-        Label3.Location = New Point(3, 5)
+        Label3.Location = New Point(3, 50)
         Label3.Name = "Label3"
         Label3.Size = New Size(100, 23)
         Label3.TabIndex = 6
@@ -97,7 +93,7 @@ Partial Class ActiveAppRuleProfilesEditor
         CoBoxEnterProfile.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxEnterProfile.FormattingEnabled = True
         Tip.SetImage(CoBoxEnterProfile, Nothing)
-        CoBoxEnterProfile.Location = New Point(229, 25)
+        CoBoxEnterProfile.Location = New Point(229, 70)
         CoBoxEnterProfile.Name = "CoBoxEnterProfile"
         CoBoxEnterProfile.Size = New Size(183, 30)
         CoBoxEnterProfile.TabIndex = 7
@@ -106,7 +102,7 @@ Partial Class ActiveAppRuleProfilesEditor
         ' Label4
         ' 
         Tip.SetImage(Label4, Nothing)
-        Label4.Location = New Point(229, 5)
+        Label4.Location = New Point(229, 50)
         Label4.Name = "Label4"
         Label4.Size = New Size(100, 23)
         Label4.TabIndex = 8
@@ -118,7 +114,7 @@ Partial Class ActiveAppRuleProfilesEditor
         CoBoxExitProfile.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxExitProfile.FormattingEnabled = True
         Tip.SetImage(CoBoxExitProfile, Nothing)
-        CoBoxExitProfile.Location = New Point(229, 80)
+        CoBoxExitProfile.Location = New Point(229, 125)
         CoBoxExitProfile.Name = "CoBoxExitProfile"
         CoBoxExitProfile.Size = New Size(183, 30)
         CoBoxExitProfile.TabIndex = 9
@@ -127,50 +123,12 @@ Partial Class ActiveAppRuleProfilesEditor
         ' Label5
         ' 
         Tip.SetImage(Label5, Nothing)
-        Label5.Location = New Point(229, 60)
+        Label5.Location = New Point(229, 105)
         Label5.Name = "Label5"
         Label5.Size = New Size(100, 23)
         Label5.TabIndex = 10
         Label5.Text = "On Exit"
         Tip.SetText(Label5, Nothing)
-        ' 
-        ' Label2
-        ' 
-        Tip.SetImage(Label2, Nothing)
-        Label2.Location = New Point(3, 112)
-        Label2.Name = "Label2"
-        Label2.Size = New Size(140, 23)
-        Label2.TabIndex = 11
-        Label2.Text = "Enter Description"
-        Tip.SetText(Label2, Nothing)
-        ' 
-        ' TxtBoxEnterDescription
-        ' 
-        Tip.SetImage(TxtBoxEnterDescription, Nothing)
-        TxtBoxEnterDescription.Location = New Point(3, 132)
-        TxtBoxEnterDescription.Name = "TxtBoxEnterDescription"
-        TxtBoxEnterDescription.Size = New Size(409, 29)
-        TxtBoxEnterDescription.TabIndex = 12
-        Tip.SetText(TxtBoxEnterDescription, Nothing)
-        ' 
-        ' TxtBoxExitDescription
-        ' 
-        Tip.SetImage(TxtBoxExitDescription, Nothing)
-        TxtBoxExitDescription.Location = New Point(3, 181)
-        TxtBoxExitDescription.Name = "TxtBoxExitDescription"
-        TxtBoxExitDescription.Size = New Size(409, 29)
-        TxtBoxExitDescription.TabIndex = 14
-        Tip.SetText(TxtBoxExitDescription, Nothing)
-        ' 
-        ' Label6
-        ' 
-        Tip.SetImage(Label6, Nothing)
-        Label6.Location = New Point(3, 161)
-        Label6.Name = "Label6"
-        Label6.Size = New Size(140, 23)
-        Label6.TabIndex = 13
-        Label6.Text = "Exit Description"
-        Tip.SetText(Label6, Nothing)
         ' 
         ' Tip
         ' 
@@ -180,9 +138,6 @@ Partial Class ActiveAppRuleProfilesEditor
         ' ActiveAppRuleProfilesEditor
         ' 
         AutoScaleMode = AutoScaleMode.None
-        Controls.Add(TxtBoxExitDescription)
-        Controls.Add(TxtBoxEnterDescription)
-        Controls.Add(Label2)
         Controls.Add(CoBoxExitProfile)
         Controls.Add(Label5)
         Controls.Add(CoBoxEnterProfile)
@@ -192,7 +147,6 @@ Partial Class ActiveAppRuleProfilesEditor
         Controls.Add(BtnSave)
         Controls.Add(TxtBoxTargetProcess)
         Controls.Add(Label1)
-        Controls.Add(Label6)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Tip.SetImage(Me, Nothing)
         Name = "ActiveAppRuleProfilesEditor"
@@ -211,10 +165,6 @@ Partial Class ActiveAppRuleProfilesEditor
     Friend WithEvents Label4 As Skye.UI.Label
     Friend WithEvents CoBoxExitProfile As Skye.UI.ComboBox
     Friend WithEvents Label5 As Skye.UI.Label
-    Friend WithEvents Label2 As Skye.UI.Label
-    Friend WithEvents TxtBoxEnterDescription As TextBox
-    Friend WithEvents TxtBoxExitDescription As TextBox
-    Friend WithEvents Label6 As Skye.UI.Label
     Friend WithEvents Tip As Skye.UI.ToolTipEX
 
 End Class

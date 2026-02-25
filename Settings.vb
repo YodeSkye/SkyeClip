@@ -7,6 +7,7 @@ Public Class Settings
     Private mOffset, mPosition As Point
     Private suppressPageSelection As Boolean = False
     Private ProfileItemMove As ListViewItem 'Item being moved in the profile list
+    Private RuleItemMove As ListViewItem 'Item being moved in the rules list
     Private Class RuleTypeItem
         Public Property Value As App.RuleType?
         Public Property Text As String
@@ -120,20 +121,21 @@ Public Class Settings
         Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
     End Sub
     Private Sub OnRuleSaved(editor As UserControl, rule As App.IRulePreview)
-        Select Case rule.RuleType
-            Case RuleType.ActiveAppRule, RuleType.LocationProfileRule, RuleType.LocationBlockRule, RuleType.TimeRule
-                If Not App.ContextRules.Contains(CType(rule, IContextRule)) Then
-                    App.ContextRules.Add(CType(rule, IContextRule))
-                    App.RebuildDelegatesForRule(CType(rule, IContextRule))
-                End If
-            Case RuleType.SourceAppRule, RuleType.KeywordRule, RuleType.FormatRule
-                If Not App.ContentRules.Contains(CType(rule, IContentRule)) Then
-                    App.ContentRules.Add(CType(rule, IContentRule))
-                End If
-        End Select
+
+        ' Add to unified list if new
+        If Not App.Rules.Contains(rule) Then
+            App.Rules.Add(rule)
+        End If
+
+        ' Rebuild delegates for context rules
+        If TypeOf rule Is App.IContextRule Then
+            App.RebuildDelegatesForRule(DirectCast(rule, App.IContextRule))
+        End If
+
         App.SaveAllRulesToRegistry()
         RefreshRuleList()
         PanelRule.Controls.Clear()
+
     End Sub
 
     ' Control Events
@@ -261,6 +263,66 @@ Public Class Settings
         BtnRuleDelete.Enabled = True
 
     End Sub
+    Private Sub LVRules_MouseDown(sender As Object, e As MouseEventArgs) Handles LVRules.MouseDown
+        If e.Clicks = 1 Then RuleItemMove = LVRules.GetItemAt(e.X, e.Y)
+    End Sub
+    Private Sub LVRules_MouseMove(sender As Object, e As MouseEventArgs) Handles LVRules.MouseMove
+        If RuleItemMove IsNot Nothing Then
+            Cursor = Cursors.Hand
+            Dim lastItemBottom = Math.Min(e.Y, LVRules.Items(LVRules.Items.Count - 1).GetBounds(ItemBoundsPortion.Entire).Bottom - 1)
+            Dim itemover = LVRules.GetItemAt(0, lastItemBottom)
+            If itemover IsNot Nothing Then
+                Dim rc = itemover.GetBounds(ItemBoundsPortion.Entire)
+                If e.Y < rc.Top + rc.Height / 2 Then
+                    LVRules.LineBefore = itemover.Index
+                    LVRules.LineAfter = -1
+                Else
+                    LVRules.LineBefore = -1
+                    LVRules.LineAfter = itemover.Index
+                End If
+                LVRules.Invalidate()
+            End If
+        End If
+    End Sub
+    Private Sub LVRules_MouseUp(sender As Object, e As MouseEventArgs) Handles LVRules.MouseUp
+        If RuleItemMove IsNot Nothing Then
+            Dim lastItemBottom = Math.Min(e.Y, LVRules.Items(LVRules.Items.Count - 1).GetBounds(ItemBoundsPortion.Entire).Bottom - 1)
+            Dim itemover = LVRules.GetItemAt(0, lastItemBottom)
+            If itemover IsNot Nothing And itemover IsNot RuleItemMove Then
+                Dim insertbefore As Boolean
+                Dim rc = itemover.GetBounds(ItemBoundsPortion.Entire)
+                If e.Y < rc.Top + rc.Height / 2 Then
+                    insertbefore = True
+                Else
+                    insertbefore = False
+                End If
+                LVRules.Items.Remove(RuleItemMove)
+                If Not RuleItemMove.Index = itemover.Index Then
+                    If insertbefore Then
+                        LVRules.Items.Insert(itemover.Index, RuleItemMove)
+                    Else
+                        LVRules.Items.Insert(itemover.Index + 1, RuleItemMove)
+                    End If
+                End If
+            End If
+            RuleItemMove = Nothing
+
+            ' Sync Rules list with new ListView order
+            Dim newOrder As New List(Of App.IRulePreview)
+            For Each it As ListViewItem In LVRules.Items
+                newOrder.Add(CType(it.Tag, App.IRulePreview))
+            Next
+            App.Rules.Clear()
+            App.Rules.AddRange(newOrder)
+            App.SaveAllRulesToRegistry()
+
+        End If
+        RuleItemMove = Nothing
+        Cursor = Cursors.Default
+        LVRules.LineBefore = -1
+        LVRules.LineAfter = -1
+        LVRules.Invalidate()
+    End Sub
     Private Sub BtnOK_Click(sender As Object, e As EventArgs) Handles BtnOK.Click
         Close()
     End Sub
@@ -349,13 +411,10 @@ Public Class Settings
         If LVRules.SelectedItems.Count = 0 Then Exit Sub
 
         Dim item As ListViewItem = LVRules.SelectedItems(0)
-        Dim rule = CType(item.Tag, App.IRulePreview)
-        Select Case rule.RuleType
-            Case RuleType.ActiveAppRule, RuleType.LocationProfileRule, RuleType.LocationBlockRule, RuleType.TimeRule
-                App.DeleteContextRule(CType(rule, App.IContextRule))
-            Case RuleType.SourceAppRule, RuleType.KeywordRule, RuleType.FormatRule
-                App.DeleteContentRule(CType(rule, App.IContentRule))
-        End Select
+        Dim rule As App.IRulePreview = CType(item.Tag, App.IRulePreview)
+
+        ' Unified delete
+        App.DeleteRule(rule)
 
         RefreshRuleList()
         PanelRule.Controls.Clear()
@@ -623,8 +682,7 @@ Public Class Settings
         LVRules.Items.Clear()
         BtnRuleDelete.Enabled = False
 
-        ' Context Rules (ActiveAppRule, TimeRule)
-        For Each r As App.IRulePreview In ContextRules
+        For Each r As App.IRulePreview In Rules
             Dim item As New ListViewItem(GetDisplayRuleType(r))
             item.SubItems.Add(r.ConditionText)
             item.SubItems.Add(r.ActionText)
@@ -633,17 +691,6 @@ Public Class Settings
             LVRules.Items.Add(item)
         Next
 
-        ' Content Rules (SourceAppRule, KeywordRule, FormatRule)
-        For Each r As App.IRulePreview In ContentRules
-            Dim item As New ListViewItem(r.RuleType.ToString())
-            item.SubItems.Add(r.ConditionText)
-            item.SubItems.Add(r.ActionText)
-            item.SubItems.Add(r.Summary)
-            item.Tag = r
-            LVRules.Items.Add(item)
-        Next
-
-        ' Auto-resize all columns to fit both content and headers
         For i As Integer = 0 To LVRules.Columns.Count - 1
             LVRules.AutoResizeColumn(i, ColumnHeaderAutoResizeStyle.ColumnContent)
             LVRules.AutoResizeColumn(i, ColumnHeaderAutoResizeStyle.HeaderSize)

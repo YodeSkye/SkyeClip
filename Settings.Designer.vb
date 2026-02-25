@@ -816,6 +816,7 @@ Partial Class Settings
         LVRules.Columns.AddRange(New ColumnHeader() {ColType, ColCondition, ColAction, ColSummary})
         LVRules.EditableColumns = CType(resources.GetObject("LVRules.EditableColumns"), List(Of Boolean))
         LVRules.FullRowSelect = True
+        LVRules.HeaderStyle = ColumnHeaderStyle.Nonclickable
         TipSettings.SetImage(LVRules, My.Resources.Resources.ImageAutomation16)
         LVRules.InsertionLineColor = Color.Teal
         LVRules.Location = New Point(10, 11)

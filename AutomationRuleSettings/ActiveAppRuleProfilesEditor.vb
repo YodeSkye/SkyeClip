@@ -83,10 +83,6 @@ Public Class ActiveAppRuleProfilesEditor
             End If
         Next
 
-        ' Descriptions
-        TxtBoxEnterDescription.Text = _rule.EnterDescription
-        TxtBoxExitDescription.Text = _rule.ExitDescription
-
     End Sub
     Friend Function SaveRule() As Boolean
         If CoBoxMode.SelectedItem Is Nothing OrElse CoBoxEnterProfile.SelectedItem Is Nothing OrElse CoBoxExitProfile.SelectedItem Is Nothing Then Return False
@@ -103,10 +99,6 @@ Public Class ActiveAppRuleProfilesEditor
         _rule.EnterProfileID = enterItem.ID
         Dim exitItem As ProfileItem = CType(CoBoxExitProfile.SelectedItem, ProfileItem)
         _rule.ExitProfileID = exitItem.ID
-
-        ' Descriptions
-        _rule.EnterDescription = TxtBoxEnterDescription.Text
-        _rule.ExitDescription = TxtBoxExitDescription.Text
 
         Return True
     End Function
