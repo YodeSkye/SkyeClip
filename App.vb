@@ -585,7 +585,9 @@ Friend Module App
         Implements IContextRule, IRulePreview
 
         Public Enum ActivationMode
+            <Description("Is Foreground Window")>
             ForegroundWindow
+            <Description("Is Running Process")>
             RunningProcess
         End Enum
         Public Enum Actions

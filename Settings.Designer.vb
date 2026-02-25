@@ -791,40 +791,39 @@ Partial Class Settings
         ' 
         BtnRuleDelete.Enabled = False
         BtnRuleDelete.Image = My.Resources.Resources.ImageClearRemoveDelete16
-        TipSettings.SetImage(BtnRuleDelete, Nothing)
+        TipSettings.SetImage(BtnRuleDelete, My.Resources.Resources.ImageClearRemoveDelete16)
         BtnRuleDelete.Location = New Point(387, 136)
         BtnRuleDelete.Name = "BtnRuleDelete"
         BtnRuleDelete.Size = New Size(36, 36)
         BtnRuleDelete.TabIndex = 3
-        TipSettings.SetText(BtnRuleDelete, Nothing)
+        TipSettings.SetText(BtnRuleDelete, "Delete selected Rule.")
         BtnRuleDelete.UseVisualStyleBackColor = True
         ' 
         ' CoBoxRuleTypes
         ' 
         CoBoxRuleTypes.DropDownStyle = ComboBoxStyle.DropDownList
-        CoBoxRuleTypes.Font = New Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         CoBoxRuleTypes.FormattingEnabled = True
-        TipSettings.SetImage(CoBoxRuleTypes, Nothing)
+        TipSettings.SetImage(CoBoxRuleTypes, My.Resources.Resources.ImageAutomation16)
         CoBoxRuleTypes.Location = New Point(10, 139)
         CoBoxRuleTypes.MaxDropDownItems = 10
         CoBoxRuleTypes.Name = "CoBoxRuleTypes"
         CoBoxRuleTypes.Size = New Size(239, 30)
         CoBoxRuleTypes.TabIndex = 1
-        TipSettings.SetText(CoBoxRuleTypes, Nothing)
+        TipSettings.SetText(CoBoxRuleTypes, "Create a new Rule.")
         ' 
         ' LVRules
         ' 
         LVRules.Columns.AddRange(New ColumnHeader() {ColType, ColCondition, ColAction, ColSummary})
         LVRules.EditableColumns = CType(resources.GetObject("LVRules.EditableColumns"), List(Of Boolean))
         LVRules.FullRowSelect = True
-        TipSettings.SetImage(LVRules, Nothing)
+        TipSettings.SetImage(LVRules, My.Resources.Resources.ImageAutomation16)
         LVRules.InsertionLineColor = Color.Teal
         LVRules.Location = New Point(10, 11)
         LVRules.MultiSelect = False
         LVRules.Name = "LVRules"
         LVRules.Size = New Size(415, 122)
         LVRules.TabIndex = 0
-        TipSettings.SetText(LVRules, Nothing)
+        TipSettings.SetText(LVRules, "List of Rules. Every active Rule is listed here.")
         LVRules.UseCompatibleStateImageBehavior = False
         LVRules.View = View.Details
         ' 

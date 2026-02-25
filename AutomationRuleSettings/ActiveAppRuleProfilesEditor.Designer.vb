@@ -22,6 +22,7 @@ Partial Class ActiveAppRuleProfilesEditor
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        components = New ComponentModel.Container()
         Label1 = New Skye.UI.Label()
         TxtBoxTargetProcess = New TextBox()
         BtnSave = New Button()
@@ -35,111 +36,146 @@ Partial Class ActiveAppRuleProfilesEditor
         TxtBoxEnterDescription = New TextBox()
         TxtBoxExitDescription = New TextBox()
         Label6 = New Skye.UI.Label()
+        Tip = New Skye.UI.ToolTipEX(components)
         SuspendLayout()
         ' 
         ' Label1
         ' 
+        Tip.SetImage(Label1, Nothing)
         Label1.Location = New Point(3, 58)
         Label1.Name = "Label1"
         Label1.Size = New Size(123, 23)
         Label1.TabIndex = 0
         Label1.Text = "Target Process"
+        Tip.SetText(Label1, Nothing)
         ' 
         ' TxtBoxTargetProcess
         ' 
+        Tip.SetImage(TxtBoxTargetProcess, Nothing)
         TxtBoxTargetProcess.Location = New Point(3, 80)
         TxtBoxTargetProcess.Name = "TxtBoxTargetProcess"
-        TxtBoxTargetProcess.Size = New Size(190, 29)
+        TxtBoxTargetProcess.Size = New Size(197, 29)
         TxtBoxTargetProcess.TabIndex = 1
+        Tip.SetText(TxtBoxTargetProcess, Nothing)
         ' 
         ' BtnSave
         ' 
         BtnSave.Image = My.Resources.Resources.ImageOK16
+        Tip.SetImage(BtnSave, Nothing)
         BtnSave.ImageAlign = ContentAlignment.MiddleLeft
         BtnSave.Location = New Point(3, 214)
         BtnSave.Name = "BtnSave"
         BtnSave.Size = New Size(409, 36)
         BtnSave.TabIndex = 4
+        Tip.SetText(BtnSave, Nothing)
         BtnSave.Text = "Save Rule"
         BtnSave.UseVisualStyleBackColor = True
         ' 
         ' CoBoxMode
         ' 
+        CoBoxMode.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxMode.FormattingEnabled = True
+        Tip.SetImage(CoBoxMode, Nothing)
         CoBoxMode.Location = New Point(3, 25)
         CoBoxMode.Name = "CoBoxMode"
-        CoBoxMode.Size = New Size(190, 30)
+        CoBoxMode.Size = New Size(197, 30)
         CoBoxMode.TabIndex = 5
+        Tip.SetText(CoBoxMode, "Rule Mode. Select whether the Rule should check for a running process or the currently active window.")
         ' 
         ' Label3
         ' 
+        Tip.SetImage(Label3, Nothing)
         Label3.Location = New Point(3, 5)
         Label3.Name = "Label3"
         Label3.Size = New Size(100, 23)
         Label3.TabIndex = 6
         Label3.Text = "Mode"
+        Tip.SetText(Label3, Nothing)
         ' 
         ' CoBoxEnterProfile
         ' 
+        CoBoxEnterProfile.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxEnterProfile.FormattingEnabled = True
+        Tip.SetImage(CoBoxEnterProfile, Nothing)
         CoBoxEnterProfile.Location = New Point(229, 25)
         CoBoxEnterProfile.Name = "CoBoxEnterProfile"
         CoBoxEnterProfile.Size = New Size(183, 30)
         CoBoxEnterProfile.TabIndex = 7
+        Tip.SetText(CoBoxEnterProfile, Nothing)
         ' 
         ' Label4
         ' 
+        Tip.SetImage(Label4, Nothing)
         Label4.Location = New Point(229, 5)
         Label4.Name = "Label4"
         Label4.Size = New Size(100, 23)
         Label4.TabIndex = 8
         Label4.Text = "On Enter"
+        Tip.SetText(Label4, Nothing)
         ' 
         ' CoBoxExitProfile
         ' 
+        CoBoxExitProfile.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxExitProfile.FormattingEnabled = True
+        Tip.SetImage(CoBoxExitProfile, Nothing)
         CoBoxExitProfile.Location = New Point(229, 80)
         CoBoxExitProfile.Name = "CoBoxExitProfile"
         CoBoxExitProfile.Size = New Size(183, 30)
         CoBoxExitProfile.TabIndex = 9
+        Tip.SetText(CoBoxExitProfile, Nothing)
         ' 
         ' Label5
         ' 
+        Tip.SetImage(Label5, Nothing)
         Label5.Location = New Point(229, 60)
         Label5.Name = "Label5"
         Label5.Size = New Size(100, 23)
         Label5.TabIndex = 10
         Label5.Text = "On Exit"
+        Tip.SetText(Label5, Nothing)
         ' 
         ' Label2
         ' 
+        Tip.SetImage(Label2, Nothing)
         Label2.Location = New Point(3, 112)
         Label2.Name = "Label2"
         Label2.Size = New Size(140, 23)
         Label2.TabIndex = 11
         Label2.Text = "Enter Description"
+        Tip.SetText(Label2, Nothing)
         ' 
         ' TxtBoxEnterDescription
         ' 
+        Tip.SetImage(TxtBoxEnterDescription, Nothing)
         TxtBoxEnterDescription.Location = New Point(3, 132)
         TxtBoxEnterDescription.Name = "TxtBoxEnterDescription"
         TxtBoxEnterDescription.Size = New Size(409, 29)
         TxtBoxEnterDescription.TabIndex = 12
+        Tip.SetText(TxtBoxEnterDescription, Nothing)
         ' 
         ' TxtBoxExitDescription
         ' 
+        Tip.SetImage(TxtBoxExitDescription, Nothing)
         TxtBoxExitDescription.Location = New Point(3, 181)
         TxtBoxExitDescription.Name = "TxtBoxExitDescription"
         TxtBoxExitDescription.Size = New Size(409, 29)
         TxtBoxExitDescription.TabIndex = 14
+        Tip.SetText(TxtBoxExitDescription, Nothing)
         ' 
         ' Label6
         ' 
+        Tip.SetImage(Label6, Nothing)
         Label6.Location = New Point(3, 161)
         Label6.Name = "Label6"
         Label6.Size = New Size(140, 23)
         Label6.TabIndex = 13
         Label6.Text = "Exit Description"
+        Tip.SetText(Label6, Nothing)
+        ' 
+        ' Tip
+        ' 
+        Tip.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Tip.ShadowThickness = 0
         ' 
         ' ActiveAppRuleProfilesEditor
         ' 
@@ -158,8 +194,10 @@ Partial Class ActiveAppRuleProfilesEditor
         Controls.Add(Label1)
         Controls.Add(Label6)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Tip.SetImage(Me, Nothing)
         Name = "ActiveAppRuleProfilesEditor"
         Size = New Size(415, 253)
+        Tip.SetText(Me, Nothing)
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -177,5 +215,6 @@ Partial Class ActiveAppRuleProfilesEditor
     Friend WithEvents TxtBoxEnterDescription As TextBox
     Friend WithEvents TxtBoxExitDescription As TextBox
     Friend WithEvents Label6 As Skye.UI.Label
+    Friend WithEvents Tip As Skye.UI.ToolTipEX
 
 End Class

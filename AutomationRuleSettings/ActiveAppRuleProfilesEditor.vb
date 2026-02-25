@@ -6,22 +6,32 @@ Public Class ActiveAppRuleProfilesEditor
     ' Declarations
     Private _rule As App.ActiveAppRule
     Friend Event RuleSaved(editor As UserControl, rule As App.IRulePreview)
+    Private Class ModeItem
+        Public Property Value As App.ActiveAppRule.ActivationMode
+        Public Property Text As String
+        Public Overrides Function ToString() As String
+            Return Text
+        End Function
+    End Class
     Private Class ProfileItem
         Public Property ID As Integer
         Public Property Name As String
-
         Public Overrides Function ToString() As String
             Return Name
         End Function
     End Class
 
     ' Form Events
-    Public Sub New()
+    Friend Sub New()
         InitializeComponent()
 
         CoBoxMode.Items.Clear()
-        CoBoxMode.Items.Add(App.ActiveAppRule.ActivationMode.ForegroundWindow)
-        CoBoxMode.Items.Add(App.ActiveAppRule.ActivationMode.RunningProcess)
+        For Each v As App.ActiveAppRule.ActivationMode In [Enum].GetValues(Of ActiveAppRule.ActivationMode)()
+            CoBoxMode.Items.Add(New ModeItem With {
+                .Value = v,
+                .Text = App.GetEnumDescription(v)
+            })
+        Next
 
         CoBoxEnterProfile.Items.Clear()
         CoBoxExitProfile.Items.Clear()
@@ -36,22 +46,25 @@ Public Class ActiveAppRuleProfilesEditor
 
     End Sub
     Private Sub ActiveAppRuleProfilesEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        'Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
+        Skye.UI.ThemeManager.ApplyToTooltip(Tip)
     End Sub
 
     ' Control Events
     Private Sub BtnSave_Click(sender As Object, e As EventArgs) Handles BtnSave.Click
-        SaveRule()
-        RaiseEvent RuleSaved(Me, _rule)
+        If SaveRule() Then RaiseEvent RuleSaved(Me, _rule)
     End Sub
 
     ' Methods
-    ' Interface method — just a wrapper
     Friend Sub LoadRule(rule As App.ActiveAppRule)
         _rule = rule
 
         ' Mode
-        CoBoxMode.SelectedItem = _rule.Mode
+        For Each item As ModeItem In CoBoxMode.Items
+            If item.Value = _rule.Mode Then
+                CoBoxMode.SelectedItem = item
+                Exit For
+            End If
+        Next
 
         ' Target process
         TxtBoxTargetProcess.Text = _rule.TargetProcess
@@ -75,15 +88,15 @@ Public Class ActiveAppRuleProfilesEditor
         TxtBoxExitDescription.Text = _rule.ExitDescription
 
     End Sub
-    Friend Sub SaveRule()
+    Friend Function SaveRule() As Boolean
+        If CoBoxMode.SelectedItem Is Nothing OrElse CoBoxEnterProfile.SelectedItem Is Nothing OrElse CoBoxExitProfile.SelectedItem Is Nothing Then Return False
 
-        ' Mode + process
-        _rule.Mode = CType(CoBoxMode.SelectedItem, App.ActiveAppRule.ActivationMode)
+        ' Mode
+        Dim modeItem As ModeItem = CType(CoBoxMode.SelectedItem, ModeItem)
+        _rule.Mode = modeItem.Value
+
+        ' Process
         _rule.TargetProcess = TxtBoxTargetProcess.Text
-
-        ' Descriptions
-        _rule.EnterDescription = TxtBoxEnterDescription.Text
-        _rule.ExitDescription = TxtBoxExitDescription.Text
 
         ' Profiles
         Dim enterItem As ProfileItem = CType(CoBoxEnterProfile.SelectedItem, ProfileItem)
@@ -91,6 +104,11 @@ Public Class ActiveAppRuleProfilesEditor
         Dim exitItem As ProfileItem = CType(CoBoxExitProfile.SelectedItem, ProfileItem)
         _rule.ExitProfileID = exitItem.ID
 
-    End Sub
+        ' Descriptions
+        _rule.EnterDescription = TxtBoxEnterDescription.Text
+        _rule.ExitDescription = TxtBoxExitDescription.Text
+
+        Return True
+    End Function
 
 End Class

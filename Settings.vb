@@ -621,6 +621,7 @@ Public Class Settings
     End Sub
     Private Sub RefreshRuleList()
         LVRules.Items.Clear()
+        BtnRuleDelete.Enabled = False
 
         ' Context Rules (ActiveAppRule, TimeRule)
         For Each r As App.IRulePreview In ContextRules
