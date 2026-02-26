@@ -32,7 +32,7 @@ Partial Class ClipViewer
         ILFileDrop = New ImageList(components)
         WebView = New Microsoft.Web.WebView2.WinForms.WebView2()
         RTFBox = New Skye.UI.RichTextBox()
-        BtnExport = New Button()
+        BtnSaveAs = New Button()
         TipClipViewer = New Skye.UI.ToolTipEX(components)
         CType(PicBox, ComponentModel.ISupportInitialize).BeginInit()
         CType(WebView, ComponentModel.ISupportInitialize).BeginInit()
@@ -127,17 +127,17 @@ Partial Class ClipViewer
         RTFBox.Text = ""
         TipClipViewer.SetText(RTFBox, Nothing)
         ' 
-        ' BtnExport
+        ' BtnSaveAs
         ' 
-        BtnExport.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
-        BtnExport.Image = My.Resources.Resources.ImageExport16
-        TipClipViewer.SetImage(BtnExport, My.Resources.Resources.ImageExport16)
-        BtnExport.Location = New Point(548, 248)
-        BtnExport.Name = "BtnExport"
-        BtnExport.Size = New Size(24, 24)
-        BtnExport.TabIndex = 6
-        TipClipViewer.SetText(BtnExport, "Export Clip")
-        BtnExport.UseVisualStyleBackColor = True
+        BtnSaveAs.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
+        BtnSaveAs.Image = My.Resources.Resources.ImageExport16
+        TipClipViewer.SetImage(BtnSaveAs, My.Resources.Resources.ImageExport16)
+        BtnSaveAs.Location = New Point(548, 248)
+        BtnSaveAs.Name = "BtnSaveAs"
+        BtnSaveAs.Size = New Size(24, 24)
+        BtnSaveAs.TabIndex = 6
+        TipClipViewer.SetText(BtnSaveAs, "Save To File")
+        BtnSaveAs.UseVisualStyleBackColor = True
         ' 
         ' TipClipViewer
         ' 
@@ -149,7 +149,7 @@ Partial Class ClipViewer
         AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(584, 284)
         ControlBox = False
-        Controls.Add(BtnExport)
+        Controls.Add(BtnSaveAs)
         Controls.Add(RTFBox)
         Controls.Add(PicBox)
         Controls.Add(WebView)
@@ -179,6 +179,6 @@ Partial Class ClipViewer
     Friend WithEvents ILFileDrop As ImageList
     Friend WithEvents WebView As Microsoft.Web.WebView2.WinForms.WebView2
     Friend WithEvents RTFBox As Skye.UI.RichTextBox
-    Friend WithEvents BtnExport As Button
+    Friend WithEvents BtnSaveAs As Button
     Friend WithEvents TipClipViewer As Skye.UI.ToolTipEX
 End Class

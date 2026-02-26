@@ -27,7 +27,7 @@ Public Class Settings
         ILPageSelector.Images.Add(My.Resources.ImageHotKeys48)
         ILPageSelector.Images.Add(My.Resources.ImageBackup48)
         ILPageSelector.Images.Add(My.Resources.ImageProfiles48)
-        ILPageSelector.Images.Add(My.Resources.ImageAutomation48)
+        ILPageSelector.Images.Add(My.Resources.ImageRules48)
 
         LVPageSelector.Items.Add(New ListViewItem("General", 0))
         LVPageSelector.Items.Add(New ListViewItem("Clips", 1))
@@ -111,31 +111,6 @@ Public Class Settings
     End Sub
     Private Sub Settings_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyData = Keys.Escape Then Close()
-    End Sub
-
-    ' Handlers
-    Private Sub OnProfileChanged()
-        LoadSettings()
-    End Sub
-    Private Sub OnThemeChanged()
-        Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
-    End Sub
-    Private Sub OnRuleSaved(editor As UserControl, rule As App.IRulePreview)
-
-        ' Add to unified list if new
-        If Not App.Rules.Contains(rule) Then
-            App.Rules.Add(rule)
-        End If
-
-        ' Rebuild delegates for context rules
-        If TypeOf rule Is App.IContextRule Then
-            App.RebuildDelegatesForRule(DirectCast(rule, App.IContextRule))
-        End If
-
-        App.SaveAllRulesToRegistry()
-        RefreshRuleList()
-        PanelRule.Controls.Clear()
-
     End Sub
 
     ' Control Events
@@ -528,6 +503,7 @@ Public Class Settings
         App.Settings.AutoBackup = item.Value
     End Sub
     Private Sub CoBoxRuleTypes_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxRuleTypes.SelectedIndexChanged
+        TipSettings.HideTooltip()
         Dim selected = CoBoxRuleTypes.SelectedValue
         If selected Is Nothing Then Return
 
@@ -611,6 +587,31 @@ Public Class Settings
         SetUseProfiles()
         App.Tray.SetAppIcon()
         App.Tray.RaiseProfileChangedEvent()
+    End Sub
+
+    ' Handlers
+    Private Sub OnProfileChanged()
+        LoadSettings()
+    End Sub
+    Private Sub OnThemeChanged()
+        Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
+    End Sub
+    Private Sub OnRuleSaved(editor As UserControl, rule As App.IRulePreview)
+
+        ' Add to unified list if new
+        If Not App.Rules.Contains(rule) Then
+            App.Rules.Add(rule)
+        End If
+
+        ' Rebuild delegates for context rules
+        If TypeOf rule Is App.IContextRule Then
+            App.RebuildDelegatesForRule(DirectCast(rule, App.IContextRule))
+        End If
+
+        App.SaveAllRulesToRegistry()
+        RefreshRuleList()
+        PanelRule.Controls.Clear()
+
     End Sub
 
     ' Methods

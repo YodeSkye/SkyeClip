@@ -51,7 +51,22 @@ Public Class ActiveAppRuleProfilesEditor
 
     ' Control Events
     Private Sub BtnSave_Click(sender As Object, e As EventArgs) Handles BtnSave.Click
-        If SaveRule() Then RaiseEvent RuleSaved(Me, _rule)
+        Tip.HideTooltip()
+        TipError.HideTooltip()
+        If CoBoxMode.SelectedItem Is Nothing Then
+            TipError.ShowTooltipAt(CoBoxMode.Location, "Please select a mode.", My.Resources.ImageRules16)
+            Exit Sub
+        End If
+        If TxtBoxTargetProcess.Text.Trim() = String.Empty Then
+            TipError.ShowTooltipAt(TxtBoxTargetProcess.PointToScreen(TxtBoxTargetProcess.Location), "Please enter a process name.", My.Resources.ImageRules16)
+            Exit Sub
+        End If
+
+        'OrElse CoBoxEnterProfile.SelectedItem Is Nothing OrElse CoBoxExitProfile.SelectedItem Is Nothing Then Return False
+
+
+        SaveRule()
+        RaiseEvent RuleSaved(Me, _rule)
     End Sub
 
     ' Methods
@@ -84,8 +99,7 @@ Public Class ActiveAppRuleProfilesEditor
         Next
 
     End Sub
-    Friend Function SaveRule() As Boolean
-        If CoBoxMode.SelectedItem Is Nothing OrElse CoBoxEnterProfile.SelectedItem Is Nothing OrElse CoBoxExitProfile.SelectedItem Is Nothing Then Return False
+    Friend Sub SaveRule()
 
         ' Mode
         Dim modeItem As ModeItem = CType(CoBoxMode.SelectedItem, ModeItem)
@@ -100,7 +114,6 @@ Public Class ActiveAppRuleProfilesEditor
         Dim exitItem As ProfileItem = CType(CoBoxExitProfile.SelectedItem, ProfileItem)
         _rule.ExitProfileID = exitItem.ID
 
-        Return True
-    End Function
+    End Sub
 
 End Class

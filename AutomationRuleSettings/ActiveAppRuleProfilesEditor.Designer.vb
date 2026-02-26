@@ -33,29 +33,35 @@ Partial Class ActiveAppRuleProfilesEditor
         CoBoxExitProfile = New Skye.UI.ComboBox()
         Label5 = New Skye.UI.Label()
         Tip = New Skye.UI.ToolTipEX(components)
+        TipError = New Skye.UI.ToolTipEX(components)
         SuspendLayout()
         ' 
         ' Label1
         ' 
+        TipError.SetImage(Label1, Nothing)
         Tip.SetImage(Label1, Nothing)
         Label1.Location = New Point(3, 103)
         Label1.Name = "Label1"
         Label1.Size = New Size(123, 23)
         Label1.TabIndex = 0
-        Label1.Text = "Target Process"
         Tip.SetText(Label1, Nothing)
+        Label1.Text = "Target Process"
+        TipError.SetText(Label1, Nothing)
         ' 
         ' TxtBoxTargetProcess
         ' 
+        TipError.SetImage(TxtBoxTargetProcess, Nothing)
         Tip.SetImage(TxtBoxTargetProcess, Nothing)
         TxtBoxTargetProcess.Location = New Point(3, 125)
         TxtBoxTargetProcess.Name = "TxtBoxTargetProcess"
         TxtBoxTargetProcess.Size = New Size(197, 29)
         TxtBoxTargetProcess.TabIndex = 1
         Tip.SetText(TxtBoxTargetProcess, Nothing)
+        TipError.SetText(TxtBoxTargetProcess, Nothing)
         ' 
         ' BtnSave
         ' 
+        TipError.SetImage(BtnSave, Nothing)
         BtnSave.Image = My.Resources.Resources.ImageOK16
         Tip.SetImage(BtnSave, Nothing)
         BtnSave.ImageAlign = ContentAlignment.MiddleLeft
@@ -64,6 +70,7 @@ Partial Class ActiveAppRuleProfilesEditor
         BtnSave.Size = New Size(409, 36)
         BtnSave.TabIndex = 4
         Tip.SetText(BtnSave, Nothing)
+        TipError.SetText(BtnSave, Nothing)
         BtnSave.Text = "Save Rule"
         BtnSave.UseVisualStyleBackColor = True
         ' 
@@ -72,68 +79,86 @@ Partial Class ActiveAppRuleProfilesEditor
         CoBoxMode.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxMode.FormattingEnabled = True
         Tip.SetImage(CoBoxMode, Nothing)
+        TipError.SetImage(CoBoxMode, Nothing)
         CoBoxMode.Location = New Point(3, 70)
         CoBoxMode.Name = "CoBoxMode"
         CoBoxMode.Size = New Size(197, 30)
         CoBoxMode.TabIndex = 5
+        TipError.SetText(CoBoxMode, Nothing)
         Tip.SetText(CoBoxMode, "Rule Mode. Select whether the Rule should check for a running process or the currently active window.")
         ' 
         ' Label3
         ' 
+        TipError.SetImage(Label3, Nothing)
         Tip.SetImage(Label3, Nothing)
         Label3.Location = New Point(3, 50)
         Label3.Name = "Label3"
         Label3.Size = New Size(100, 23)
         Label3.TabIndex = 6
-        Label3.Text = "Mode"
         Tip.SetText(Label3, Nothing)
+        Label3.Text = "Mode"
+        TipError.SetText(Label3, Nothing)
         ' 
         ' CoBoxEnterProfile
         ' 
         CoBoxEnterProfile.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxEnterProfile.FormattingEnabled = True
         Tip.SetImage(CoBoxEnterProfile, Nothing)
+        TipError.SetImage(CoBoxEnterProfile, Nothing)
         CoBoxEnterProfile.Location = New Point(229, 70)
         CoBoxEnterProfile.Name = "CoBoxEnterProfile"
         CoBoxEnterProfile.Size = New Size(183, 30)
         CoBoxEnterProfile.TabIndex = 7
+        TipError.SetText(CoBoxEnterProfile, Nothing)
         Tip.SetText(CoBoxEnterProfile, Nothing)
         ' 
         ' Label4
         ' 
+        TipError.SetImage(Label4, Nothing)
         Tip.SetImage(Label4, Nothing)
         Label4.Location = New Point(229, 50)
         Label4.Name = "Label4"
         Label4.Size = New Size(100, 23)
         Label4.TabIndex = 8
-        Label4.Text = "On Enter"
         Tip.SetText(Label4, Nothing)
+        Label4.Text = "On Enter"
+        TipError.SetText(Label4, Nothing)
         ' 
         ' CoBoxExitProfile
         ' 
         CoBoxExitProfile.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxExitProfile.FormattingEnabled = True
         Tip.SetImage(CoBoxExitProfile, Nothing)
+        TipError.SetImage(CoBoxExitProfile, Nothing)
         CoBoxExitProfile.Location = New Point(229, 125)
         CoBoxExitProfile.Name = "CoBoxExitProfile"
         CoBoxExitProfile.Size = New Size(183, 30)
         CoBoxExitProfile.TabIndex = 9
+        TipError.SetText(CoBoxExitProfile, Nothing)
         Tip.SetText(CoBoxExitProfile, Nothing)
         ' 
         ' Label5
         ' 
+        TipError.SetImage(Label5, Nothing)
         Tip.SetImage(Label5, Nothing)
         Label5.Location = New Point(229, 105)
         Label5.Name = "Label5"
         Label5.Size = New Size(100, 23)
         Label5.TabIndex = 10
-        Label5.Text = "On Exit"
         Tip.SetText(Label5, Nothing)
+        Label5.Text = "On Exit"
+        TipError.SetText(Label5, Nothing)
         ' 
         ' Tip
         ' 
         Tip.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Tip.ShadowThickness = 0
+        ' 
+        ' TipError
+        ' 
+        TipError.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipError.HideDelay = 4000
+        TipError.ShadowThickness = 0
         ' 
         ' ActiveAppRuleProfilesEditor
         ' 
@@ -149,8 +174,10 @@ Partial Class ActiveAppRuleProfilesEditor
         Controls.Add(Label1)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Tip.SetImage(Me, Nothing)
+        TipError.SetImage(Me, Nothing)
         Name = "ActiveAppRuleProfilesEditor"
         Size = New Size(415, 253)
+        TipError.SetText(Me, Nothing)
         Tip.SetText(Me, Nothing)
         ResumeLayout(False)
         PerformLayout()
@@ -166,5 +193,6 @@ Partial Class ActiveAppRuleProfilesEditor
     Friend WithEvents CoBoxExitProfile As Skye.UI.ComboBox
     Friend WithEvents Label5 As Skye.UI.Label
     Friend WithEvents Tip As Skye.UI.ToolTipEX
+    Friend WithEvents TipError As Skye.UI.ToolTipEX
 
 End Class

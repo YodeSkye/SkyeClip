@@ -803,7 +803,7 @@ Partial Class Settings
         ' 
         CoBoxRuleTypes.DropDownStyle = ComboBoxStyle.DropDownList
         CoBoxRuleTypes.FormattingEnabled = True
-        TipSettings.SetImage(CoBoxRuleTypes, My.Resources.Resources.ImageAutomation16)
+        TipSettings.SetImage(CoBoxRuleTypes, My.Resources.Resources.ImageRules16)
         CoBoxRuleTypes.Location = New Point(10, 139)
         CoBoxRuleTypes.MaxDropDownItems = 10
         CoBoxRuleTypes.Name = "CoBoxRuleTypes"
@@ -817,7 +817,7 @@ Partial Class Settings
         LVRules.EditableColumns = CType(resources.GetObject("LVRules.EditableColumns"), List(Of Boolean))
         LVRules.FullRowSelect = True
         LVRules.HeaderStyle = ColumnHeaderStyle.Nonclickable
-        TipSettings.SetImage(LVRules, My.Resources.Resources.ImageAutomation16)
+        TipSettings.SetImage(LVRules, My.Resources.Resources.ImageRules16)
         LVRules.InsertionLineColor = Color.Teal
         LVRules.Location = New Point(10, 11)
         LVRules.MultiSelect = False

@@ -57,7 +57,7 @@ Partial Class ClipExplorer
         CMICAFavorite = New ToolStripMenuItem()
         CMICAClipViewer = New ToolStripMenuItem()
         CMICAScratchPad = New ToolStripMenuItem()
-        CMICAExport = New ToolStripMenuItem()
+        CMICASaveAs = New ToolStripMenuItem()
         CMICAOpenSourceApp = New ToolStripMenuItem()
         ToolStripSeparator2 = New ToolStripSeparator()
         CMICADelete = New ToolStripMenuItem()
@@ -378,7 +378,7 @@ Partial Class ClipExplorer
         ' 
         CMClipActions.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.SetImage(CMClipActions, Nothing)
-        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, CMIUseClipAndToSetCurrentProfile, CMIMoveClipsToCurrentProfile, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICAExport, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
+        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, CMIUseClipAndToSetCurrentProfile, CMIMoveClipsToCurrentProfile, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICASaveAs, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
         CMClipActions.Name = "CMClipActions"
         CMClipActions.Size = New Size(277, 236)
         TipClipExplorer.SetText(CMClipActions, Nothing)
@@ -430,12 +430,12 @@ Partial Class ClipExplorer
         CMICAScratchPad.Size = New Size(276, 22)
         CMICAScratchPad.Text = "Send To Scratch Pad"
         ' 
-        ' CMICAExport
+        ' CMICASaveAs
         ' 
-        CMICAExport.Image = My.Resources.Resources.ImageExport16
-        CMICAExport.Name = "CMICAExport"
-        CMICAExport.Size = New Size(276, 22)
-        CMICAExport.Text = "Export"
+        CMICASaveAs.Image = My.Resources.Resources.ImageExport16
+        CMICASaveAs.Name = "CMICASaveAs"
+        CMICASaveAs.Size = New Size(276, 22)
+        CMICASaveAs.Text = "Save To File"
         ' 
         ' CMICAOpenSourceApp
         ' 
@@ -587,7 +587,7 @@ Partial Class ClipExplorer
     Friend WithEvents FileIcon As ColumnHeader
     Friend WithEvents FileName As ColumnHeader
     Friend WithEvents FileSize As ColumnHeader
-    Friend WithEvents CMICAExport As ToolStripMenuItem
+    Friend WithEvents CMICASaveAs As ToolStripMenuItem
     Friend WithEvents PicBox As PictureBox
     Friend WithEvents CMIUseClipAndToSetCurrentProfile As ToolStripMenuItem
     Friend WithEvents ChkBoxShowAll As CheckBox

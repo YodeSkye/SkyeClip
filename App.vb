@@ -1243,8 +1243,310 @@ Friend Module App
         End If
     End Sub
 
-    ' EXPORT TO FILE
-    Friend Sub ExportClipToFile(clipId As Integer)
+    ' CLIP FUNCTIONS
+    Friend Function BuildLiveClipboardPreview() As String
+        Dim data = Clipboard.GetDataObject()
+        If data Is Nothing OrElse data.GetFormats().Length = 0 Then
+            Return App.CBEmptyString
+        End If
+
+        Dim formats = ClipboardWin32.CaptureFormatsFromClipboard()
+        ' If Win32 capture sees nothing, but DataObject had formats,
+        ' treat it as unknown / unsupported, NOT clipboard empty.
+        If formats Is Nothing OrElse formats.Count = 0 Then
+            Return App.CBUnknownFormatString
+        End If
+
+        Return BuildPreviewFromFormats(formats)
+
+    End Function
+    Friend Function BuildPreviewFromFormats(formats As List(Of ClipData)) As String
+        If formats Is Nothing OrElse formats.Count = 0 Then
+            Return App.CBNoPreviewString
+        End If
+
+        ' 1. TEXT (Unicode)
+        Dim uni = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_UNICODETEXT)
+        If uni IsNot Nothing Then
+            Return BuildTextPreview(formats, uni)
+        End If
+
+        ' 2. FILE DROP
+        Dim filedrop = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_HDROP)
+        If filedrop IsNot Nothing Then
+            Return BuildFileDropPreview()
+        End If
+
+        ' 3. IMAGE
+        Dim dib = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_DIB OrElse f.FormatId = Skye.WinAPI.CF_DIBV5)
+        If dib IsNot Nothing Then
+            Return "< Image >"
+        End If
+
+        ' 4. FALLBACK: we have data, but nothing we know how to preview
+        Dim f0 = formats.First()
+        Return If(String.IsNullOrWhiteSpace(f0.FormatName), App.CBUnknownFormatString, f0.FormatName)
+
+
+        'Dim f0 = formats.First()
+        'Return If(String.IsNullOrWhiteSpace(f0.FormatName), $"Format {f0.FormatId}", f0.FormatName)
+    End Function
+    Private Function BuildTextPreview(formats As List(Of ClipData), uni As ClipData) As String
+        Dim s = Encoding.Unicode.GetString(Skye.Common.TrimUnicodeNull(uni.DataBytes))
+
+        ' Normalize whitespace
+        s = s.Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ")
+        s = System.Text.RegularExpressions.Regex.Replace(s, "\s+", " ").TrimEnd()
+
+        If String.IsNullOrWhiteSpace(s) Then
+            Return "< No Preview >"
+        End If
+
+        ' Truncate
+        Dim preview = Skye.Common.Trunc(s, App.Settings.MaxClipPreviewLength)
+
+        ' Detect RTF/HTML
+        'Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").ToLower().Contains("rtf"))
+        'Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").ToLower().Contains("html"))
+        Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").Contains("rtf", StringComparison.OrdinalIgnoreCase))
+        Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").Contains("html", StringComparison.OrdinalIgnoreCase))
+        If hasRtf Then preview &= App.CBRTFSuffix
+        If hasHtml Then preview &= App.CBHTMLSuffix
+
+        Return preview
+    End Function
+    Friend Function BuildFileDropPreview() As String
+        Dim files As String() = Array.Empty(Of String)()
+
+        If Clipboard.TryGetData(DataFormats.FileDrop, files) Then
+            If files Is Nothing Then
+                files = Array.Empty(Of String)()
+            End If
+        End If
+
+        Dim count = files.Length
+        If count = 0 Then
+            Return "< Empty File Drop >"
+        ElseIf count = 1 Then
+            Return $"< 1 File >"
+        Else
+            Return $"< {count} Files >"
+        End If
+    End Function
+    Private Function DecodeFileDrop(bytes As Byte()) As String()
+        ' Convert raw bytes to UTF-16 string
+        Dim txt As String = System.Text.Encoding.Unicode.GetString(bytes)
+
+        ' Remove trailing nulls (there can be MANY)
+        txt = txt.TrimEnd(ControlChars.NullChar)
+
+        ' Split on single null
+        Dim parts = txt.Split(ControlChars.NullChar)
+
+        ' Filter out garbage entries
+        Dim files = parts.
+        Where(Function(p) Not String.IsNullOrWhiteSpace(p)).
+        Where(Function(p) p.IndexOfAny(Path.GetInvalidPathChars()) = -1).
+        ToArray()
+
+        Return files
+    End Function
+    Private Function GetFolderIcon(path As String) As Icon
+        Dim shinfo As New Skye.WinAPI.SHFILEINFO()
+        Dim hImg = Skye.WinAPI.SHGetFileInfo(path, 0, shinfo, Marshal.SizeOf(shinfo), Skye.WinAPI.SHGFI_ICON Or Skye.WinAPI.SHGFI_SMALLICON)
+        If hImg <> IntPtr.Zero AndAlso shinfo.hIcon <> IntPtr.Zero Then
+            Return Icon.FromHandle(shinfo.hIcon)
+        End If
+        Return Nothing
+    End Function
+    Friend Function ParseFileDrop(bytes As Byte()) As List(Of FileDropEntry)
+        Dim files = DecodeFileDrop(bytes)
+        Dim list As New List(Of FileDropEntry)
+
+        For Each path In files
+            Dim entry As New FileDropEntry With {
+            .FullPath = path,
+            .FileName = IO.Path.GetFileName(path)
+        }
+
+            If File.Exists(path) Then
+                Dim size = New FileInfo(path).Length
+                entry.SizeText = Skye.Common.FormatFileSize(size, Skye.Common.FormatFileSizeUnits.Auto)
+            Else
+                entry.SizeText = ""
+            End If
+
+            Try
+                If Directory.Exists(path) Then
+                    entry.Icon = GetFolderIcon(path)
+                ElseIf File.Exists(path) Then
+                    entry.Icon = Icon.ExtractAssociatedIcon(path)
+                End If
+            Catch
+            End Try
+
+            list.Add(entry)
+        Next
+
+        Return list
+    End Function
+    Public Async Function ComputeFolderSizesAsync(entries As List(Of FileDropEntry)) As Task(Of Long)
+        Dim folderPaths = entries.
+            Where(Function(e) Directory.Exists(e.FullPath)).
+            Select(Function(e) e.FullPath).
+            ToList()
+
+        Dim total As Long = 0
+
+        For Each folder In folderPaths
+            total += Await Task.Run(Function() GetFolderSize(folder))
+        Next
+
+        Return total
+    End Function
+    Private Function GetFolderSize(path As String) As Long
+        Dim total As Long = 0
+
+        Try
+            For Each file In Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
+                Try
+                    total += New FileInfo(file).Length
+                Catch
+                End Try
+            Next
+        Catch
+        End Try
+
+        Return total
+    End Function
+    Friend Function GetSourceAppInfo() As (AppName As String, IconBytes As Byte(), ExePath As String)
+        Dim hwnd = Skye.WinAPI.GetForegroundWindow()
+        Dim pid As UInteger
+        Dim result As UInteger = Skye.WinAPI.GetWindowThreadProcessId(hwnd, pid)
+        If pid = 0 Then Return ("Unknown", Nothing, Nothing)
+        Try
+            Dim proc = Process.GetProcessById(CInt(pid))
+            Dim exePath As String = Nothing
+
+            Try
+                exePath = proc.MainModule.FileName
+            Catch
+                ' Some protected processes throw here
+                exePath = Nothing
+            End Try
+
+            ' Friendly name
+            Dim appName As String = "Unknown"
+
+            If Not String.IsNullOrWhiteSpace(exePath) Then
+                appName = Path.GetFileNameWithoutExtension(exePath)
+
+                Dim verInfo = FileVersionInfo.GetVersionInfo(exePath)
+                If Not String.IsNullOrWhiteSpace(verInfo.ProductName) Then
+                    appName = verInfo.ProductName
+                End If
+            End If
+
+            ' Extract icon
+            Dim iconBytes As Byte() = Nothing
+
+            If Not String.IsNullOrWhiteSpace(exePath) Then
+                Try
+                    Dim ico = Icon.ExtractAssociatedIcon(exePath)
+                    If ico IsNot Nothing Then
+                        Using ms As New MemoryStream()
+                            ico.ToBitmap().Save(ms, Imaging.ImageFormat.Png)
+                            iconBytes = ms.ToArray()
+                        End Using
+                    End If
+                Catch
+                    ' Ignore icon extraction failures
+                End Try
+            End If
+
+            Return (appName, iconBytes, exePath)
+
+        Catch
+            Return ("Unknown", Nothing, Nothing)
+        End Try
+    End Function
+    Friend Function IsLegitimateSourceApp(path As String) As Boolean
+        If String.IsNullOrWhiteSpace(path) Then Return False
+        If Not File.Exists(path) Then Return False
+
+        Dim p = path.ToLower()
+
+        ' Exclude temp EXEs
+        If p.Contains("\appdata\local\temp\") Then Return False
+
+        ' Exclude system processes
+        Dim win = Environment.GetFolderPath(Environment.SpecialFolder.Windows).ToLower()
+        If p.StartsWith(win & "\system32") Then Return False
+        If p.StartsWith(win & "\syswow64") Then Return False
+
+        ' Exclude UWP apps
+        If p.Contains("\windowsapps\") Then Return False
+
+        Return True
+    End Function
+    Friend Function NormalizeRtf(rtf As String) As String
+        If String.IsNullOrWhiteSpace(rtf) Then
+            Return String.Empty
+        End If
+
+        Dim cleaned As String = rtf
+
+        ' Remove volatile RTF header metadata (generator, build, timestamps)
+        cleaned = Regex.Replace(cleaned,
+                            "\\\*?\\generator[^;]*;",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        cleaned = Regex.Replace(cleaned,
+                            "\\\*?\\creatim[^}]*}",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        cleaned = Regex.Replace(cleaned,
+                            "\\\*?\\revtim[^}]*}",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        ' Remove font table (not needed for search)
+        cleaned = Regex.Replace(cleaned,
+                            "{\\fonttbl[^}]*}",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        ' Remove color table (not needed for search)
+        cleaned = Regex.Replace(cleaned,
+                            "{\\colortbl[^}]*}",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        ' Remove stylesheet blocks
+        cleaned = Regex.Replace(cleaned,
+                            "{\\stylesheet[^}]*}",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        ' Remove picture data (huge blobs)
+        cleaned = Regex.Replace(cleaned,
+                            "{\\pict[^}]*}",
+                            "",
+                            RegexOptions.IgnoreCase)
+
+        ' Collapse excessive whitespace
+        cleaned = Regex.Replace(cleaned,
+                            "\s+",
+                            " ",
+                            RegexOptions.Multiline)
+
+        Return cleaned.Trim()
+    End Function
+
+    ' SAVE TO FILE
+    Friend Sub SaveClipToFile(clipId As Integer)
         Dim formats = App.Tray.repo.GetClipFormats(clipId)
         If formats Is Nothing OrElse formats.Count = 0 Then
             MessageBox.Show("This clip has no exportable formats.")
@@ -1917,225 +2219,6 @@ Friend Module App
     End Sub
 
     ' METHODS
-    Friend Function BuildLiveClipboardPreview() As String
-        Dim data = Clipboard.GetDataObject()
-        If data Is Nothing OrElse data.GetFormats().Length = 0 Then
-            Return App.CBEmptyString
-        End If
-
-        Dim formats = ClipboardWin32.CaptureFormatsFromClipboard()
-        ' If Win32 capture sees nothing, but DataObject had formats,
-        ' treat it as unknown / unsupported, NOT clipboard empty.
-        If formats Is Nothing OrElse formats.Count = 0 Then
-            Return App.CBUnknownFormatString
-        End If
-
-        Return BuildPreviewFromFormats(formats)
-
-        'Dim formats = ClipboardWin32.CaptureFormatsFromClipboard()
-        'Return BuildPreviewFromFormats(formats)
-
-        'Dim data = Clipboard.GetDataObject()
-        'If data Is Nothing OrElse data.GetFormats().Length = 0 Then
-        '    Return CBEmptyString
-        'End If
-
-        'Dim hasRtf As Boolean = data.GetDataPresent(DataFormats.Rtf)
-        'Dim hasHtml As Boolean = data.GetDataPresent(DataFormats.Html)
-
-        '' --- TEXT PREVIEW ---
-        'If data.GetDataPresent(DataFormats.UnicodeText) Then
-        '    Dim raw = CStr(data.GetData(DataFormats.UnicodeText))
-
-        '    Dim t = raw.Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ")
-        '    t = System.Text.RegularExpressions.Regex.Replace(t, "\s+", " ").Trim()
-        '    t = Skye.Common.Trunc(t, App.Settings.MaxClipPreviewLength)
-
-        '    If String.IsNullOrWhiteSpace(t) Then
-        '        t = "< No Preview >"
-        '    End If
-
-        '    ' Append format tags
-        '    If hasRtf Then
-        '        t &= CBRTFSuffix
-        '    ElseIf hasHtml Then
-        '        t &= CBHTMLSuffix
-        '    End If
-
-        '    Return t
-        'End If
-
-        '' --- IMAGE ---
-        'If data.GetDataPresent(DataFormats.Bitmap) Then
-        '    Return "< Image >"
-        'End If
-
-        '' --- FILE DROP ---
-        'If data.GetDataPresent(DataFormats.FileDrop) Then
-        '    Return BuildFileDropPreview()
-        'End If
-
-        'Return "< Unknown Format >"
-    End Function
-    Friend Function BuildPreviewFromFormats(formats As List(Of ClipData)) As String
-        If formats Is Nothing OrElse formats.Count = 0 Then
-            Return App.CBNoPreviewString
-        End If
-
-        ' 1. TEXT (Unicode)
-        Dim uni = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_UNICODETEXT)
-        If uni IsNot Nothing Then
-            Return BuildTextPreview(formats, uni)
-        End If
-
-        ' 2. FILE DROP
-        Dim filedrop = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_HDROP)
-        If filedrop IsNot Nothing Then
-            Return BuildFileDropPreview()
-        End If
-
-        ' 3. IMAGE
-        Dim dib = formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_DIB OrElse f.FormatId = Skye.WinAPI.CF_DIBV5)
-        If dib IsNot Nothing Then
-            Return "< Image >"
-        End If
-
-        ' 4. FALLBACK: we have data, but nothing we know how to preview
-        Dim f0 = formats.First()
-        Return If(String.IsNullOrWhiteSpace(f0.FormatName), App.CBUnknownFormatString, f0.FormatName)
-
-
-        'Dim f0 = formats.First()
-        'Return If(String.IsNullOrWhiteSpace(f0.FormatName), $"Format {f0.FormatId}", f0.FormatName)
-    End Function
-    Private Function BuildTextPreview(formats As List(Of ClipData), uni As ClipData) As String
-        Dim s = Encoding.Unicode.GetString(Skye.Common.TrimUnicodeNull(uni.DataBytes))
-
-        ' Normalize whitespace
-        s = s.Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ")
-        s = System.Text.RegularExpressions.Regex.Replace(s, "\s+", " ").TrimEnd()
-
-        If String.IsNullOrWhiteSpace(s) Then
-            Return "< No Preview >"
-        End If
-
-        ' Truncate
-        Dim preview = Skye.Common.Trunc(s, App.Settings.MaxClipPreviewLength)
-
-        ' Detect RTF/HTML
-        'Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").ToLower().Contains("rtf"))
-        'Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").ToLower().Contains("html"))
-        Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").Contains("rtf", StringComparison.OrdinalIgnoreCase))
-        Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").Contains("html", StringComparison.OrdinalIgnoreCase))
-        If hasRtf Then preview &= App.CBRTFSuffix
-        If hasHtml Then preview &= App.CBHTMLSuffix
-
-        Return preview
-    End Function
-    Friend Function BuildFileDropPreview() As String
-        Dim files As String() = Array.Empty(Of String)()
-
-        If Clipboard.TryGetData(DataFormats.FileDrop, files) Then
-            If files Is Nothing Then
-                files = Array.Empty(Of String)()
-            End If
-        End If
-
-        Dim count = files.Length
-        If count = 0 Then
-            Return "< Empty File Drop >"
-        ElseIf count = 1 Then
-            Return $"< 1 File >"
-        Else
-            Return $"< {count} Files >"
-        End If
-    End Function
-    Private Function DecodeFileDrop(bytes As Byte()) As String()
-        ' Convert raw bytes to UTF-16 string
-        Dim txt As String = System.Text.Encoding.Unicode.GetString(bytes)
-
-        ' Remove trailing nulls (there can be MANY)
-        txt = txt.TrimEnd(ControlChars.NullChar)
-
-        ' Split on single null
-        Dim parts = txt.Split(ControlChars.NullChar)
-
-        ' Filter out garbage entries
-        Dim files = parts.
-        Where(Function(p) Not String.IsNullOrWhiteSpace(p)).
-        Where(Function(p) p.IndexOfAny(Path.GetInvalidPathChars()) = -1).
-        ToArray()
-
-        Return files
-    End Function
-    Private Function GetFolderIcon(path As String) As Icon
-        Dim shinfo As New Skye.WinAPI.SHFILEINFO()
-        Dim hImg = Skye.WinAPI.SHGetFileInfo(path, 0, shinfo, Marshal.SizeOf(shinfo), Skye.WinAPI.SHGFI_ICON Or Skye.WinAPI.SHGFI_SMALLICON)
-        If hImg <> IntPtr.Zero AndAlso shinfo.hIcon <> IntPtr.Zero Then
-            Return Icon.FromHandle(shinfo.hIcon)
-        End If
-        Return Nothing
-    End Function
-    Friend Function ParseFileDrop(bytes As Byte()) As List(Of FileDropEntry)
-        Dim files = DecodeFileDrop(bytes)
-        Dim list As New List(Of FileDropEntry)
-
-        For Each path In files
-            Dim entry As New FileDropEntry With {
-            .FullPath = path,
-            .FileName = IO.Path.GetFileName(path)
-        }
-
-            If File.Exists(path) Then
-                Dim size = New FileInfo(path).Length
-                entry.SizeText = Skye.Common.FormatFileSize(size, Skye.Common.FormatFileSizeUnits.Auto)
-            Else
-                entry.SizeText = ""
-            End If
-
-            Try
-                If Directory.Exists(path) Then
-                    entry.Icon = GetFolderIcon(path)
-                ElseIf File.Exists(path) Then
-                    entry.Icon = Icon.ExtractAssociatedIcon(path)
-                End If
-            Catch
-            End Try
-
-            list.Add(entry)
-        Next
-
-        Return list
-    End Function
-    Public Async Function ComputeFolderSizesAsync(entries As List(Of FileDropEntry)) As Task(Of Long)
-        Dim folderPaths = entries.
-            Where(Function(e) Directory.Exists(e.FullPath)).
-            Select(Function(e) e.FullPath).
-            ToList()
-
-        Dim total As Long = 0
-
-        For Each folder In folderPaths
-            total += Await Task.Run(Function() GetFolderSize(folder))
-        Next
-
-        Return total
-    End Function
-    Private Function GetFolderSize(path As String) As Long
-        Dim total As Long = 0
-
-        Try
-            For Each file In Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
-                Try
-                    total += New FileInfo(file).Length
-                Catch
-                End Try
-            Next
-        Catch
-        End Try
-
-        Return total
-    End Function
     Friend Function GetEnumDescription(value As [Enum]) As String
         Dim fi = value.GetType().GetField(value.ToString())
         Dim attributes = CType(fi.GetCustomAttributes(GetType(DescriptionAttribute), False), DescriptionAttribute())
@@ -2145,57 +2228,6 @@ Friend Module App
         End If
 
         Return value.ToString()
-    End Function
-    Friend Function GetSourceAppInfo() As (AppName As String, IconBytes As Byte(), ExePath As String)
-        Dim hwnd = Skye.WinAPI.GetForegroundWindow()
-        Dim pid As UInteger
-        Dim result As UInteger = Skye.WinAPI.GetWindowThreadProcessId(hwnd, pid)
-        If pid = 0 Then Return ("Unknown", Nothing, Nothing)
-        Try
-            Dim proc = Process.GetProcessById(CInt(pid))
-            Dim exePath As String = Nothing
-
-            Try
-                exePath = proc.MainModule.FileName
-            Catch
-                ' Some protected processes throw here
-                exePath = Nothing
-            End Try
-
-            ' Friendly name
-            Dim appName As String = "Unknown"
-
-            If Not String.IsNullOrWhiteSpace(exePath) Then
-                appName = Path.GetFileNameWithoutExtension(exePath)
-
-                Dim verInfo = FileVersionInfo.GetVersionInfo(exePath)
-                If Not String.IsNullOrWhiteSpace(verInfo.ProductName) Then
-                    appName = verInfo.ProductName
-                End If
-            End If
-
-            ' Extract icon
-            Dim iconBytes As Byte() = Nothing
-
-            If Not String.IsNullOrWhiteSpace(exePath) Then
-                Try
-                    Dim ico = Icon.ExtractAssociatedIcon(exePath)
-                    If ico IsNot Nothing Then
-                        Using ms As New MemoryStream()
-                            ico.ToBitmap().Save(ms, Imaging.ImageFormat.Png)
-                            iconBytes = ms.ToArray()
-                        End Using
-                    End If
-                Catch
-                    ' Ignore icon extraction failures
-                End Try
-            End If
-
-            Return (appName, iconBytes, exePath)
-
-        Catch
-            Return ("Unknown", Nothing, Nothing)
-        End Try
     End Function
     Friend Function GetAssemblyName() As String
         Dim asm = Assembly.GetExecutingAssembly()
@@ -2237,80 +2269,6 @@ Friend Module App
     Friend Function GetFullVersion() As String
         Dim ver = Assembly.GetExecutingAssembly().GetName().Version
         GetFullVersion = ver.Major.ToString & "." & ver.Minor.ToString & "." & ver.Build.ToString
-    End Function
-    Friend Function IsLegitimateSourceApp(path As String) As Boolean
-        If String.IsNullOrWhiteSpace(path) Then Return False
-        If Not File.Exists(path) Then Return False
-
-        Dim p = path.ToLower()
-
-        ' Exclude temp EXEs
-        If p.Contains("\appdata\local\temp\") Then Return False
-
-        ' Exclude system processes
-        Dim win = Environment.GetFolderPath(Environment.SpecialFolder.Windows).ToLower()
-        If p.StartsWith(win & "\system32") Then Return False
-        If p.StartsWith(win & "\syswow64") Then Return False
-
-        ' Exclude UWP apps
-        If p.Contains("\windowsapps\") Then Return False
-
-        Return True
-    End Function
-    Friend Function NormalizeRtf(rtf As String) As String
-        If String.IsNullOrWhiteSpace(rtf) Then
-            Return String.Empty
-        End If
-
-        Dim cleaned As String = rtf
-
-        ' Remove volatile RTF header metadata (generator, build, timestamps)
-        cleaned = Regex.Replace(cleaned,
-                            "\\\*?\\generator[^;]*;",
-                            "",
-                            RegexOptions.IgnoreCase)
-
-        cleaned = Regex.Replace(cleaned,
-                            "\\\*?\\creatim[^}]*}",
-                            "",
-                            RegexOptions.IgnoreCase)
-
-        cleaned = Regex.Replace(cleaned,
-                            "\\\*?\\revtim[^}]*}",
-                            "",
-                            RegexOptions.IgnoreCase)
-
-        ' Remove font table (not needed for search)
-        cleaned = Regex.Replace(cleaned,
-                            "{\\fonttbl[^}]*}",
-                            "",
-                            RegexOptions.IgnoreCase)
-
-        ' Remove color table (not needed for search)
-        cleaned = Regex.Replace(cleaned,
-                            "{\\colortbl[^}]*}",
-                            "",
-                            RegexOptions.IgnoreCase)
-
-        ' Remove stylesheet blocks
-        cleaned = Regex.Replace(cleaned,
-                            "{\\stylesheet[^}]*}",
-                            "",
-                            RegexOptions.IgnoreCase)
-
-        ' Remove picture data (huge blobs)
-        cleaned = Regex.Replace(cleaned,
-                            "{\\pict[^}]*}",
-                            "",
-                            RegexOptions.IgnoreCase)
-
-        ' Collapse excessive whitespace
-        cleaned = Regex.Replace(cleaned,
-                            "\s+",
-                            " ",
-                            RegexOptions.Multiline)
-
-        Return cleaned.Trim()
     End Function
     Friend Sub WriteToLog(message As String)
         If String.IsNullOrWhiteSpace(message) Then Exit Sub

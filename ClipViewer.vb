@@ -73,9 +73,9 @@ Friend Class ClipViewer
     End Sub
 
     ' Control Events
-    Private Sub BtnExport_Click(sender As Object, e As EventArgs) Handles BtnExport.Click
+    Private Sub BtnExport_Click(sender As Object, e As EventArgs) Handles BtnSaveAs.Click
         Close()
-        App.ExportClipToFile(_clipID)
+        App.SaveClipToFile(_clipID)
     End Sub
 
     ' Handlers
@@ -168,7 +168,7 @@ Friend Class ClipViewer
             Case Else
                 ShowRaw(bytes, format)
         End Select
-        BtnExport.BringToFront()
+        BtnSaveAs.BringToFront()
 
     End Sub
     Private Function ExtractHtmlFragment(rawHtml As String) As String
@@ -251,7 +251,7 @@ Friend Class ClipViewer
                     WebView.CoreWebView2?.NavigateToString(wrappedHtml)
                     WebView.Visible = True
                     WebView.BringToFront()
-                    BtnExport.BringToFront()
+                    BtnSaveAs.BringToFront()
                 End Sub
             Return
         End If
