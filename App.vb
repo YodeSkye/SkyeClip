@@ -597,8 +597,6 @@ Friend Module App
         Public Property OnExit As Action(Of ContextEngine)
         Public Property EnterProfileID As Integer
         Public Property ExitProfileID As Integer
-        'Public Property EnterDescription As String
-        'Public Property ExitDescription As String
         Public Property Action As Actions
 
         ' === UI Preview Properties ===
@@ -609,10 +607,16 @@ Friend Module App
         End Property
         Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
             Get
-                Dim modeText = If(Mode = ActivationMode.ForegroundWindow,
+                Dim modetext As String = String.Empty
+                Select Case Action
+                    Case Actions.SwitchProfile
+                        modetext = If(Mode = ActivationMode.ForegroundWindow,
                           GetEnumDescription(ActivationMode.ForegroundWindow),
                           GetEnumDescription(ActivationMode.RunningProcess))
-                Return $"{modeText} = {TargetProcess}"
+                    Case Actions.BlockCapture
+                        modetext = "Active App"
+                End Select
+                Return $"{modetext} = {TargetProcess}"
             End Get
         End Property
         Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
@@ -636,7 +640,7 @@ Friend Module App
                         exitText = $"Switch to profile '{exitName}' when leaving {processText}"
 
                     Case Actions.BlockCapture
-                        enterText = $"Block capture while {processText} is active ({modeText})"
+                        enterText = $"Block capture while {processText} is active"
                         exitText = $"Stop blocking when {processText} is inactive"
                 End Select
 

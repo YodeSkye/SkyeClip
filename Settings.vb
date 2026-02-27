@@ -504,6 +504,8 @@ Public Class Settings
     End Sub
     Private Sub CoBoxRuleTypes_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxRuleTypes.SelectedIndexChanged
         TipSettings.HideTooltip()
+        LVRules.SelectedItems.Clear()
+        BtnRuleDelete.Enabled = False
         Dim selected = CoBoxRuleTypes.SelectedValue
         If selected Is Nothing Then Return
 
