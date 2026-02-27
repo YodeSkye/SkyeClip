@@ -24,7 +24,6 @@ Partial Class ActiveAppRuleProfilesEditor
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
         Label1 = New Skye.UI.Label()
-        TxtBoxTargetProcess = New TextBox()
         BtnSave = New Button()
         CoBoxMode = New Skye.UI.ComboBox()
         Label3 = New Skye.UI.Label()
@@ -33,6 +32,8 @@ Partial Class ActiveAppRuleProfilesEditor
         CoBoxExitProfile = New Skye.UI.ComboBox()
         Label5 = New Skye.UI.Label()
         Tip = New Skye.UI.ToolTipEX(components)
+        TxtBoxTargetProcess = New TextBox()
+        CoBoxTargetProcess = New Skye.UI.ComboBox()
         TipError = New Skye.UI.ToolTipEX(components)
         SuspendLayout()
         ' 
@@ -48,17 +49,6 @@ Partial Class ActiveAppRuleProfilesEditor
         Label1.Text = "Target Process"
         TipError.SetText(Label1, Nothing)
         ' 
-        ' TxtBoxTargetProcess
-        ' 
-        TipError.SetImage(TxtBoxTargetProcess, Nothing)
-        Tip.SetImage(TxtBoxTargetProcess, Nothing)
-        TxtBoxTargetProcess.Location = New Point(3, 125)
-        TxtBoxTargetProcess.Name = "TxtBoxTargetProcess"
-        TxtBoxTargetProcess.Size = New Size(197, 29)
-        TxtBoxTargetProcess.TabIndex = 1
-        Tip.SetText(TxtBoxTargetProcess, Nothing)
-        TipError.SetText(TxtBoxTargetProcess, Nothing)
-        ' 
         ' BtnSave
         ' 
         TipError.SetImage(BtnSave, Nothing)
@@ -68,7 +58,7 @@ Partial Class ActiveAppRuleProfilesEditor
         BtnSave.Location = New Point(3, 214)
         BtnSave.Name = "BtnSave"
         BtnSave.Size = New Size(409, 36)
-        BtnSave.TabIndex = 4
+        BtnSave.TabIndex = 100
         Tip.SetText(BtnSave, Nothing)
         TipError.SetText(BtnSave, Nothing)
         BtnSave.Text = "Save Rule"
@@ -108,7 +98,7 @@ Partial Class ActiveAppRuleProfilesEditor
         CoBoxEnterProfile.Location = New Point(229, 70)
         CoBoxEnterProfile.Name = "CoBoxEnterProfile"
         CoBoxEnterProfile.Size = New Size(183, 30)
-        CoBoxEnterProfile.TabIndex = 7
+        CoBoxEnterProfile.TabIndex = 20
         TipError.SetText(CoBoxEnterProfile, Nothing)
         Tip.SetText(CoBoxEnterProfile, Nothing)
         ' 
@@ -133,7 +123,7 @@ Partial Class ActiveAppRuleProfilesEditor
         CoBoxExitProfile.Location = New Point(229, 125)
         CoBoxExitProfile.Name = "CoBoxExitProfile"
         CoBoxExitProfile.Size = New Size(183, 30)
-        CoBoxExitProfile.TabIndex = 9
+        CoBoxExitProfile.TabIndex = 30
         TipError.SetText(CoBoxExitProfile, Nothing)
         Tip.SetText(CoBoxExitProfile, Nothing)
         ' 
@@ -154,6 +144,33 @@ Partial Class ActiveAppRuleProfilesEditor
         Tip.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Tip.ShadowThickness = 0
         ' 
+        ' TxtBoxTargetProcess
+        ' 
+        TxtBoxTargetProcess.BorderStyle = BorderStyle.None
+        TipError.SetImage(TxtBoxTargetProcess, Nothing)
+        Tip.SetImage(TxtBoxTargetProcess, Nothing)
+        TxtBoxTargetProcess.Location = New Point(7, 129)
+        TxtBoxTargetProcess.Name = "TxtBoxTargetProcess"
+        TxtBoxTargetProcess.Size = New Size(179, 22)
+        TxtBoxTargetProcess.TabIndex = 11
+        Tip.SetText(TxtBoxTargetProcess, Nothing)
+        TipError.SetText(TxtBoxTargetProcess, Nothing)
+        ' 
+        ' CoBoxTargetProcess
+        ' 
+        CoBoxTargetProcess.DropDownStyle = ComboBoxStyle.DropDownList
+        CoBoxTargetProcess.FormattingEnabled = True
+        Tip.SetImage(CoBoxTargetProcess, Nothing)
+        TipError.SetImage(CoBoxTargetProcess, Nothing)
+        CoBoxTargetProcess.ItemHeight = 24
+        CoBoxTargetProcess.Location = New Point(3, 125)
+        CoBoxTargetProcess.Name = "CoBoxTargetProcess"
+        CoBoxTargetProcess.Size = New Size(197, 30)
+        CoBoxTargetProcess.TabIndex = 12
+        CoBoxTargetProcess.TabStop = False
+        TipError.SetText(CoBoxTargetProcess, Nothing)
+        Tip.SetText(CoBoxTargetProcess, Nothing)
+        ' 
         ' TipError
         ' 
         TipError.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
@@ -163,6 +180,7 @@ Partial Class ActiveAppRuleProfilesEditor
         ' ActiveAppRuleProfilesEditor
         ' 
         AutoScaleMode = AutoScaleMode.None
+        Controls.Add(TxtBoxTargetProcess)
         Controls.Add(CoBoxExitProfile)
         Controls.Add(Label5)
         Controls.Add(CoBoxEnterProfile)
@@ -170,7 +188,7 @@ Partial Class ActiveAppRuleProfilesEditor
         Controls.Add(CoBoxMode)
         Controls.Add(Label3)
         Controls.Add(BtnSave)
-        Controls.Add(TxtBoxTargetProcess)
+        Controls.Add(CoBoxTargetProcess)
         Controls.Add(Label1)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Tip.SetImage(Me, Nothing)
@@ -184,7 +202,6 @@ Partial Class ActiveAppRuleProfilesEditor
     End Sub
 
     Friend WithEvents Label1 As Skye.UI.Label
-    Friend WithEvents TxtBoxTargetProcess As TextBox
     Friend WithEvents BtnSave As Button
     Friend WithEvents CoBoxMode As Skye.UI.ComboBox
     Friend WithEvents Label3 As Skye.UI.Label
@@ -194,5 +211,7 @@ Partial Class ActiveAppRuleProfilesEditor
     Friend WithEvents Label5 As Skye.UI.Label
     Friend WithEvents Tip As Skye.UI.ToolTipEX
     Friend WithEvents TipError As Skye.UI.ToolTipEX
+    Friend WithEvents TxtBoxTargetProcess As TextBox
+    Friend WithEvents CoBoxTargetProcess As Skye.UI.ComboBox
 
 End Class

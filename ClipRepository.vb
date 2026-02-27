@@ -36,6 +36,14 @@ Friend Class ClipRepository
         Public Property SourceAppIcon As Byte()
         Public Property IsFavorite As Boolean
     End Class
+    Public Class SourceAppInfo
+        Public Property Name As String
+        Public Property Path As String
+        Public Property ProcessName As String
+        Public Overrides Function ToString() As String
+            Return Name
+        End Function
+    End Class
     Friend Class ClipData
         Public Property FormatId As UInteger
         Public Property FormatName As String
@@ -794,7 +802,35 @@ Friend Class ClipRepository
             End Using
         End Using
     End Sub
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Friend Function GetKnownSourceApps() As List(Of SourceAppInfo)
+        Dim list As New List(Of SourceAppInfo)
 
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+            Dim sql = "SELECT DISTINCT SourceAppName, SourceAppPath
+                        FROM Clips
+                        WHERE SourceAppName IS NOT NULL AND SourceAppName <> ''
+                          AND SourceAppPath IS NOT NULL AND SourceAppPath <> ''
+                        ORDER BY SourceAppName"
+            Using cmd As New SQLiteCommand(sql, conn)
+                Using reader = cmd.ExecuteReader()
+                    While reader.Read()
+                        Dim friendly = reader("SourceAppName").ToString()
+                        Dim path = reader("SourceAppPath").ToString()
+                        Dim processName = IO.Path.GetFileNameWithoutExtension(path)
+                        list.Add(New SourceAppInfo With {
+                            .Name = friendly,
+                            .Path = path,
+                            .ProcessName = processName
+                        })
+                    End While
+                End Using
+            End Using
+        End Using
+
+        Return list
+    End Function
     ' Methods
     Private Shared Sub RunMigrations(conn As SQLiteConnection)
         ' Source App Pathh on Clips

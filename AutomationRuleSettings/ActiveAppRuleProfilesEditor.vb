@@ -1,5 +1,6 @@
 ﻿
 Imports System.Text
+Imports SkyeClip.ClipRepository
 
 Public Class ActiveAppRuleProfilesEditor
 
@@ -33,6 +34,11 @@ Public Class ActiveAppRuleProfilesEditor
             })
         Next
 
+        CoBoxTargetProcess.Items.Clear()
+        For Each a In App.Tray.repo.GetKnownSourceApps()
+            CoBoxTargetProcess.Items.Add(a)
+        Next
+
         CoBoxEnterProfile.Items.Clear()
         CoBoxExitProfile.Items.Clear()
         For Each p In App.Settings.Profiles
@@ -47,26 +53,43 @@ Public Class ActiveAppRuleProfilesEditor
     End Sub
     Private Sub ActiveAppRuleProfilesEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Skye.UI.ThemeManager.ApplyToTooltip(Tip)
+        Skye.UI.ThemeManager.ApplyToTooltip(TipError)
     End Sub
 
     ' Control Events
+    Private Sub CoBoxTargetProcess_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CoBoxTargetProcess.SelectedIndexChanged
+        If TypeOf CoBoxTargetProcess.SelectedItem Is SourceAppInfo Then
+            Dim item = CType(CoBoxTargetProcess.SelectedItem, SourceAppInfo)
+            TxtBoxTargetProcess.Text = item.ProcessName
+        End If
+    End Sub
     Private Sub BtnSave_Click(sender As Object, e As EventArgs) Handles BtnSave.Click
         Tip.HideTooltip()
         TipError.HideTooltip()
         If CoBoxMode.SelectedItem Is Nothing Then
-            TipError.ShowTooltipAt(CoBoxMode.Location, "Please select a mode.", My.Resources.ImageRules16)
+            Dim pt = CoBoxMode.PointToScreen(New Point(0, CoBoxMode.Height))
+            TipError.ShowTooltipAt(pt, "Please select a mode.", My.Resources.ImageRules16)
             Exit Sub
         End If
         If TxtBoxTargetProcess.Text.Trim() = String.Empty Then
-            TipError.ShowTooltipAt(TxtBoxTargetProcess.PointToScreen(TxtBoxTargetProcess.Location), "Please enter a process name.", My.Resources.ImageRules16)
+            Dim pt = CoBoxTargetProcess.PointToScreen(New Point(0, CoBoxTargetProcess.Height))
+            TipError.ShowTooltipAt(pt, "Please enter or select a process name.", My.Resources.ImageRules16)
+            Exit Sub
+        End If
+        If CoBoxEnterProfile.SelectedItem Is Nothing Then
+            Dim pt = CoBoxEnterProfile.PointToScreen(New Point(0, CoBoxEnterProfile.Height))
+            TipError.ShowTooltipAt(pt, "Please select a profile.", My.Resources.ImageRules16)
+            Exit Sub
+        End If
+        If CoBoxExitProfile.SelectedItem Is Nothing Then
+            Dim pt = CoBoxExitProfile.PointToScreen(New Point(0, CoBoxExitProfile.Height))
+            TipError.ShowTooltipAt(pt, "Please select a profile.", My.Resources.ImageRules16)
             Exit Sub
         End If
 
-        'OrElse CoBoxEnterProfile.SelectedItem Is Nothing OrElse CoBoxExitProfile.SelectedItem Is Nothing Then Return False
-
-
         SaveRule()
         RaiseEvent RuleSaved(Me, _rule)
+
     End Sub
 
     ' Methods
