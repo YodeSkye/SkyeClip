@@ -808,11 +808,11 @@ Friend Class ClipRepository
 
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
-            Dim sql = "SELECT DISTINCT SourceAppName, SourceAppPath
+            Dim sql = "SELECT SourceAppName, MIN(SourceAppPath) AS SourceAppPath
                         FROM Clips
-                        WHERE SourceAppName IS NOT NULL AND SourceAppName <> ''
-                          AND SourceAppPath IS NOT NULL AND SourceAppPath <> ''
-                        ORDER BY SourceAppName"
+                        WHERE SourceAppName IS NOT NULL AND SourceAppName <> '' AND SourceAppName <> 'Unknown'
+                        GROUP BY SourceAppName
+                        ORDER BY SourceAppName;"
             Using cmd As New SQLiteCommand(sql, conn)
                 Using reader = cmd.ExecuteReader()
                     While reader.Read()
@@ -824,6 +824,7 @@ Friend Class ClipRepository
                             .Path = path,
                             .ProcessName = processName
                         })
+                        Debug.WriteLine("[" & path & "]")
                     End While
                 End Using
             End Using
