@@ -9,22 +9,34 @@ Public Class KeywordRuleEditor
 
     ' Form Events
     Private Sub KeywordRuleEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Skye.UI.ThemeManager.ApplyToTooltip(Tip)
+        Skye.UI.ThemeManager.ApplyToTooltip(TipError)
         CoBoxAction.DataSource = [Enum].GetValues(Of App.ContentAction)()
     End Sub
 
     ' Control Events
     Private Sub BtnSave_Click(sender As Object, e As EventArgs) Handles BtnSave.Click
+        Tip.HideTooltip()
+        TipError.HideTooltip()
+        If TxtBoxKeyword.Text.Trim() = String.Empty Then
+            Dim pt = TxtBoxKeyword.PointToScreen(New Point(0, TxtBoxKeyword.Height))
+            TipError.ShowTooltipAt(pt, "Please enter a keyword.", My.Resources.ImageRules16)
+            Exit Sub
+        End If
+        If CoBoxAction.SelectedItem Is Nothing Then
+            Dim pt = CoBoxAction.PointToScreen(New Point(0, CoBoxAction.Height))
+            TipError.ShowTooltipAt(pt, "Please select an action.", My.Resources.ImageRules16)
+            Exit Sub
+        End If
+
         SaveRule()
         RaiseEvent RuleSaved(Me, _rule)
+
     End Sub
 
     ' Methods
     Friend Sub LoadRule(rule As App.KeywordRule)
-        If rule Is Nothing Then
-            _rule = New KeywordRule()
-        Else
-            _rule = rule
-        End If
+        _rule = rule
         TxtBoxKeyword.Text = rule.Keyword
         CoBoxAction.SelectedItem = rule.Action
     End Sub

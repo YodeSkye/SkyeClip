@@ -53,13 +53,13 @@ Partial Class ActiveAppRuleProfilesEditor
         ' 
         TipError.SetImage(BtnSave, Nothing)
         BtnSave.Image = My.Resources.Resources.ImageOK16
-        Tip.SetImage(BtnSave, Nothing)
+        Tip.SetImage(BtnSave, My.Resources.Resources.ImageOK16)
         BtnSave.ImageAlign = ContentAlignment.MiddleLeft
         BtnSave.Location = New Point(3, 214)
         BtnSave.Name = "BtnSave"
         BtnSave.Size = New Size(409, 36)
         BtnSave.TabIndex = 100
-        Tip.SetText(BtnSave, Nothing)
+        Tip.SetText(BtnSave, "Save this Rule.")
         TipError.SetText(BtnSave, Nothing)
         BtnSave.Text = "Save Rule"
         BtnSave.UseVisualStyleBackColor = True
@@ -100,7 +100,7 @@ Partial Class ActiveAppRuleProfilesEditor
         CoBoxEnterProfile.Size = New Size(183, 30)
         CoBoxEnterProfile.TabIndex = 20
         TipError.SetText(CoBoxEnterProfile, Nothing)
-        Tip.SetText(CoBoxEnterProfile, Nothing)
+        Tip.SetText(CoBoxEnterProfile, "Select the Profile to switch to when the app is active.")
         ' 
         ' Label4
         ' 
@@ -125,7 +125,7 @@ Partial Class ActiveAppRuleProfilesEditor
         CoBoxExitProfile.Size = New Size(183, 30)
         CoBoxExitProfile.TabIndex = 30
         TipError.SetText(CoBoxExitProfile, Nothing)
-        Tip.SetText(CoBoxExitProfile, Nothing)
+        Tip.SetText(CoBoxExitProfile, "Select the Profile to switch to when the app is inactive.")
         ' 
         ' Label5
         ' 
@@ -153,7 +153,7 @@ Partial Class ActiveAppRuleProfilesEditor
         TxtBoxTargetProcess.Name = "TxtBoxTargetProcess"
         TxtBoxTargetProcess.Size = New Size(179, 22)
         TxtBoxTargetProcess.TabIndex = 11
-        Tip.SetText(TxtBoxTargetProcess, Nothing)
+        Tip.SetText(TxtBoxTargetProcess, "Enter or select a Target Process." & vbCrLf & "This is the process name associated with an app. May be found in details view of Windows Task Manager or in the properties of any running app.")
         TipError.SetText(TxtBoxTargetProcess, Nothing)
         ' 
         ' CoBoxTargetProcess

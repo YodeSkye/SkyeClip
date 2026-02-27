@@ -35,13 +35,13 @@ Partial Class ActiveAppRuleBlockEditor
         ' 
         TipError.SetImage(BtnSave, Nothing)
         BtnSave.Image = My.Resources.Resources.ImageOK16
-        Tip.SetImage(BtnSave, Nothing)
+        Tip.SetImage(BtnSave, My.Resources.Resources.ImageOK16)
         BtnSave.ImageAlign = ContentAlignment.MiddleLeft
         BtnSave.Location = New Point(3, 214)
         BtnSave.Name = "BtnSave"
         BtnSave.Size = New Size(409, 36)
         BtnSave.TabIndex = 100
-        Tip.SetText(BtnSave, Nothing)
+        Tip.SetText(BtnSave, "Save this Rule.")
         TipError.SetText(BtnSave, Nothing)
         BtnSave.Text = "Save Rule"
         BtnSave.UseVisualStyleBackColor = True
@@ -55,7 +55,7 @@ Partial Class ActiveAppRuleBlockEditor
         TxtBoxTargetProcess.Name = "TxtBoxTargetProcess"
         TxtBoxTargetProcess.Size = New Size(179, 22)
         TxtBoxTargetProcess.TabIndex = 14
-        Tip.SetText(TxtBoxTargetProcess, Nothing)
+        Tip.SetText(TxtBoxTargetProcess, "Enter or select a Target Process." & vbCrLf & "This is the process name associated with an app. May be found in details view of Windows Task Manager or in the properties of any running app.")
         TipError.SetText(TxtBoxTargetProcess, Nothing)
         ' 
         ' CoBoxTargetProcess
