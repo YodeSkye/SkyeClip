@@ -856,7 +856,7 @@ Friend Module App
                      repo As ClipRepository) _
                      Implements IContentRule.Apply
 
-            If clip.SourceAppName.Equals(AppName, StringComparison.OrdinalIgnoreCase) Then
+            If IO.Path.GetFileNameWithoutExtension(clip.SourceAppPath).Equals(AppName, StringComparison.OrdinalIgnoreCase) Then
                 Select Case Action
                     Case ContentAction.AutoFavorite
                         repo.SetFavorite(clip.Id, True)
