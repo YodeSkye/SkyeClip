@@ -824,7 +824,6 @@ Friend Class ClipRepository
                             .Path = path,
                             .ProcessName = processName
                         })
-                        Debug.WriteLine("[" & path & "]")
                     End While
                 End Using
             End Using
