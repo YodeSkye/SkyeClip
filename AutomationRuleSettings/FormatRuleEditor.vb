@@ -44,15 +44,32 @@ Public Class FormatRuleEditor
         CoBoxAction.Items.AddRange(actions)
 
     End Sub
+    Private Sub FormatRuleEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Skye.UI.ThemeManager.ApplyToTooltip(Tip)
+        Skye.UI.ThemeManager.ApplyToTooltip(TipError)
+    End Sub
 
     ' Control Events
     Private Sub BtnSave_Click(sender As Object, e As EventArgs) Handles BtnSave.Click
+        Tip.HideTooltip()
+        TipError.HideTooltip()
+        If CoBoxFormatName.SelectedItem Is Nothing Then
+            Dim pt = CoBoxFormatName.PointToScreen(New Point(0, CoBoxFormatName.Height))
+            TipError.ShowTooltipAt(pt, "Please select a format name.", My.Resources.ImageRules16)
+            Exit Sub
+        End If
+        If CoBoxAction.SelectedItem Is Nothing Then
+            Dim pt = CoBoxAction.PointToScreen(New Point(0, CoBoxAction.Height))
+            TipError.ShowTooltipAt(pt, "Please select an action.", My.Resources.ImageRules16)
+            Exit Sub
+        End If
+
         SaveRule()
         RaiseEvent RuleSaved(Me, _rule)
+
     End Sub
 
     ' Methods
-    ' Interface method — just a wrapper
     Friend Sub LoadRule(rule As App.FormatRule)
         _rule = rule
 

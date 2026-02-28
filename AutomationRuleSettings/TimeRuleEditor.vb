@@ -1,4 +1,5 @@
 ﻿
+Imports System.Drawing.Imaging
 Imports System.Text
 
 Public Class TimeRuleEditor
@@ -9,7 +10,6 @@ Public Class TimeRuleEditor
     Private Class ProfileItem
         Public Property ID As Integer
         Public Property Name As String
-
         Public Overrides Function ToString() As String
             Return Name
         End Function
@@ -27,14 +27,30 @@ Public Class TimeRuleEditor
         CoBoxProfile.ValueMember = "ID"
 
     End Sub
-    Private Sub KeywordRuleEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+    Private Sub TimeRuleEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Skye.UI.ThemeManager.ApplyToTooltip(Tip)
+        Skye.UI.ThemeManager.ApplyToTooltip(TipError)
     End Sub
 
     ' Control Events
     Private Sub BtnSave_Click(sender As Object, e As EventArgs) Handles BtnSave.Click
+        Tip.HideTooltip()
+        TipError.HideTooltip()
+
+        If DTPEndTime.Value <= DTPStartTime.Value Then
+            Dim pt = DTPEndTime.PointToScreen(New Point(0, DTPEndTime.Height))
+            TipError.ShowTooltipAt(pt, "End time must be greater than start time.", My.Resources.ImageRules16)
+            Exit Sub
+        End If
+        If CoBoxProfile.SelectedItem Is Nothing Then
+            Dim pt = CoBoxProfile.PointToScreen(New Point(0, CoBoxProfile.Height))
+            TipError.ShowTooltipAt(pt, "Please select a profile.", My.Resources.ImageRules16)
+            Exit Sub
+        End If
+
         SaveRule()
         RaiseEvent RuleSaved(Me, _rule)
+
     End Sub
 
     ' Methods

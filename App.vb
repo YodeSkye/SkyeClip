@@ -591,6 +591,7 @@ Friend Module App
             SwitchProfile
             BlockCapture
         End Enum
+        Private _wasActive As Boolean = False
         Public Property Mode As ActivationMode = ActivationMode.ForegroundWindow
         Public Property TargetProcess As String
         Public Property OnEnter As Action(Of ContextEngine)
@@ -653,8 +654,6 @@ Friend Module App
             End Get
         End Property
 
-        Private _wasActive As Boolean = False
-
         Public Function Matches(ctx As ContextEngine) As Boolean Implements IContextRule.Matches
             Dim isActive As Boolean
             If Mode = ActivationMode.ForegroundWindow Then
@@ -663,13 +662,20 @@ Friend Module App
                 isActive = Process.GetProcessesByName(TargetProcess).Length > 0
             End If
 
-            If isActive AndAlso Not _wasActive Then
-                OnEnter?.Invoke(ctx)
-            End If
+            Select Case Action
+                Case Actions.SwitchProfile
+                    If isActive AndAlso Not _wasActive Then
+                        OnEnter?.Invoke(ctx)
+                    End If
 
-            If Not isActive AndAlso _wasActive Then
-                OnExit?.Invoke(ctx)
-            End If
+                    If Not isActive AndAlso _wasActive Then
+                        OnExit?.Invoke(ctx)
+                    End If
+                Case Actions.BlockCapture
+                    If isActive Then
+                        ctx.BlockCapture = True
+                    End If
+            End Select
 
             _wasActive = isActive
             Return isActive
@@ -679,33 +685,25 @@ Friend Module App
     Friend Class LocationProfileRule
         Implements IContextRule, IRulePreview
 
+        Private wasActive As Boolean = False
         Public Property TargetName As String
         Public Property ProfileID As Integer
-        Public Property Description As String
-
-        Private wasActive As Boolean = False
 
         Public ReadOnly Property RuleType As RuleType Implements IRulePreview.RuleType
             Get
                 Return RuleType.LocationProfileRule
             End Get
         End Property
-
         Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
             Get
                 Return $"Network = ""{TargetName}"""
             End Get
         End Property
-
         Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
             Get
-                Dim desc = If(String.IsNullOrEmpty(Description),
-                          $"Switch to Profile {ProfileID}",
-                          Description)
-                Return desc
+                Return $"Switch to Profile {ProfileID}"
             End Get
         End Property
-
         Public ReadOnly Property Summary As String Implements IRulePreview.Summary
             Get
                 Return $"If {ConditionText} → {ActionText}"
@@ -731,30 +729,22 @@ Friend Module App
         Implements IContextRule, IRulePreview
 
         Public Property TargetName As String
-        Public Property Description As String
-
-        Private wasActive As Boolean = False
 
         Public ReadOnly Property RuleType As RuleType Implements IRulePreview.RuleType
             Get
                 Return RuleType.LocationBlockRule
             End Get
         End Property
-
         Public ReadOnly Property ConditionText As String Implements IRulePreview.ConditionText
             Get
                 Return $"Network = ""{TargetName}"""
             End Get
         End Property
-
         Public ReadOnly Property ActionText As String Implements IRulePreview.ActionText
             Get
-                Return If(String.IsNullOrEmpty(Description),
-                      "Block Capture",
-                      Description)
+                Return "Block Capture"
             End Get
         End Property
-
         Public ReadOnly Property Summary As String Implements IRulePreview.Summary
             Get
                 Return $"If {ConditionText} → {ActionText}"
@@ -763,18 +753,14 @@ Friend Module App
 
         Public Function Matches(ctx As ContextEngine) As Boolean Implements IContextRule.Matches
             Dim name = ctx.Network.CurrentName
-            Dim active = Not String.IsNullOrEmpty(name) AndAlso
-                     name.Equals(TargetName, StringComparison.OrdinalIgnoreCase)
+            Dim active = Not String.IsNullOrEmpty(name) AndAlso name.Equals(TargetName, StringComparison.OrdinalIgnoreCase)
 
-            If active AndAlso Not wasActive Then
+            If active Then
                 ctx.BlockCapture = True
-            End If
-
-            If Not active AndAlso wasActive Then
+            Else
                 ctx.BlockCapture = False
             End If
 
-            wasActive = active
             Return active
         End Function
 
@@ -1052,6 +1038,7 @@ Friend Module App
     End Sub
     Private Sub AutomationTimer_Tick(sender As Object, e As EventArgs) Handles AutomationTimer.Tick
         App.Context.Time.Now = DateTime.Now
+        Context.BlockCapture = False
         UpdateAppContext()
         UpdateNetwork()
         For Each r In Rules.OfType(Of IContextRule)
@@ -2084,15 +2071,12 @@ Friend Module App
         Rules.Clear()
 
         Dim count = Skye.Common.RegistryHelper.GetInt("RuleCount", 0)
-
         For i = 0 To count - 1
             Dim prefix = $"Rule{i}_"
             Dim rt = CType(Skye.Common.RegistryHelper.GetInt(prefix & "Type", -1), RuleType)
 
             Dim r As IRulePreview = Nothing
-
             Select Case rt
-
                 Case RuleType.ActiveAppRule
                     Dim ar As New ActiveAppRule With {
                         .Mode = CType(Skye.Common.RegistryHelper.GetInt(prefix & "Mode", 0), ActiveAppRule.ActivationMode),
@@ -2102,22 +2086,17 @@ Friend Module App
                         .ExitProfileID = Skye.Common.RegistryHelper.GetInt(prefix & "ExitProfileID", 0)
                     }
                     r = ar
-
                 Case RuleType.LocationProfileRule
                     Dim lr As New LocationProfileRule With {
                         .TargetName = Skye.Common.RegistryHelper.GetString(prefix & "TargetName", ""),
-                        .ProfileID = Skye.Common.RegistryHelper.GetInt(prefix & "ProfileID", 0),
-                        .Description = Skye.Common.RegistryHelper.GetString(prefix & "Description", "")
+                        .ProfileID = Skye.Common.RegistryHelper.GetInt(prefix & "ProfileID", 0)
                     }
                     r = lr
-
                 Case RuleType.LocationBlockRule
                     Dim br As New LocationBlockRule With {
-                        .TargetName = Skye.Common.RegistryHelper.GetString(prefix & "TargetName", ""),
-                        .Description = Skye.Common.RegistryHelper.GetString(prefix & "Description", "")
+                        .TargetName = Skye.Common.RegistryHelper.GetString(prefix & "TargetName", "")
                     }
                     r = br
-
                 Case RuleType.TimeRule
                     Dim tr As New TimeRule With {
                         .StartTime = TimeSpan.Parse(Skye.Common.RegistryHelper.GetString(prefix & "StartTime", "00:00:00")),
@@ -2125,21 +2104,18 @@ Friend Module App
                         .TargetProfileID = Skye.Common.RegistryHelper.GetInt(prefix & "TargetProfileID", 0)
                     }
                     r = tr
-
                 Case RuleType.SourceAppRule
                     Dim sr As New SourceAppRule With {
                         .AppName = Skye.Common.RegistryHelper.GetString(prefix & "AppName", ""),
                         .Action = CType(Skye.Common.RegistryHelper.GetInt(prefix & "Action", 0), ContentAction)
                     }
                     r = sr
-
                 Case RuleType.KeywordRule
                     Dim kr As New KeywordRule With {
                         .Keyword = Skye.Common.RegistryHelper.GetString(prefix & "Keyword", ""),
                         .Action = CType(Skye.Common.RegistryHelper.GetInt(prefix & "Action", 0), ContentAction)
                     }
                     r = kr
-
                 Case RuleType.FormatRule
                     Dim fr As New FormatRule With {
                         .FormatName = Skye.Common.RegistryHelper.GetString(prefix & "FormatName", ""),
@@ -2155,6 +2131,7 @@ Friend Module App
         For Each ctxRule In Rules.OfType(Of IContextRule)
             RebuildDelegatesForRule(ctxRule)
         Next
+
     End Sub
     Friend Sub SaveAllRulesToRegistry()
         ' Clear old unified entries
@@ -2165,16 +2142,13 @@ Friend Module App
         Next
 
         Skye.Common.RegistryHelper.SetInt("RuleCount", Rules.Count)
-
         For i = 0 To Rules.Count - 1
             Dim r = Rules(i)
             Dim prefix = $"Rule{i}_"
 
             ' Save type
             Skye.Common.RegistryHelper.SetInt(prefix & "Type", CInt(r.RuleType))
-
             Select Case r.RuleType
-
                 Case RuleType.ActiveAppRule
                     Dim ar = DirectCast(r, ActiveAppRule)
                     Skye.Common.RegistryHelper.SetInt(prefix & "Mode", CInt(ar.Mode))
@@ -2182,40 +2156,34 @@ Friend Module App
                     Skye.Common.RegistryHelper.SetInt(prefix & "Action", CInt(ar.Action))
                     Skye.Common.RegistryHelper.SetInt(prefix & "EnterProfileID", ar.EnterProfileID)
                     Skye.Common.RegistryHelper.SetInt(prefix & "ExitProfileID", ar.ExitProfileID)
-
                 Case RuleType.LocationProfileRule
                     Dim lr = DirectCast(r, LocationProfileRule)
                     Skye.Common.RegistryHelper.SetString(prefix & "TargetName", lr.TargetName)
                     Skye.Common.RegistryHelper.SetInt(prefix & "ProfileID", lr.ProfileID)
-                    Skye.Common.RegistryHelper.SetString(prefix & "Description", lr.Description)
-
                 Case RuleType.LocationBlockRule
                     Dim br = DirectCast(r, LocationBlockRule)
                     Skye.Common.RegistryHelper.SetString(prefix & "TargetName", br.TargetName)
-                    Skye.Common.RegistryHelper.SetString(prefix & "Description", br.Description)
-
                 Case RuleType.TimeRule
                     Dim tr = DirectCast(r, TimeRule)
                     Skye.Common.RegistryHelper.SetString(prefix & "StartTime", tr.StartTime.ToString())
                     Skye.Common.RegistryHelper.SetString(prefix & "EndTime", tr.EndTime.ToString())
                     Skye.Common.RegistryHelper.SetInt(prefix & "TargetProfileID", tr.TargetProfileID)
-
                 Case RuleType.SourceAppRule
                     Dim sr = DirectCast(r, SourceAppRule)
                     Skye.Common.RegistryHelper.SetString(prefix & "AppName", sr.AppName)
                     Skye.Common.RegistryHelper.SetInt(prefix & "Action", CInt(sr.Action))
-
                 Case RuleType.KeywordRule
                     Dim kr = DirectCast(r, KeywordRule)
                     Skye.Common.RegistryHelper.SetString(prefix & "Keyword", kr.Keyword)
                     Skye.Common.RegistryHelper.SetInt(prefix & "Action", CInt(kr.Action))
-
                 Case RuleType.FormatRule
                     Dim fr = DirectCast(r, FormatRule)
                     Skye.Common.RegistryHelper.SetString(prefix & "FormatName", fr.FormatName)
                     Skye.Common.RegistryHelper.SetInt(prefix & "Action", CInt(fr.Action))
             End Select
+
         Next
+
     End Sub
     Friend Sub DeleteRule(rule As IRulePreview)
         Rules.Remove(rule)

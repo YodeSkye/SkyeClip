@@ -9,7 +9,6 @@ Public Class LocationBlockRuleEditor
     Private Class ProfileItem
         Public Property ID As Integer
         Public Property Name As String
-
         Public Overrides Function ToString() As String
             Return Name
         End Function
@@ -26,32 +25,38 @@ Public Class LocationBlockRuleEditor
         Next
 
     End Sub
+    Private Sub LocationBlockRuleEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Skye.UI.ThemeManager.ApplyToTooltip(Tip)
+        Skye.UI.ThemeManager.ApplyToTooltip(TipError)
+    End Sub
 
     ' Control Events
     Private Sub BtnSave_Click(sender As Object, e As EventArgs) Handles BtnSave.Click
+        Tip.HideTooltip()
+        TipError.HideTooltip()
+        If CoBoxTargetName.Text.Trim() = String.Empty Then
+            Dim pt = CoBoxTargetName.PointToScreen(New Point(0, CoBoxTargetName.Height))
+            TipError.ShowTooltipAt(pt, "Please enter or select a network name.", My.Resources.ImageRules16)
+            Exit Sub
+        End If
+
         SaveRule()
         RaiseEvent RuleSaved(Me, _rule)
+
     End Sub
 
     ' Methods
-    ' Interface method — just a wrapper
     Friend Sub LoadRule(rule As App.LocationBlockRule)
         _rule = rule
 
         ' Network name
         CoBoxTargetName.Text = _rule.TargetName
 
-        ' Description
-        TxtBoxDescription.Text = _rule.Description
-
     End Sub
     Friend Sub SaveRule()
 
         ' Network name
         _rule.TargetName = CoBoxTargetName.Text
-
-        ' Description
-        _rule.Description = TxtBoxDescription.Text
 
     End Sub
 
