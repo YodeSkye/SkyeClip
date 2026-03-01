@@ -130,7 +130,7 @@ Partial Class ClipViewer
         ' BtnSaveAs
         ' 
         BtnSaveAs.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
-        BtnSaveAs.Image = My.Resources.Resources.ImageExport16
+        BtnSaveAs.Image = My.Resources.Resources.ImageSave16
         TipClipViewer.SetImage(BtnSaveAs, My.Resources.Resources.ImageExport16)
         BtnSaveAs.Location = New Point(548, 248)
         BtnSaveAs.Name = "BtnSaveAs"

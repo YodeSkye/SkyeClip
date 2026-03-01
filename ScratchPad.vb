@@ -272,7 +272,7 @@ Friend Class ScratchPad
     End Sub
     Private Sub Export()
         Dim uiSaveFile As New SaveFileDialog With {
-            .Title = "Export Scratch Pad Content",
+            .Title = "Save Scratch Pad Content",
             .Filter = "Rich Text Format (*.rtf)|*.rtf|Plain Text (*.txt)|*.txt|All Files (*.*)|*.*",
             .DefaultExt = "rtf",
             .AddExtension = True,
@@ -291,7 +291,7 @@ Friend Class ScratchPad
     End Sub
     Private Sub Import()
         Dim uiOpenFile As New OpenFileDialog With {
-            .Title = "Import Content into Scratch Pad (Clears Current Text)",
+            .Title = "Load Content into Scratch Pad (Clears Current Text)",
             .Filter = "Rich Text Format (*.rtf)|*.rtf|Plain Text (*.txt)|*.txt|All Files (*.*)|*.*",
             .DefaultExt = "rtf",
             .AddExtension = True,

@@ -72,100 +72,100 @@ Partial Class ScratchPad
         TipScratchPad.SetImage(CMRTB, Nothing)
         CMRTB.Items.AddRange(New ToolStripItem() {CMIUndo, ToolStripSeparator1, CMICut, CMICopy, CMIPaste, CMIDelete, ToolStripSeparator2, MICase, ToolStripSeparator3, CMISelectAll})
         CMRTB.Name = "CMRTB"
-        CMRTB.Size = New Size(181, 198)
+        CMRTB.Size = New Size(142, 176)
         TipScratchPad.SetText(CMRTB, Nothing)
         ' 
         ' CMIUndo
         ' 
         CMIUndo.Image = My.Resources.Resources.ImageEditUndo16
         CMIUndo.Name = "CMIUndo"
-        CMIUndo.Size = New Size(180, 22)
+        CMIUndo.Size = New Size(141, 22)
         CMIUndo.Text = "Undo / Redo"
         ' 
         ' ToolStripSeparator1
         ' 
         ToolStripSeparator1.Name = "ToolStripSeparator1"
-        ToolStripSeparator1.Size = New Size(177, 6)
+        ToolStripSeparator1.Size = New Size(138, 6)
         ' 
         ' CMICut
         ' 
         CMICut.Image = My.Resources.Resources.ImageEditCut16
         CMICut.Name = "CMICut"
-        CMICut.Size = New Size(180, 22)
+        CMICut.Size = New Size(141, 22)
         CMICut.Text = "Cut"
         ' 
         ' CMICopy
         ' 
         CMICopy.Image = My.Resources.Resources.ImageEditCopy16
         CMICopy.Name = "CMICopy"
-        CMICopy.Size = New Size(180, 22)
+        CMICopy.Size = New Size(141, 22)
         CMICopy.Text = "Copy"
         ' 
         ' CMIPaste
         ' 
         CMIPaste.Image = My.Resources.Resources.ImageEditPaste16
         CMIPaste.Name = "CMIPaste"
-        CMIPaste.Size = New Size(180, 22)
+        CMIPaste.Size = New Size(141, 22)
         CMIPaste.Text = "Paste"
         ' 
         ' CMIDelete
         ' 
         CMIDelete.Image = My.Resources.Resources.ImageEditDelete16
         CMIDelete.Name = "CMIDelete"
-        CMIDelete.Size = New Size(180, 22)
+        CMIDelete.Size = New Size(141, 22)
         CMIDelete.Text = "Delete"
         ' 
         ' ToolStripSeparator2
         ' 
         ToolStripSeparator2.Name = "ToolStripSeparator2"
-        ToolStripSeparator2.Size = New Size(177, 6)
+        ToolStripSeparator2.Size = New Size(138, 6)
         ' 
         ' MICase
         ' 
         MICase.DropDownItems.AddRange(New ToolStripItem() {CMIToUpperCase, CMIToLowerCase, CMIToProperCase, CMIToSentenceCase})
         MICase.Image = My.Resources.Resources.ImageEditCaseProper16
         MICase.Name = "MICase"
-        MICase.Size = New Size(180, 22)
+        MICase.Size = New Size(141, 22)
         MICase.Text = "Case"
         ' 
         ' CMIToUpperCase
         ' 
         CMIToUpperCase.Image = My.Resources.Resources.ImageEditCaseUpper16
         CMIToUpperCase.Name = "CMIToUpperCase"
-        CMIToUpperCase.Size = New Size(180, 22)
+        CMIToUpperCase.Size = New Size(150, 22)
         CMIToUpperCase.Text = "Upper Case"
         ' 
         ' CMIToLowerCase
         ' 
         CMIToLowerCase.Image = My.Resources.Resources.ImageEditCaseLower16
         CMIToLowerCase.Name = "CMIToLowerCase"
-        CMIToLowerCase.Size = New Size(180, 22)
+        CMIToLowerCase.Size = New Size(150, 22)
         CMIToLowerCase.Text = "Lower Case"
         ' 
         ' CMIToProperCase
         ' 
         CMIToProperCase.Image = My.Resources.Resources.ImageEditCaseProper16
         CMIToProperCase.Name = "CMIToProperCase"
-        CMIToProperCase.Size = New Size(180, 22)
+        CMIToProperCase.Size = New Size(150, 22)
         CMIToProperCase.Text = "Proper Case"
         ' 
         ' CMIToSentenceCase
         ' 
         CMIToSentenceCase.Image = My.Resources.Resources.ImageEditCaseSentence16
         CMIToSentenceCase.Name = "CMIToSentenceCase"
-        CMIToSentenceCase.Size = New Size(180, 22)
+        CMIToSentenceCase.Size = New Size(150, 22)
         CMIToSentenceCase.Text = "Sentence Case"
         ' 
         ' ToolStripSeparator3
         ' 
         ToolStripSeparator3.Name = "ToolStripSeparator3"
-        ToolStripSeparator3.Size = New Size(177, 6)
+        ToolStripSeparator3.Size = New Size(138, 6)
         ' 
         ' CMISelectAll
         ' 
         CMISelectAll.Image = My.Resources.Resources.ImageEditSelectAll16
         CMISelectAll.Name = "CMISelectAll"
-        CMISelectAll.Size = New Size(180, 22)
+        CMISelectAll.Size = New Size(141, 22)
         CMISelectAll.Text = "Select All"
         ' 
         ' PanelBottom
@@ -222,13 +222,13 @@ Partial Class ScratchPad
         ' BtnExport
         ' 
         BtnExport.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
-        BtnExport.Image = My.Resources.Resources.ImageExport16
-        TipScratchPad.SetImage(BtnExport, My.Resources.Resources.ImageExport16)
+        BtnExport.Image = My.Resources.Resources.ImageSave16
+        TipScratchPad.SetImage(BtnExport, My.Resources.Resources.ImageSave16)
         BtnExport.Location = New Point(50, 38)
         BtnExport.Name = "BtnExport"
         BtnExport.Size = New Size(32, 32)
         BtnExport.TabIndex = 20
-        TipScratchPad.SetText(BtnExport, "Export" & vbCrLf & "Saves the contents of the Scratch Pad to a file." & vbCrLf & "Right-Click = Load the contents of a file to the Scratch Pad (Clears Current Text)." & vbCrLf & "Both plain text and rich text files are supported.")
+        TipScratchPad.SetText(BtnExport, "Save As" & vbCrLf & "Saves the contents of the Scratch Pad to a file." & vbCrLf & "Right-Click = Load the contents of a file to the Scratch Pad (Clears Current Text)." & vbCrLf & "Both plain text and rich text files are supported.")
         BtnExport.UseVisualStyleBackColor = True
         ' 
         ' TipScratchPad

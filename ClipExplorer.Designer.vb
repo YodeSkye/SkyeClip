@@ -432,7 +432,7 @@ Partial Class ClipExplorer
         ' 
         ' CMICASaveAs
         ' 
-        CMICASaveAs.Image = My.Resources.Resources.ImageExport16
+        CMICASaveAs.Image = My.Resources.Resources.ImageSave16
         CMICASaveAs.Name = "CMICASaveAs"
         CMICASaveAs.Size = New Size(276, 22)
         CMICASaveAs.Text = "Save To File"

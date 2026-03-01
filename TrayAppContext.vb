@@ -113,7 +113,7 @@ Friend Class TrayAppContext
         ClipCM.Items.Add(cmi)
         ClipCM.Items.Add("View Clip", My.Resources.imageClipViewer16, AddressOf OnClipCMViewClip)
         ClipCM.Items.Add("Send To Scratch Pad", My.Resources.imageScratchPad16, AddressOf OnCLipCMScratchPad)
-        ClipCM.Items.Add("Save To File", My.Resources.ImageExport16, AddressOf OnCLipCMSaveAs)
+        ClipCM.Items.Add("Save To File", My.Resources.ImageSave16, AddressOf OnCLipCMSaveAs)
         cmi = New ToolStripMenuItem("Open Source App", Nothing, AddressOf OnCLipCMOpenSourceApp) With {.Name = "OpenSourceApp"}
         ClipCM.Items.Add(cmi)
         ClipCM.Items.Add(New ToolStripSeparator())
