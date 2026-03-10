@@ -1544,14 +1544,14 @@ Friend Module App
             Exit Sub
         End If
 
-        Dim exportOptions = BuildExportOptions(formats)
+        Dim exportOptions = BuildSaveAsOptions(formats)
         If exportOptions.Count = 0 Then
             MessageBox.Show("No supported export formats found.")
             Exit Sub
         End If
 
         Dim sfd As New SaveFileDialog With {
-            .Title = "Export Clip",
+            .Title = "Save Clip As...",
             .Filter = BuildFilterString(exportOptions),
             .FileName = "Clip_" & clipId
         }
@@ -1559,9 +1559,9 @@ Friend Module App
         If sfd.ShowDialog() <> DialogResult.OK Then Exit Sub
 
         Dim chosenExt = Path.GetExtension(sfd.FileName).ToLower()
-        ExportByExtension(formats, chosenExt, sfd.FileName)
+        SaveByExtension(formats, chosenExt, sfd.FileName)
     End Sub
-    Private Function BuildExportOptions(formats As List(Of ClipData)) As Dictionary(Of String, String)
+    Private Function BuildSaveAsOptions(formats As List(Of ClipData)) As Dictionary(Of String, String)
         Dim opts As New Dictionary(Of String, String)
 
         If HasFormat(formats, "HTML Format") Then
@@ -1609,7 +1609,7 @@ Friend Module App
     Private Function BuildFilterString(opts As Dictionary(Of String, String)) As String
         Return String.Join("|", opts.Values)
     End Function
-    Private Sub ExportByExtension(formats As List(Of ClipData), ext As String, outPath As String)
+    Private Sub SaveByExtension(formats As List(Of ClipData), ext As String, outPath As String)
         Select Case ext
             Case ".html"
                 File.WriteAllBytes(outPath, GetFormatBytes(formats, "HTML Format"))
@@ -1665,7 +1665,7 @@ Friend Module App
             Case ".zip"
                 Task.Run(Sub()
                              Try
-                                 ExportFileDropAsZip(formats, outPath)
+                                 SaveFileDropAsZip(formats, outPath)
                                  App.Tray.ShowToast("Export Complete, Your ZIP File Is Ready.")
                              Catch ex As Exception
                                  App.Tray.ShowToast("Clip Export Failed.")
@@ -1761,7 +1761,7 @@ Friend Module App
         End Using
         Return safeBmp
     End Function
-    Private Sub ExportFileDropAsZip(formats As List(Of ClipData), outPath As String)
+    Private Sub SaveFileDropAsZip(formats As List(Of ClipData), outPath As String)
         Dim fd = formats.FirstOrDefault(Function(f) f.FormatName = "FileDrop")
         If fd Is Nothing Then Exit Sub
 
