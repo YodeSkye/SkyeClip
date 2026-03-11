@@ -2407,5 +2407,10 @@ Friend Module App
         Dim hIcon = bmp.GetHicon()
         Return Icon.FromHandle(hIcon)
     End Function
+    Friend Sub WarmUpDataTable()
+        Dim dt As New DataTable()
+        dt.Columns.Add("Warmup", GetType(Integer))
+        dt.Rows.Add(1)
+    End Sub
 
 End Module

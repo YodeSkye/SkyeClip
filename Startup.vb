@@ -46,6 +46,8 @@ Module Startup
         App.LoadScratchPadText()
         Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) 'Allows use of Windows-1252 character encoding, needed for Scratch Pad Proper Case function.
 
+        App.WarmUpDataTable() 'Pre-load DataTable to improve performance and stop errors when it's first used in the app.
+
         ' START APPLICATION
         Application.EnableVisualStyles()
         Application.SetCompatibleTextRenderingDefault(False)
