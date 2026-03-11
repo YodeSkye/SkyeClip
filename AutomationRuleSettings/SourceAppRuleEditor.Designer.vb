@@ -80,7 +80,7 @@ Partial Class SourceAppRuleEditor
         Tip.SetImage(TxtBoxTargetProcess, Nothing)
         TxtBoxTargetProcess.Location = New Point(113, 82)
         TxtBoxTargetProcess.Name = "TxtBoxTargetProcess"
-        TxtBoxTargetProcess.Size = New Size(179, 22)
+        TxtBoxTargetProcess.Size = New Size(176, 22)
         TxtBoxTargetProcess.TabIndex = 14
         Tip.SetText(TxtBoxTargetProcess, "Enter or select a Target Process." & vbCrLf & "This is the process name associated with an app. May be found in details view of Windows Task Manager or in the properties of any running app.")
         TipError.SetText(TxtBoxTargetProcess, Nothing)
