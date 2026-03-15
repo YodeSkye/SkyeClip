@@ -116,6 +116,12 @@ No data is sent anywhere — everything stays on your machine.
 
 ---
 
+## Issues
+Found a bug or have a feature request?  
+[Open an issue on GitHub](https://github.com/YodeSkye/SkyeClip/issues).
+
+---
+
 ## ❤️ Support the Project
 If you enjoy SkyeClip and want to support development, consider sponsoring or donating via GitHub Sponsors or PayPal. Links available in the About window.
 
