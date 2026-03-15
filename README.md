@@ -116,7 +116,7 @@ No data is sent anywhere — everything stays on your machine.
 
 ---
 
-## Issues
+## 📬 Issues
 Found a bug or have a feature request?  
 [Open an issue on GitHub](https://github.com/YodeSkye/SkyeClip/issues).
 
