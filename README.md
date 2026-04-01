@@ -8,7 +8,9 @@ A lightweight, fast, and elegant clipboard manager for Windows.
 ## ⚡ Quick Overview
 SkyeClip is a modern clipboard manager for Windows that captures everything you copy, 
 keeps your history organized, and gives you fast access through a clean tray menu, 
-Clip Explorer, and customizable HotKeys.
+Clip Explorer, and customizable HotKeys. SkyeClip now includes Profiles
+and a powerful Rules System that adapts to your workflow automatically.
+
 
 ---
 
@@ -36,6 +38,20 @@ Clip Explorer, and customizable HotKeys.
 - Temporary space to store clips you’re working with, or even add clips together
 - Edit the text directly in the Scratch Pad
 - Cut, copy, and paste plain text between the Scratch Pad and other apps
+
+### 🧩 Profiles
+- Maintain completely separate clipboard environments (Work, Personal, DEV, etc.)
+- Each profile has its own history, favorites, theme, and behavior settings
+- Switch profiles instantly from the tray menu
+- Move clips between profiles in Clip Explorer
+
+### ⚡ Rules System
+Automate SkyeClip based on your context:
+- App Rules — trigger actions when specific apps are active
+- Location Rules — react to your current network
+- Time Rules — schedule behavior changes
+- Content Rules — trigger actions based on clipboard content or formats
+Rules can switch profiles, block capture, or perform other automated actions.
 
 ### 🔍 Clip Explorer
 - Browse and search your entire clipboard history in a dedicated window
@@ -71,6 +87,13 @@ SkyeClip supports customizable HotKeys for:
 - No background services  
 - Starts instantly and stays out of your way  
 
+### 🤖 Smart Automation
+SkyeClip can adapt to your workflow automatically:
+- Switch to your Work profile when Outlook is active
+- Block clipboard capture on public Wi‑Fi
+- Switch to your DEV profile during work hours
+- Trigger actions based on clipboard content
+  
 ---
 
 ## 💡 Why SkyeClip?
@@ -80,6 +103,7 @@ SkyeClip focuses on:
 - Speed — instant capture and restore
 - Simplicity — no clutter, no bloat
 - Reliability — predictable behavior, clean UI
+- Context‑aware — adapts automatically using Profiles and Rules
 
 ---
 
@@ -95,16 +119,19 @@ No additional dependencies required.
 
 ---
 
-## 📝 What’s New (v1.2)
-- Backup System
-- Better filedrop previews
-- Image Previews in Clip Explorer
-- Export Clip
-- Cleaner unified previews for text, HTML, and RTF
-- Better stability when capturing images and file drops
-- Update/Version Checker
-- Clip Explorer improvements
-- More Themes
+## 📝 What’s New (v1.3)
+
+### New Features
+- Added a full Rules System that reacts to your context
+- Added Profile Support with separate histories, favorites, themes, and settings
+
+### Improvements
+- Renamed “Export Clip” to Save To File
+- Added Home Page link in About window
+
+### Fixes
+- Fixed a rare issue where the Clip Viewer could fail to open until restarting the app.
+- Fixed an issue that prevented certain keystrokes in Scratch Pad.
 
 Full changelog available in app.
 
