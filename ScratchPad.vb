@@ -184,7 +184,8 @@ Friend Class ScratchPad
         CMICut.Enabled = RTB.SelectedText.Length > 0
         CMICopy.Enabled = RTB.SelectedText.Length > 0
         CMIDelete.Enabled = RTB.SelectedText.Length > 0
-        CMIPaste.Enabled = Clipboard.ContainsText()
+        Dim canPaste = App.TryClipboard(Function() Clipboard.ContainsText())
+        CMIPaste.Enabled = canPaste
         If RTB.SelectionLength = 0 Then
             MICase.Enabled = False
         Else
@@ -434,20 +435,26 @@ Friend Class ScratchPad
     Private Sub Paste()
         Dim rtf As String = Nothing
 
-        ' Try to get RTF as a string
-        If Clipboard.TryGetData(Of String)(rtf, DataFormats.Rtf) Then
+        ' Try to get RTF as a string (safe)
+        Dim gotRtfString = App.TryClipboard(Function()
+                                                Return Clipboard.TryGetData(Of String)(rtf, DataFormats.Rtf)
+                                            End Function)
+
+        If gotRtfString AndAlso rtf IsNot Nothing Then
             RTB.SelectedRtf = rtf
             Return
         End If
 
         ' Old API fallback (required for Office, browsers, etc.)
 #Disable Warning WFDEV005
-        Dim obj = Clipboard.GetData(DataFormats.Rtf)
+        Dim obj = App.TryClipboard(Function() Clipboard.GetData(DataFormats.Rtf))
 #Enable Warning WFDEV005
+
         If TypeOf obj Is String Then
             RTB.SelectedRtf = DirectCast(obj, String)
             Return
         End If
+
         If TypeOf obj Is MemoryStream Then
             Using ms = DirectCast(obj, MemoryStream)
                 RTB.LoadFile(ms, RichTextBoxStreamType.RichText)
@@ -455,17 +462,27 @@ Friend Class ScratchPad
             Return
         End If
 
-        ' Fallback: plain text
-        If Clipboard.ContainsText() Then
-            RTB.SelectedText = Clipboard.GetText(TextDataFormat.UnicodeText)
+        ' Fallback: plain text (safe)
+        Dim hasText = App.TryClipboard(Function() Clipboard.ContainsText())
+        If hasText Then
+            Dim txt = App.TryClipboard(Function() Clipboard.GetText(TextDataFormat.UnicodeText))
+            If txt IsNot Nothing Then
+                RTB.SelectedText = txt
+            End If
         End If
 
     End Sub
     Private Sub PastePlain()
-        If Clipboard.ContainsText() Then
-            RTB.SelectedText = Clipboard.GetText(TextDataFormat.UnicodeText)
+        Dim hasText = App.TryClipboard(Function() Clipboard.ContainsText())
+
+        If hasText Then
+            Dim txt = App.TryClipboard(Function() Clipboard.GetText(TextDataFormat.UnicodeText))
+            If txt IsNot Nothing Then
+                RTB.SelectedText = txt
+            End If
         End If
     End Sub
+
     Private Sub Delete()
         RTB.SelectedText = String.Empty
     End Sub

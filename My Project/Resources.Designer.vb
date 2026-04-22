@@ -61,14 +61,14 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil Segoe UI;}{\f3\fnil\fcharset0 Segoe UI Symbol;}{\f4\fnil\fcharset1 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil\fcharset0 SimSun;}}
+        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset0 SimSun;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil Segoe UI;}}
         '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
         '''{\*\generator Riched20 10.0.26100}\viewkind4\uc1 
-        '''\pard\cf1\b\f0\fs28\lang9 SkyeClip v1.2 What&apos;s New\par
-        '''\cf0\fs24 Released February 2026\par
+        '''\pard\cf1\b\f0\fs28\lang9 SkyeClip v1.3 What&apos;s New\par
+        '''\cf0\fs24 Released April 2026\par
         '''\cf1\fs28\par
         '''\cf2\fs24 New Features\par
-        '''\ [rest of string was truncated]&quot;;.
+        '''\cf0 [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property ChangeLogRT() As String
             Get
@@ -77,14 +77,14 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}{\f2\fswiss Segoe UI;}{\f3\fnil\fcharset1 Cambria Math;}}
+        '''  Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fswiss\fcharset0 Segoe UI;}{\f2\fswiss Segoe UI;}{\f3\fnil\fcharset1 Cambria Math;}{\f4\fnil Segoe UI;}{\f5\fnil\fcharset0 Cambria Math;}}
         '''{\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
         '''{\*\generator Riched20 10.0.26100}{\*\mmathPr\mmathFont3\mwrapIndent1440 }\viewkind4\uc1 
         '''\pard\cf1\b\f0\fs28\lang9 SkyeClip Help\par
         '''\par
         '''\cf2\f1\fs24 Overview\par
         '''\cf0\b0\par
-        '''SkyeClip is a lightweight clipboard manager that stores your recent clips, lets you mark favorites [rest of string was truncated]&quot;;.
+        '''SkyeClip is a lightweight clipboard manager  [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property HelpRT() As String
             Get

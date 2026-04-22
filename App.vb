@@ -1236,7 +1236,7 @@ Friend Module App
 
     ' CLIP FUNCTIONS
     Friend Function BuildLiveClipboardPreview() As String
-        Dim data = Clipboard.GetDataObject()
+        Dim data = TryClipboard(Function() Clipboard.GetDataObject())
         If data Is Nothing OrElse data.GetFormats().Length = 0 Then
             Return App.CBEmptyString
         End If
@@ -1308,18 +1308,18 @@ Friend Module App
     End Function
     Friend Function BuildFileDropPreview() As String
         Dim files As String() = Array.Empty(Of String)()
-
-        If Clipboard.TryGetData(DataFormats.FileDrop, files) Then
-            If files Is Nothing Then
-                files = Array.Empty(Of String)()
-            End If
+        Dim success = App.TryClipboard(Function()
+                                           Return Clipboard.TryGetData(DataFormats.FileDrop, files)
+                                       End Function)
+        If Not success OrElse files Is Nothing Then
+            files = Array.Empty(Of String)()
         End If
 
         Dim count = files.Length
         If count = 0 Then
             Return "< Empty File Drop >"
         ElseIf count = 1 Then
-            Return $"< 1 File >"
+            Return "< 1 File >"
         Else
             Return $"< {count} Files >"
         End If
@@ -1341,6 +1341,16 @@ Friend Module App
         ToArray()
 
         Return files
+    End Function
+    Friend Function TryClipboard(Of T)(getter As Func(Of T)) As T
+        For i As Integer = 1 To 5
+            Try
+                Return getter()
+            Catch ex As ExternalException
+                Threading.Thread.Sleep(20)
+            End Try
+        Next
+        Return Nothing
     End Function
     Private Function GetFolderIcon(path As String) As Icon
         Dim shinfo As New Skye.WinAPI.SHFILEINFO()

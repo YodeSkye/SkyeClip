@@ -512,21 +512,39 @@ Friend Class TrayAppContext
         Return e.Modifiers = mods AndAlso e.KeyCode = key
     End Function
     Private Shared Function GetClipboardSignature() As Byte()
-        If Clipboard.ContainsFileDropList() Then
-            Dim files = Clipboard.GetFileDropList()
-            Dim fileList As String = String.Join("|", files.Cast(Of String)())
-            Return Text.Encoding.UTF8.GetBytes(fileList)
-        ElseIf Clipboard.ContainsImage() Then
-            Dim img = Clipboard.GetImage()
-            Using ms As New MemoryStream()
-                img.Save(ms, Imaging.ImageFormat.Png)
-                Return ms.ToArray()
-            End Using
-        ElseIf Clipboard.ContainsText() Then
-            Dim txt = Clipboard.GetText()
-            Return Text.Encoding.UTF8.GetBytes(txt)
+
+        ' FILE DROP
+        Dim hasFiles = App.TryClipboard(Function() Clipboard.ContainsFileDropList())
+        If hasFiles Then
+            Dim files = App.TryClipboard(Function() Clipboard.GetFileDropList())
+            If files IsNot Nothing Then
+                Dim fileList As String = String.Join("|", files.Cast(Of String)())
+                Return Text.Encoding.UTF8.GetBytes(fileList)
+            End If
         End If
-        Return Nothing 'unsupported format
+
+        ' IMAGE
+        Dim hasImg = App.TryClipboard(Function() Clipboard.ContainsImage())
+        If hasImg Then
+            Dim img = App.TryClipboard(Function() Clipboard.GetImage())
+            If img IsNot Nothing Then
+                Using ms As New MemoryStream()
+                    img.Save(ms, Imaging.ImageFormat.Png)
+                    Return ms.ToArray()
+                End Using
+            End If
+        End If
+
+        ' TEXT
+        Dim hasText = App.TryClipboard(Function() Clipboard.ContainsText())
+        If hasText Then
+            Dim txt = App.TryClipboard(Function() Clipboard.GetText())
+            If txt IsNot Nothing Then
+                Return Text.Encoding.UTF8.GetBytes(txt)
+            End If
+        End If
+
+        Return Nothing
     End Function
     Private Function ShouldIgnoreClip(signatureBytes As Byte(), now As DateTime) As Boolean
 
