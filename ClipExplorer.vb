@@ -24,9 +24,8 @@ Public Class ClipExplorer
 
     ' Form Events
     Private Sub ClipExplorer_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Skye.UI.ThemeManager.RegisterComponent(TipClipExplorer)
         Skye.UI.ThemeManager.ApplyTheme(Me)
-        Skye.UI.ThemeManager.ApplyToTooltip(TipClipExplorer)
-        AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
         Text = App.GetAppTitle() & " " & Text
         RadBtnPlainText.Checked = True
         CMClipActions.Font = App.MenuFont
@@ -82,9 +81,6 @@ Public Class ClipExplorer
     ' Handlers
     Private Sub OnProfileChanged()
         UpdateProfileUI()
-    End Sub
-    Private Sub OnThemeChanged()
-        Skye.UI.ThemeManager.ApplyToTooltip(TipClipExplorer)
     End Sub
 
     ' Control Events

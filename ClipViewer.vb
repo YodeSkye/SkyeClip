@@ -22,8 +22,9 @@ Friend Class ClipViewer
     Public Sub New()
         InitializeComponent()
         Opacity = 0
+
+        Skye.UI.RegisterComponent(TipClipViewer)
         Skye.UI.ThemeManager.ApplyTheme(Me)
-        Skye.UI.ThemeManager.ApplyToTooltip(TipClipViewer)
 
         fadeInTimer = New Timer With {.Interval = 15}
         AddHandler fadeInTimer.Tick, AddressOf FadeIn_Tick

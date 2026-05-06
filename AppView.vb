@@ -12,9 +12,10 @@ Friend Class AppView
     Private Sub AppView_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Opacity = 0
 
+        Skye.UI.ThemeManager.RegisterComponent(TipAppView)
         Skye.UI.ThemeManager.ApplyTheme(Me)
-        Skye.UI.ThemeManager.ApplyToTooltip(TipAppView)
-        AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
+        'Skye.UI.ThemeManager.ApplyToTooltip(TipAppView)
+        'AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
 
         'Ensure the form is fully on-screen
         Dim wa = Screen.FromPoint(Location).WorkingArea
@@ -94,9 +95,6 @@ Friend Class AppView
             fadeOutTimer.Stop()
             Close()
         End If
-    End Sub
-    Private Sub OnThemeChanged()
-        Skye.UI.ThemeManager.ApplyToTooltip(TipAppView)
     End Sub
 
 End Class
