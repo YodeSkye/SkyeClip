@@ -254,7 +254,7 @@ Friend Module App
             End Get
             Set(value As Integer)
                 If _currentProfileID <> value Then
-                    Debug.Print("Current Profile changed from " & _currentProfileID.ToString & " to " & value.ToString)
+                    'Debug.Print("Current Profile changed from " & _currentProfileID.ToString & " to " & value.ToString)
                     _currentProfileID = value
                     If _currentProfileID <> 0 AndAlso Not Settings.Profiles.Any(Function(p) p.ID = _currentProfileID) Then
                         _currentProfileID = 0
@@ -1892,7 +1892,7 @@ Friend Module App
         If proc <> Context.App.ActiveProcessName OrElse title <> Context.App.ActiveWindowTitle Then
             Context.App.ActiveProcessName = proc
             Context.App.ActiveWindowTitle = title
-            Debug.Print($"Context Updated: {Context.App.ActiveProcessName} ({Context.App.ActiveWindowTitle})")
+            'Debug.Print($"Context Updated: {Context.App.ActiveProcessName} ({Context.App.ActiveWindowTitle})")
         End If
     End Sub
     Friend Function GetActiveProcessName() As String
@@ -1934,7 +1934,7 @@ Friend Module App
             AddToRecentNetworks(newName)
             Settings.Save()
 
-            Debug.WriteLine("NETWORK: " & App.Context.Network.CurrentName)
+            'Debug.WriteLine("NETWORK: " & App.Context.Network.CurrentName)
 
         End If
     End Sub
