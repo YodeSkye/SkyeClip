@@ -20,12 +20,14 @@ Module Startup
         If Not createdNew Then Return 'Another instance is already running → just exit
 
         ' INITIALIZE APPLICATION
-        App.WriteToLog(GetAssemblyName() & " Started...")
 #If DEBUG Then
-        Skye.Common.RegistryHelper.BaseKey = "Software\" + App.GetAssemblyName + "DEV" 'Use separate registry key for debug builds
+        Skye.Common.Log.Initialize(App.GetAssemblyName() & "DEV") ' Use separate log file for debug builds
+        Skye.Common.RegistryHelper.BaseKey = "Software\" + App.GetAssemblyName + "DEV" ' Use separate registry key for debug builds
 #Else
-        Skye.Common.RegistryHelper.BaseKey = "Software\" + App.GetAssemblyName 'Use standard registry key for release builds
+        Skye.Common.Log.Initialize(App.GetAssemblyName()) ' Use standard log file for release builds
+        Skye.Common.RegistryHelper.BaseKey = "Software\" + App.GetAssemblyName ' Use standard registry key for release builds
 #End If
+        Skye.Common.Log.Write(GetAssemblyName() & " Started...")
         App.Settings.Load()
 
         ' Get Theme
@@ -58,7 +60,7 @@ Module Startup
         Application.Run(App.Tray)
 
         ' APPLICATION IS CLOSING
-        App.WriteToLog("..." & GetAssemblyName() & " Closed")
+        Skye.Common.Log.Write("..." & GetAssemblyName() & " Closed")
 
     End Sub
 

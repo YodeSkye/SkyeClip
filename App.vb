@@ -428,7 +428,7 @@ Friend Module App
             LoadAllRulesFromRegistry()
             Context.Network.RecentNames = RegistryHelper.GetStringArray("RecentNetworks", Array.Empty(Of String)()).ToList()
 
-            WriteToLog("Settings Loaded (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
+            Skye.Common.Log.Write("Settings Loaded (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
         End Sub
         Friend Shared Sub Save()
             Dim starttime As TimeSpan = DateTime.Now.TimeOfDay
@@ -489,7 +489,7 @@ Friend Module App
             ' Automation, Recent Network Names
             RegistryHelper.SetStringArray("RecentNetworks", Context.Network.RecentNames.ToArray())
 
-            WriteToLog("Settings Saved (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
+            Skye.Common.Log.Write("Settings Saved (" & Skye.Common.GenerateLogTime(starttime, DateTime.Now.TimeOfDay, True) & ")")
         End Sub
         Friend Shared Function GetNextProfileID() As Integer
             Dim id = _nextProfileID
@@ -527,7 +527,7 @@ Friend Module App
                 End If
                 Return True
             Catch ex As Exception
-                App.WriteToLog("Error Deleting Profile ID " & profileID.ToString & ": " & ex.Message)
+                Skye.Common.Log.Write("Error Deleting Profile ID " & profileID.ToString & ": " & ex.Message)
                 Return False
             End Try
         End Function
@@ -1011,7 +1011,7 @@ Friend Module App
                 End If
             End If
         Catch ex As Exception
-            WriteToLog("Auto Clip Purge Execution Error: " & ex.Message)
+            Skye.Common.Log.Write("Auto Clip Purge Execution Error: " & ex.Message)
         End Try
 
 
@@ -1032,7 +1032,7 @@ Friend Module App
                 End If
             End If
         Catch ex As Exception
-            App.WriteToLog("Auto Backup Execution Error: " & ex.Message)
+            Skye.Common.Log.Write("Auto Backup Execution Error: " & ex.Message)
         End Try
 
     End Sub
@@ -1679,7 +1679,7 @@ Friend Module App
                                  App.Tray.ShowToast("Export Complete, Your ZIP File Is Ready.")
                              Catch ex As Exception
                                  App.Tray.ShowToast("Clip Export Failed.")
-                                 App.WriteToLog("Clip Export Failed: " & ex.Message)
+                                 Skye.Common.Log.Write("Clip Export Failed: " & ex.Message)
                              End Try
                          End Sub)
             Case ".bin"
@@ -1810,9 +1810,9 @@ Friend Module App
         Try
             File.Copy(App.DBPath, path, overwrite:=True)
             Tray.ShowToast("Backup Completed Successfully")
-            WriteToLog("Manual Backup Successful: " & path)
+            Skye.Common.Log.Write("Manual Backup Successful: " & path)
         Catch ex As Exception
-            WriteToLog("Manual Backup Failed: " & path & vbCr & ex.Message)
+            Skye.Common.Log.Write("Manual Backup Failed: " & path & vbCr & ex.Message)
         End Try
     End Sub
     Friend Sub BackupAuto()
@@ -1823,9 +1823,9 @@ Friend Module App
             If App.Settings.AutoBackupPurge Then
                 PurgeOldAutoBackups()
             End If
-            WriteToLog("Auto Backup Successful: " & path)
+            Skye.Common.Log.Write("Auto Backup Successful: " & path)
         Catch ex As Exception
-            WriteToLog("Auto Backup Failed: " & path & vbCr & ex.Message)
+            Skye.Common.Log.Write("Auto Backup Failed: " & path & vbCr & ex.Message)
         End Try
     End Sub
     Private Sub PurgeOldAutoBackups()
@@ -1835,10 +1835,10 @@ Friend Module App
                 For Each f In files.Skip(10)
                     File.Delete(f)
                 Next
-                WriteToLog("Auto Backup Purge Completed.")
+                Skye.Common.Log.Write("Auto Backup Purge Completed.")
             End If
         Catch ex As Exception
-            WriteToLog("Auto Backup Purge Failed." & vbCr & ex.Message)
+            Skye.Common.Log.Write("Auto Backup Purge Failed." & vbCr & ex.Message)
         End Try
     End Sub
     Friend Sub RestoreBackup(backupPath As String)
@@ -1852,9 +1852,9 @@ Friend Module App
             Tray.UpdateUI(False)
 
             Tray.ShowToast("Backup Restored Successfully")
-            WriteToLog("Backup successfully restored from: " & backupPath)
+            Skye.Common.Log.Write("Backup successfully restored from: " & backupPath)
         Catch ex As Exception
-            WriteToLog("Failed to restore backup from: " & backupPath & vbCr & ex.Message)
+            Skye.Common.Log.Write("Failed to restore backup from: " & backupPath & vbCr & ex.Message)
         End Try
     End Sub
     Private Function GetNextAutoBackupTime(last As DateTime, freq As AutoBackupFrequency) As DateTime
@@ -2252,26 +2252,26 @@ Friend Module App
         Dim ver = Assembly.GetExecutingAssembly().GetName().Version
         GetFullVersion = ver.Major.ToString & "." & ver.Minor.ToString & "." & ver.Build.ToString
     End Function
-    Friend Sub WriteToLog(message As String)
-        If String.IsNullOrWhiteSpace(message) Then Exit Sub
-        RotateLogIfNeeded()
-        Try
-            Dim line As String = $"{Date.Now:yyyy/MM/dd @ HH:mm:ss} --> {message}{Environment.NewLine}"
-            IO.File.AppendAllText(LogPath, line)
-        Catch ' Logging must never crash the app. Swallowing exceptions here is intentional.
-        End Try
-    End Sub
-    Private Sub RotateLogIfNeeded()
-        Try
-            Dim fi As New IO.FileInfo(LogPath)
-            If fi.Exists AndAlso fi.Length >= 1_000_000 Then
-                Dim timestamp As String = Date.Now.ToString("yyyyMMdd@HHmmss")
-                Dim backupPath As String = IO.Path.Combine(fi.DirectoryName, $"{IO.Path.GetFileNameWithoutExtension(LogPath)}_Backup@{timestamp}{fi.Extension}")
-                IO.File.Move(LogPath, backupPath)
-            End If
-        Catch ' If rotation fails, ignore — logging must never break the app.
-        End Try
-    End Sub
+    'Friend Sub WriteToLog(message As String)
+    '    If String.IsNullOrWhiteSpace(message) Then Exit Sub
+    '    RotateLogIfNeeded()
+    '    Try
+    '        Dim line As String = $"{Date.Now:yyyy/MM/dd @ HH:mm:ss} --> {message}{Environment.NewLine}"
+    '        IO.File.AppendAllText(LogPath, line)
+    '    Catch ' Logging must never crash the app. Swallowing exceptions here is intentional.
+    '    End Try
+    'End Sub
+    'Private Sub RotateLogIfNeeded()
+    '    Try
+    '        Dim fi As New IO.FileInfo(LogPath)
+    '        If fi.Exists AndAlso fi.Length >= 1_000_000 Then
+    '            Dim timestamp As String = Date.Now.ToString("yyyyMMdd@HHmmss")
+    '            Dim backupPath As String = IO.Path.Combine(fi.DirectoryName, $"{IO.Path.GetFileNameWithoutExtension(LogPath)}_Backup@{timestamp}{fi.Extension}")
+    '            IO.File.Move(LogPath, backupPath)
+    '        End If
+    '    Catch ' If rotation fails, ignore — logging must never break the app.
+    '    End Try
+    'End Sub
     Friend Sub DeleteLog()
         If IO.File.Exists(LogPath) Then IO.File.Delete(LogPath)
         ShowLog(True)
@@ -2281,9 +2281,9 @@ Friend Module App
                 .Arguments = "/SELECT," + """" + filename + """"}
         Try
             Process.Start(psi)
-            WriteToLog("File Location Opened (" + filename + ")")
+            Skye.Common.Log.Write("File Location Opened (" + filename + ")")
         Catch ex As Exception
-            WriteToLog("Error Opening File Location (" + filename + ")" + vbCr + ex.Message)
+            Skye.Common.Log.Write("Error Opening File Location (" + filename + ")" + vbCr + ex.Message)
         End Try
     End Sub
     Friend Function ResizeImage(src As Image, size As Integer) As Image

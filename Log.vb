@@ -12,10 +12,11 @@ Public Class Log
 
     ' Form Events
     Private Sub Log_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        Skye.UI.ThemeManager.RegisterComponent(TipLog)
+        Skye.UI.ThemeManager.RegisterComponent(TipAlert)
         Skye.UI.ThemeManager.ApplyTheme(Me)
-        Skye.UI.ThemeManager.ApplyToTooltip(TipAlert)
-        Skye.UI.ThemeManager.ApplyToTooltip(TipLog)
-        AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
+
         Text = App.GetAppTitle + " Log"
         RTBCMLog.Font = App.MenuFont
         LogSearchTitle = TxBxSearch.Text
@@ -133,10 +134,6 @@ Public Class Log
     ' Handlers
     Private Sub TimerDeleteLog_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerDeleteLog.Tick
         SetDeleteLogConfirm()
-    End Sub
-    Private Sub OnThemeChanged()
-        Skye.UI.ThemeManager.ApplyToTooltip(TipAlert)
-        Skye.UI.ThemeManager.ApplyToTooltip(TipLog)
     End Sub
 
     ' Methods

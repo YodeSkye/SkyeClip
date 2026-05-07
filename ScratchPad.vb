@@ -14,21 +14,6 @@ Friend Class ScratchPad
     Private _clipID As Integer = -1
 
     ' Form Events
-    Private Sub ScratchPad_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Skye.UI.ThemeManager.ApplyTheme(Me)
-        Skye.UI.ThemeManager.ApplyToTooltip(TipScratchPad)
-        AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
-        TitleText = Text
-        OKText = TipScratchPad.GetText(BtnOK)
-        UpdateUI()
-        If App.Settings.ScratchPadSize.Height >= 0 Then Me.Size = App.Settings.ScratchPadSize
-        If App.Settings.ScratchPadLocation.Y >= 0 Then Me.Location = App.Settings.ScratchPadLocation
-        CMRTB.Font = App.MenuFont
-        If Not String.IsNullOrWhiteSpace(App.ScratchPadText) Then
-            RTB.Rtf = App.ScratchPadText
-        End If
-        AddHandler App.Tray.ProfileChanged, AddressOf OnProfileChanged
-    End Sub
     Friend Overloads Sub Show(clipID As Integer)
         _clipID = clipID
         MyBase.Show()
@@ -40,6 +25,22 @@ Friend Class ScratchPad
             If best IsNot Nothing Then ShowClipData(best)
         End If
 
+    End Sub
+    Private Sub ScratchPad_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        Skye.UI.ThemeManager.RegisterComponent(TipScratchPad)
+        Skye.UI.ThemeManager.ApplyTheme(Me)
+
+        TitleText = Text
+        OKText = TipScratchPad.GetText(BtnOK)
+        UpdateUI()
+        If App.Settings.ScratchPadSize.Height >= 0 Then Me.Size = App.Settings.ScratchPadSize
+        If App.Settings.ScratchPadLocation.Y >= 0 Then Me.Location = App.Settings.ScratchPadLocation
+        CMRTB.Font = App.MenuFont
+        If Not String.IsNullOrWhiteSpace(App.ScratchPadText) Then
+            RTB.Rtf = App.ScratchPadText
+        End If
+        AddHandler App.Tray.ProfileChanged, AddressOf OnProfileChanged
     End Sub
     Private Sub ScratchPad_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         SaveScratchPad()
@@ -252,9 +253,6 @@ Friend Class ScratchPad
     Private Sub OnProfileChanged()
         UpdateUI()
     End Sub
-    Private Sub OnThemeChanged()
-        Skye.UI.ThemeManager.ApplyToTooltip(TipScratchPad)
-    End Sub
 
     ' Methods
     Friend Sub SaveScratchPad()
@@ -307,7 +305,7 @@ Friend Class ScratchPad
                     Try
                         RTB.LoadFile(uiOpenFile.FileName, RichTextBoxStreamType.RichText)
                     Catch ex As Exception
-                        WriteToLog("Error Importing File into Scratch Pad: " & ex.Message)
+                        Skye.Common.Log.Write("Error Importing File into Scratch Pad: " & ex.Message)
                     End Try
             End Select
         End If

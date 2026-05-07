@@ -188,7 +188,7 @@ Friend Class ClipRepository
                 If(sourceInfo.IconBytes IsNot Nothing, CType(sourceInfo.IconBytes, Object), DBNull.Value)
 
                 entryId = Convert.ToInt32(insertEntry.ExecuteScalar())
-                App.WriteToLog("New Clip Saved: ID=" & entryId & " """ & preview & """")
+                Skye.Common.Log.Write("New Clip Saved: ID=" & entryId & " """ & preview & """")
 
                 ' Formats
                 For Each cd In formats
@@ -760,7 +760,7 @@ Friend Class ClipRepository
                     cmd2.Parameters.AddWithValue("@id", clipID)
                     cmd2.ExecuteNonQuery()
                     Debug.Print($"Deleted Clip {clipID}")
-                    WriteToLog($"Deleted Clip {clipID}")
+                    Skye.Common.Log.Write($"Deleted Clip {clipID}")
                 End Using
 
                 tx.Commit()
@@ -795,7 +795,7 @@ Friend Class ClipRepository
                     cmd2.Parameters.AddWithValue("@cutoff", cutoff)
                     Dim rows = cmd2.ExecuteNonQuery()
                     Debug.Print($"Purge Removed {rows} Clips")
-                    WriteToLog($"Purge Removed {rows} Clips")
+                    Skye.Common.Log.Write($"Purge Removed {rows} Clips")
                 End Using
 
                 tx.Commit()

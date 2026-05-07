@@ -18,9 +18,9 @@ Public Class Settings
 
     ' Form Events
     Private Sub Settings_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        Skye.UI.ThemeManager.RegisterComponent(TipSettings)
         Skye.UI.ThemeManager.ApplyTheme(Me)
-        Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
-        AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
 
         ILPageSelector.Images.Add(My.Resources.ImageSettings48)
         ILPageSelector.Images.Add(My.Resources.ImageApp48)
@@ -594,9 +594,6 @@ Public Class Settings
     ' Handlers
     Private Sub OnProfileChanged()
         LoadSettings()
-    End Sub
-    Private Sub OnThemeChanged()
-        Skye.UI.ThemeManager.ApplyToTooltip(TipSettings)
     End Sub
     Private Sub OnRuleSaved(editor As UserControl, rule As App.IRulePreview)
 

@@ -124,7 +124,7 @@ Public Class About
         Try
             Diagnostics.Process.Start(pInfo)
         Catch ex As Exception
-            WriteToLog("Cannot Open " & target & vbCr & ex.Message)
+            Skye.Common.Log.Write("Cannot Open " & target & vbCr & ex.Message)
         End Try
     End Sub
     Private Sub ShowUpdateLabelIfNeeded(latest As String)

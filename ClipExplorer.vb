@@ -308,7 +308,7 @@ Public Class ClipExplorer
         Try
             Process.Start(exePath)
         Catch
-            App.WriteToLog("Unable to Open the Source Application: " & exePath)
+            Skye.Common.Log.Write("Unable to Open the Source Application: " & exePath)
         End Try
 
     End Sub
