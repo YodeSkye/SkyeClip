@@ -27,12 +27,9 @@ Partial Class Log
         RTBCMLog = New Skye.UI.RichTextBoxContextMenu()
         BTNOK = New Button()
         BTNDeleteLog = New Button()
-        BTNRefreshLog = New Button()
         LBLLogInfo = New Skye.UI.Label()
-        TxBxSearch = New TextBox()
-        LblStatus = New Skye.UI.Label()
-        RTBLog = New Skye.UI.RichTextBox()
         TipLog = New Skye.UI.ToolTipEX(components)
+        LogViewer = New Skye.UI.Log.LogViewerControl()
         TipAlert = New Skye.UI.ToolTipEX(components)
         SuspendLayout()
         ' 
@@ -74,20 +71,6 @@ Partial Class Log
         TipAlert.SetText(BTNDeleteLog, Nothing)
         BTNDeleteLog.UseVisualStyleBackColor = True
         ' 
-        ' BTNRefreshLog
-        ' 
-        BTNRefreshLog.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
-        TipAlert.SetImage(BTNRefreshLog, Nothing)
-        BTNRefreshLog.Image = My.Resources.Resources.ImageRefreshLog32
-        TipLog.SetImage(BTNRefreshLog, Nothing)
-        BTNRefreshLog.Location = New Point(740, 399)
-        BTNRefreshLog.Name = "BTNRefreshLog"
-        BTNRefreshLog.Size = New Size(48, 48)
-        BTNRefreshLog.TabIndex = 4
-        TipLog.SetText(BTNRefreshLog, "Refresh Log")
-        TipAlert.SetText(BTNRefreshLog, Nothing)
-        BTNRefreshLog.UseVisualStyleBackColor = True
-        ' 
         ' LBLLogInfo
         ' 
         LBLLogInfo.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
@@ -103,64 +86,24 @@ Partial Class Log
         TipAlert.SetText(LBLLogInfo, Nothing)
         LBLLogInfo.TextAlign = ContentAlignment.BottomCenter
         ' 
-        ' TxBxSearch
-        ' 
-        TxBxSearch.BackColor = SystemColors.Control
-        TxBxSearch.BorderStyle = BorderStyle.None
-        TxBxSearch.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipAlert.SetImage(TxBxSearch, Nothing)
-        TipLog.SetImage(TxBxSearch, Nothing)
-        TxBxSearch.Location = New Point(15, 12)
-        TxBxSearch.Name = "TxBxSearch"
-        TxBxSearch.ShortcutsEnabled = False
-        TxBxSearch.Size = New Size(175, 18)
-        TxBxSearch.TabIndex = 6
-        TxBxSearch.Text = "Search Log"
-        TipLog.SetText(TxBxSearch, Nothing)
-        TipAlert.SetText(TxBxSearch, Nothing)
-        ' 
-        ' LblStatus
-        ' 
-        LblStatus.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        LblStatus.AutoSize = True
-        LblStatus.BackColor = Color.Transparent
-        LblStatus.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblStatus.ForeColor = Color.Red
-        TipAlert.SetImage(LblStatus, Nothing)
-        TipLog.SetImage(LblStatus, Nothing)
-        LblStatus.Location = New Point(657, 12)
-        LblStatus.Name = "LblStatus"
-        LblStatus.Size = New Size(128, 17)
-        LblStatus.TabIndex = 7
-        TipLog.SetText(LblStatus, Nothing)
-        LblStatus.Text = "Searching The Log..."
-        TipAlert.SetText(LblStatus, Nothing)
-        LblStatus.TextAlign = ContentAlignment.MiddleRight
-        LblStatus.Visible = False
-        ' 
-        ' RTBLog
-        ' 
-        RTBLog.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        RTBLog.BackColor = SystemColors.Control
-        RTBLog.ContextMenuStrip = RTBCMLog
-        RTBLog.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        TipAlert.SetImage(RTBLog, Nothing)
-        TipLog.SetImage(RTBLog, Nothing)
-        RTBLog.Location = New Point(12, 32)
-        RTBLog.Name = "RTBLog"
-        RTBLog.ReadOnly = True
-        RTBLog.ShortcutsEnabled = False
-        RTBLog.Size = New Size(776, 317)
-        RTBLog.TabIndex = 8
-        RTBLog.Text = ""
-        TipLog.SetText(RTBLog, Nothing)
-        TipAlert.SetText(RTBLog, Nothing)
-        RTBLog.WordWrap = False
-        ' 
         ' TipLog
         ' 
         TipLog.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipLog.ShadowThickness = 0
+        ' 
+        ' LogViewer
+        ' 
+        LogViewer.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        LogViewer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipLog.SetImage(LogViewer, Nothing)
+        TipAlert.SetImage(LogViewer, Nothing)
+        LogViewer.Location = New Point(0, 0)
+        LogViewer.Margin = New Padding(4)
+        LogViewer.Name = "LogViewer"
+        LogViewer.Size = New Size(800, 344)
+        LogViewer.TabIndex = 6
+        TipLog.SetText(LogViewer, Nothing)
+        TipAlert.SetText(LogViewer, Nothing)
         ' 
         ' TipAlert
         ' 
@@ -172,11 +115,8 @@ Partial Class Log
         ' 
         AutoScaleMode = AutoScaleMode.None
         ClientSize = New Size(800, 459)
-        Controls.Add(RTBLog)
-        Controls.Add(LblStatus)
-        Controls.Add(TxBxSearch)
+        Controls.Add(LogViewer)
         Controls.Add(LBLLogInfo)
-        Controls.Add(BTNRefreshLog)
         Controls.Add(BTNDeleteLog)
         Controls.Add(BTNOK)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
@@ -190,16 +130,13 @@ Partial Class Log
         TipLog.SetText(Me, Nothing)
         TipAlert.SetText(Me, Nothing)
         ResumeLayout(False)
-        PerformLayout()
     End Sub
     Friend WithEvents BTNOK As Button
     Friend WithEvents BTNDeleteLog As Button
-    Friend WithEvents BTNRefreshLog As Button
     Friend WithEvents RTBCMLog As Skye.UI.RichTextBoxContextMenu
     Friend WithEvents LBLLogInfo As Skye.UI.Label
-    Friend WithEvents TxBxSearch As TextBox
-    Friend WithEvents LblStatus As Skye.UI.Label
-    Friend WithEvents RTBLog As Skye.UI.RichTextBox
     Friend WithEvents TipLog As Skye.UI.ToolTipEX
     Friend WithEvents TipAlert As Skye.UI.ToolTipEX
+    Friend WithEvents LogViewerControl1 As Skye.UI.Log.LogViewerControl
+    Friend WithEvents LogViewer As Skye.UI.Log.LogViewerControl
 End Class

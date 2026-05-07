@@ -43,7 +43,7 @@ Friend Module App
     Friend ReadOnly CBUnknownFormatString As String = "< Unknown Format >"
     Friend ReadOnly CBRTFSuffix As String = " <RTF>"
     Friend ReadOnly CBHTMLSuffix As String = " <HTML>"
-    Friend ReadOnly MenuFont As New Font("Segoe UI", 10) 'SystemFonts.MenuFont.FontFamily ' MenuFont is the font used for context menus.
+    Friend ReadOnly MenuFont As New Font("Segoe UI", 10, FontStyle.Regular) ' MenuFont is the font used for context menus.
     Friend ReadOnly AttributionSkye As String = "https://github.com/YodeSkye/SkyeClip" ' AttributionSkye is the URL for the SkyeClip project.
     Friend ReadOnly AttributionMicrosoft As String = "https://www.microsoft.com" 'AttributionMicrosoft is the URL for Microsoft, which provides various APIs and libraries used in the application.
     Friend ReadOnly AttributionSQLite As String = "https://www.sqlite.org/index.html" 'AttributionSQLite is the URL for SQLite, which provides database functionality in the application.
@@ -79,12 +79,10 @@ Friend Module App
     Friend ReadOnly UserPath As String = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) & "\Skye\" 'UserPath is the base path for user-specific files.
 #If DEBUG Then
     Private ReadOnly devFileTag As String = "DEV"
-    Friend ReadOnly LogPath As String = IO.Path.GetTempPath & GetAssemblyName() & "LogDEV.txt" 'LogPath is the path to the log file.
     Friend ReadOnly DBPath As String = UserPath & Application.ProductName & "ClipboardDEV.db" 'DatabasePath is the path to the SQLite database file.
     Friend ReadOnly ScratchPadPath As String = UserPath & Application.ProductName & "ScratchPadDEV.rtf" 'ScratchPadPath is the path to the ScratchPad KeepText RTF file.
 #Else
     Private ReadOnly devFileTag As String = String.Empty
-    Friend ReadOnly LogPath As String = IO.Path.GetTempPath & GetAssemblyName() & "Log.txt" 'LogPath is the path to the log file.
     Friend ReadOnly DBPath As String = UserPath & Application.ProductName & "Clipboard.db" 'DatabasePath is the path to the SQLite database file.
     Friend ReadOnly ScratchPadPath As String = UserPath & Application.ProductName & "ScratchPad.rtf" 'ScratchPadPath is the path to the ScratchPad KeepText RTF file.
 #End If
@@ -1147,25 +1145,8 @@ Friend Module App
             FrmLog.Focus()
         Else
             FrmLog = New Log
+            FrmLog.LogViewer.Tip.Font = MenuFont
             FrmLog.Show()
-        End If
-        Dim logtext As String = String.Empty
-        Dim lines As Integer = 0
-        FrmLog.RTBLog.Clear()
-        Try
-            logtext = IO.File.ReadAllText(LogPath)
-        Catch
-        End Try
-        FrmLog.RTBLog.AppendText(logtext)
-        FrmLog.LBLLogInfo.Text = LogPath
-        If FrmLog.RTBLog.Lines.Length > 0 AndAlso FrmLog.RTBLog.Lines(0).Length > 0 Then lines = FrmLog.RTBLog.GetLineFromCharIndex(FrmLog.RTBLog.Text.Length)
-        FrmLog.LBLLogInfo.Text += " (" + lines.ToString + IIf(lines = 1, " Line", " Lines").ToString + ")"
-        If lines > 0 Then
-            FrmLog.BTNDeleteLog.Visible = True
-            FrmLog.BTNRefreshLog.Visible = True
-            FrmLog.RTBLog.ScrollToCaret()
-        Else
-            FrmLog.BTNDeleteLog.Visible = False
         End If
         FrmLog.BTNOK.Select()
     End Sub
@@ -2252,40 +2233,6 @@ Friend Module App
         Dim ver = Assembly.GetExecutingAssembly().GetName().Version
         GetFullVersion = ver.Major.ToString & "." & ver.Minor.ToString & "." & ver.Build.ToString
     End Function
-    'Friend Sub WriteToLog(message As String)
-    '    If String.IsNullOrWhiteSpace(message) Then Exit Sub
-    '    RotateLogIfNeeded()
-    '    Try
-    '        Dim line As String = $"{Date.Now:yyyy/MM/dd @ HH:mm:ss} --> {message}{Environment.NewLine}"
-    '        IO.File.AppendAllText(LogPath, line)
-    '    Catch ' Logging must never crash the app. Swallowing exceptions here is intentional.
-    '    End Try
-    'End Sub
-    'Private Sub RotateLogIfNeeded()
-    '    Try
-    '        Dim fi As New IO.FileInfo(LogPath)
-    '        If fi.Exists AndAlso fi.Length >= 1_000_000 Then
-    '            Dim timestamp As String = Date.Now.ToString("yyyyMMdd@HHmmss")
-    '            Dim backupPath As String = IO.Path.Combine(fi.DirectoryName, $"{IO.Path.GetFileNameWithoutExtension(LogPath)}_Backup@{timestamp}{fi.Extension}")
-    '            IO.File.Move(LogPath, backupPath)
-    '        End If
-    '    Catch ' If rotation fails, ignore — logging must never break the app.
-    '    End Try
-    'End Sub
-    Friend Sub DeleteLog()
-        If IO.File.Exists(LogPath) Then IO.File.Delete(LogPath)
-        ShowLog(True)
-    End Sub
-    Friend Sub OpenFileLocation(filename As String)
-        Dim psi As New ProcessStartInfo("EXPLORER.EXE") With {
-                .Arguments = "/SELECT," + """" + filename + """"}
-        Try
-            Process.Start(psi)
-            Skye.Common.Log.Write("File Location Opened (" + filename + ")")
-        Catch ex As Exception
-            Skye.Common.Log.Write("Error Opening File Location (" + filename + ")" + vbCr + ex.Message)
-        End Try
-    End Sub
     Friend Function ResizeImage(src As Image, size As Integer) As Image
         Dim bmp As New Bitmap(size, size)
         Using g = Graphics.FromImage(bmp)

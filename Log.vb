@@ -3,14 +3,13 @@ Imports Skye.UI
 
 Public Class Log
 
-    ' Declarations
+    ' DECLARATIONS
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
-    Private LogSearchTitle As String
     Private DeleteLogConfirm As Boolean = False
     Private WithEvents TimerDeleteLog As New Timer
 
-    ' Form Events
+    ' FORM EVENTS
     Private Sub Log_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         Skye.UI.ThemeManager.RegisterComponent(TipLog)
@@ -18,8 +17,8 @@ Public Class Log
         Skye.UI.ThemeManager.ApplyTheme(Me)
 
         Text = App.GetAppTitle + " Log"
+        LBLLogInfo.Text = Skye.Common.Log.LogFilePath
         RTBCMLog.Font = App.MenuFont
-        LogSearchTitle = TxBxSearch.Text
         TimerDeleteLog.Interval = 5000
     End Sub
     Private Sub Log_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
@@ -53,90 +52,37 @@ Public Class Log
         If Visible AndAlso WindowState = FormWindowState.Normal AndAlso Not mMove Then CheckMove(Location)
     End Sub
     Private Sub Log_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
-        If Not TxBxSearch.Focused Then
-            If e.KeyData = Keys.Escape Then Me.Close()
-        End If
+        If e.KeyData = Keys.Escape Then Me.Close()
     End Sub
     Private Sub Log_DoubleClick(sender As Object, e As EventArgs) Handles MyBase.DoubleClick
         ToggleMaximized()
     End Sub
 
-    ' Control Events
-    Private Sub RTBLog_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles RTBLog.PreviewKeyDown
-        RTBCMLog.ShortcutKeys(CType(sender, RichTextBox), e)
-    End Sub
+    ' CONTROL EVENTS
     Private Sub LBLLogInfo_DoubleClick(sender As Object, e As EventArgs) Handles LBLLogInfo.DoubleClick
-        App.OpenFileLocation(App.LogPath)
+        Skye.Common.Log.OpenLocation()
     End Sub
     Private Sub BTNOK_Click(sender As Object, e As EventArgs) Handles BTNOK.Click
         Close()
     End Sub
-    Private Sub BTNRefreshLog_Click(sender As Object, e As EventArgs) Handles BTNRefreshLog.Click
+    Private Sub BTNRefreshLog_Click(sender As Object, e As EventArgs)
         SetDeleteLogConfirm(True)
-        App.ShowLog(True)
+        ShowLog(True)
     End Sub
     Private Sub BTNDeleteLog_Click(sender As Object, e As EventArgs) Handles BTNDeleteLog.Click
         If DeleteLogConfirm Then
-            App.DeleteLog()
+            Skye.Common.Log.Clear()
+            LogViewer.RefreshContent()
         End If
         SetDeleteLogConfirm()
     End Sub
-    Private Sub TxBxSearch_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TxBxSearch.KeyPress
-        Select Case e.KeyChar
-            Case Convert.ToChar(Keys.Escape)
-                ResetRTBLogFind()
-                RTBLog.Focus()
-                e.Handled = True
-        End Select
-    End Sub
-    Private Sub TxBxSearch_Enter(sender As Object, e As EventArgs) Handles TxBxSearch.Enter
-        If TxBxSearch.Text = LogSearchTitle Then TxBxSearch.ResetText()
-    End Sub
-    Private Sub TxBxSearch_Leave(sender As Object, e As EventArgs) Handles TxBxSearch.Leave
-        TxBxSearch.Text = LogSearchTitle
-        TxBxSearch.ForeColor = Skye.UI.ThemeManager.CurrentTheme.TextFore
-    End Sub
-    Private Sub TxBxSearch_TextChanged(sender As Object, e As EventArgs) Handles TxBxSearch.TextChanged
-        If TxBxSearch.Text Is String.Empty Or RTBLog.Focused Then
-            ResetRTBLogFind()
-        ElseIf TxBxSearch.Text.Length <= 4 Then
-            TxBxSearch.ForeColor = Skye.UI.ThemeManager.CurrentTheme.TextFore
-            ResetRTBLogFind()
-        ElseIf Not TxBxSearch.Text = LogSearchTitle AndAlso TxBxSearch.Text.Length > 4 AndAlso IsHandleCreated Then
-            'Debug.Print("Searching Log...")
-            LblStatus.Visible = True
-            LblStatus.Refresh()
-            Dim foundindex As Integer
-            Dim searchtext As String = RTBLog.Text
-            ResetRTBLogFind()
-            'Try To Find First Occurrence
-            foundindex = searchtext.IndexOf(TxBxSearch.Text, 0, StringComparison.CurrentCultureIgnoreCase)
-            If foundindex < 0 Then
-                TxBxSearch.ForeColor = Color.Red
-            Else
-                TxBxSearch.ForeColor = Skye.UI.ThemeManager.CurrentTheme.TextFore
-                RTBLog.Select(foundindex, 0)
-                RTBLog.ScrollToCaret()
-            End If
-            Do Until foundindex < 0
-                'Highlight Current Match
-                RTBLog.SelectionStart = foundindex
-                RTBLog.SelectionLength = TxBxSearch.Text.Length
-                RTBLog.SelectionBackColor = Color.FromArgb(180, 210, 255)
-                RTBLog.SelectionColor = Color.Black
-                'Try To Find Next Occurrence
-                foundindex = searchtext.IndexOf(TxBxSearch.Text, foundindex + TxBxSearch.Text.Length, StringComparison.CurrentCultureIgnoreCase)
-            Loop
-            LblStatus.Visible = False
-        End If
-    End Sub
 
-    ' Handlers
+    ' HANDLERS
     Private Sub TimerDeleteLog_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles TimerDeleteLog.Tick
         SetDeleteLogConfirm()
     End Sub
 
-    ' Methods
+    ' METHODS
     Private Sub ToggleMaximized()
         Select Case WindowState
             Case FormWindowState.Normal, FormWindowState.Minimized
@@ -144,15 +90,6 @@ Public Class Log
             Case FormWindowState.Maximized
                 WindowState = FormWindowState.Normal
         End Select
-    End Sub
-    Private Sub ResetRTBLogFind()
-        RTBLog.SelectAll()
-        RTBLog.SelectionBackColor = RTBLog.BackColor
-        RTBLog.SelectionColor = RTBLog.ForeColor
-        RTBLog.DeselectAll()
-        RTBLog.SelectionStart = RTBLog.TextLength
-        RTBLog.SelectionLength = 0
-        RTBLog.ScrollToCaret()
     End Sub
     Private Sub SetDeleteLogConfirm(Optional forcereset As Boolean = False)
         If DeleteLogConfirm Or forcereset Then
