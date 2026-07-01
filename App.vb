@@ -262,8 +262,8 @@ Friend Module App
                     If App.Settings.ThemeAuto Then
                         Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
                     Else
-                        Skye.UI.ThemeManager.SetTheme(GetTheme(App.Settings.ThemeName))
-                        ApplyThemeToAllOpenForms()
+                        Skye.UI.ThemeManager.SetTheme(Skye.UI.SkyeThemes.GetTheme(App.Settings.ThemeName))
+                        Skye.UI.ThemeManager.ApplyThemeToAllOpenForms()
                     End If
                     Tray.SetAppIcon()
                 End If

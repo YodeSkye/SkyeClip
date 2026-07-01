@@ -493,8 +493,8 @@ Public Class Settings
         Dim selected = CoBoxTheme.SelectedItem.ToString
         App.Settings.ThemeName = selected
         If Not App.Settings.ThemeAuto Then
-            SetTheme(GetTheme(selected))
-            ApplyThemeToAllOpenForms()
+            Skye.UI.ThemeManager.SetTheme(Skye.UI.SkyeThemes.GetTheme(selected))
+            Skye.UI.ThemeManager.ApplyThemeToAllOpenForms()
             App.Tray.SetAppIcon()
         End If
     End Sub
@@ -802,8 +802,8 @@ Public Class Settings
         If App.Settings.ThemeAuto Then
             Skye.UI.ThemeManager.SetTheme(DetectWindowsTheme())
         Else
-            SetTheme(GetTheme(App.Settings.ThemeName))
-            ApplyThemeToAllOpenForms()
+            Skye.UI.ThemeManager.SetTheme(Skye.UI.SkyeThemes.GetTheme(App.Settings.ThemeName))
+            Skye.UI.ThemeManager.ApplyThemeToAllOpenForms()
         End If
         LoadSettings() 'Reload settings to update badges visibility
     End Sub
