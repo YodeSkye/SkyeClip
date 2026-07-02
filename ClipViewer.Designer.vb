@@ -141,7 +141,7 @@ Partial Class ClipViewer
         ' 
         ' TipClipViewer
         ' 
-        TipClipViewer.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipClipViewer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipViewer.ShadowThickness = 0
         ' 
         ' ClipViewer

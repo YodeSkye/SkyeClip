@@ -77,7 +77,7 @@ Partial Class AppView
         ' 
         ' TipAppView
         ' 
-        TipAppView.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipAppView.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAppView.ShadowThickness = 0
         ' 
         ' BtnExit

@@ -233,7 +233,7 @@ Partial Class ScratchPad
         ' 
         ' TipScratchPad
         ' 
-        TipScratchPad.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipScratchPad.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipScratchPad.ShadowThickness = 0
         ' 
         ' ScratchPad

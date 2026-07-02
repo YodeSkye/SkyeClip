@@ -88,7 +88,7 @@ Partial Class Log
         ' 
         ' TipLog
         ' 
-        TipLog.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipLog.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipLog.ShadowThickness = 0
         ' 
         ' LogViewer
@@ -107,7 +107,7 @@ Partial Class Log
         ' 
         ' TipAlert
         ' 
-        TipAlert.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipAlert.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipAlert.HideDelay = 5000
         TipAlert.ShadowThickness = 0
         ' 

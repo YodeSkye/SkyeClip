@@ -166,7 +166,7 @@ Partial Class Settings
         ' 
         ' TipSettings
         ' 
-        TipSettings.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        TipSettings.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipSettings.ShadowThickness = 0
         ' 
         ' ChkBoxBlinkOnNewClip
