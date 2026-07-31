@@ -28,6 +28,22 @@ Module Startup
         Skye.Common.RegistryHelper.BaseKey = "Software\" + App.GetAssemblyName ' Use standard registry key for release builds
 #End If
         Skye.Common.Log.Write(GetAssemblyName() & " Started...")
+
+        ' Check for storage lockout
+        If String.IsNullOrEmpty(App.UserPath) Then
+            MessageBox.Show(
+                $"Critical Error: {Application.ProductName} was unable to access its local storage directory." & vbCrLf & vbCrLf &
+                "This is usually caused by temporary file locks, security software, or folder permission issues." & vbCrLf & vbCrLf &
+                "The application will now exit.",
+                $"{Application.ProductName} - Storage Access Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Stop
+            )
+            ' Cleanly terminate startup before any modules try to load broken paths
+            Environment.Exit(1)
+            Return
+        End If
+
         App.Settings.Load()
 
         ' Get Theme

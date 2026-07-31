@@ -76,11 +76,11 @@ Friend Module App
     }
 
     ' Paths
-    Friend ReadOnly UserPath As String = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) & "\Skye\" 'UserPath is the base path for user-specific files.
+    Friend ReadOnly UserPath As String = Skye.Common.StorageManager.GetAppDirectory ' UserPath is the base path for user-specific files.
 #If DEBUG Then
     Private ReadOnly devFileTag As String = "DEV"
-    Friend ReadOnly DBPath As String = UserPath & Application.ProductName & "ClipboardDEV.db" 'DatabasePath is the path to the SQLite database file.
-    Friend ReadOnly ScratchPadPath As String = UserPath & Application.ProductName & "ScratchPadDEV.rtf" 'ScratchPadPath is the path to the ScratchPad KeepText RTF file.
+    Friend ReadOnly DBPath As String = UserPath & Application.ProductName & "ClipboardDEV.db" ' DatabasePath is the path to the SQLite database file.
+    Friend ReadOnly ScratchPadPath As String = UserPath & Application.ProductName & "ScratchPadDEV.rtf" ' ScratchPadPath is the path to the ScratchPad KeepText RTF file.
 #Else
     Private ReadOnly devFileTag As String = String.Empty
     Friend ReadOnly DBPath As String = UserPath & Application.ProductName & "Clipboard.db" 'DatabasePath is the path to the SQLite database file.
