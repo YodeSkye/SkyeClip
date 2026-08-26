@@ -129,6 +129,46 @@ Friend Class TrayAppContext
             uiInvoker.BeginInvoke(action)
         End If
     End Sub
+    Protected Overrides Sub ExitThreadCore()
+        ' Stop background timers
+        If blinkTimer IsNot Nothing Then
+            blinkTimer.Stop()
+            RemoveHandler blinkTimer.Tick, AddressOf BlinkTimer_Tick
+            blinkTimer.Dispose()
+        End If
+
+        If clipboardTimer IsNot Nothing Then
+            clipboardTimer.Stop()
+            RemoveHandler clipboardTimer.Tick, AddressOf OnClipboardStabilized
+            clipboardTimer.Dispose()
+        End If
+
+        ' Detach clipboard watcher handlers
+        If Watcher IsNot Nothing Then
+            RemoveHandler Watcher.ClipboardChanged, AddressOf OnClipboardChanged
+            Watcher.Dispose()
+        End If
+
+        ' Remove Tray Icon to prevent ghost icons in system tray
+        If NIClipboard IsNot Nothing Then
+            NIClipboard.Visible = False
+            NIClipboard.Icon = Nothing
+            NIClipboard.Dispose()
+        End If
+
+        ' Dispose native message window and control invoker
+        If winWatcher IsNot Nothing Then
+            winWatcher.Close()
+            winWatcher.Dispose()
+        End If
+
+        uiInvoker?.Dispose()
+
+        ' Remove theme listener
+        RemoveHandler Skye.UI.ThemeManager.ThemeChanged, AddressOf OnThemeChanged
+
+        MyBase.ExitThreadCore()
+    End Sub
 
     ' Handlers
     Private Sub OnClipboardChanged()

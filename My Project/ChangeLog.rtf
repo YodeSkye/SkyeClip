@@ -8,7 +8,8 @@
 \cf0\b0\f1\lang1033\'a3\'ab\f2  \cf1\b\f0\fs28\lang9\par
 \cf2\fs24\par
 Improvements\par
-\cf0\b0\f3\u10003?\f4\lang1033  \f5\lang9 Improved Data Storage & Automated Migration\f4\lang1033 . \f5\lang9 Core application files have moved to AppData\\Local\\Skye\\ for better system compatibility and faster file access. Existing files from Documents\\Skye are moved automatically on first launch, featuring built-in startup protection against background file locks.\f4\lang1033\par
+\cf0\b0\f3\u10003?\f4\lang1033  \f5\lang9 Improved Data Storage & Automated Migration\f4\lang1033 . \f5\lang9 Core application files have moved to AppData\\Local\\Skye\\ for better system compatibility and faster file access. Existing files from Documents\\Skye are moved automatically on first launch, featuring built-in startup protection against background file locks.\par
+\f3\u10003?\f4\lang1033  \f5\lang9 Hardened application startup and shutdown sequences to eliminate resource leaks, ghost system tray icons, orphaned clipboard hooks\f4\lang1033 , and to provide necessary logging in the event of an error.\par
 \cf2\b\f0\lang9\par
 Fixes\par
 \cf0\b0\f3\u10005?\f4\lang1033  Windows clipboard contention can cause intermittent ExternalException errors when another app temporarily locks the clipboard. SkyeClip now handles these situations safely. All clipboard access paths \f5\emdash  including text, RTF, images, and file drops \emdash  have been updated to use a unified, retry\_safe helper. This eliminates random clipboard\_related crashes and ensures smooth, predictable behavior across the entire app.\f4\par
