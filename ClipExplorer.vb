@@ -299,6 +299,15 @@ Public Class ClipExplorer
         App.SaveClipToFile(clipId)
 
     End Sub
+    Private Sub CMICAExport_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAExport.MouseDown
+        If DGV.SelectedRows.Count = 0 Then Return
+
+        For Each row As DataGridViewRow In DGV.SelectedRows
+            Dim clipId = CInt(row.Cells("Id").Value)
+            'App.Tray.repo.SetFavorite(clipId, doFavorite)
+        Next
+
+    End Sub
     Private Sub CMICAOpenSourceApp_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAOpenSourceApp.MouseDown
         If DGV.SelectedRows.Count = 0 Then Return
 

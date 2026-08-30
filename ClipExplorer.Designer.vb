@@ -69,6 +69,7 @@ Partial Class ClipExplorer
         ILFileDrop = New ImageList(components)
         RTB = New Skye.UI.RichTextBox()
         TipClipExplorer = New Skye.UI.ToolTipEX(components)
+        CMICAExport = New ToolStripMenuItem()
         StatusStripCE.SuspendLayout()
         PanelCE.SuspendLayout()
         GrpBoxSearch.SuspendLayout()
@@ -378,9 +379,9 @@ Partial Class ClipExplorer
         ' 
         CMClipActions.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.SetImage(CMClipActions, Nothing)
-        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, CMIUseClipAndToSetCurrentProfile, CMIMoveClipsToCurrentProfile, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICASaveAs, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
+        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, CMIUseClipAndToSetCurrentProfile, CMIMoveClipsToCurrentProfile, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICASaveAs, CMICAExport, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
         CMClipActions.Name = "CMClipActions"
-        CMClipActions.Size = New Size(277, 214)
+        CMClipActions.Size = New Size(277, 258)
         TipClipExplorer.SetText(CMClipActions, Nothing)
         ' 
         ' CMICAUseClip
@@ -524,6 +525,13 @@ Partial Class ClipExplorer
         TipClipExplorer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.ShadowThickness = 0
         ' 
+        ' CMICAExport
+        ' 
+        CMICAExport.Image = My.Resources.Resources.ImageExport16
+        CMICAExport.Name = "CMICAExport"
+        CMICAExport.Size = New Size(276, 22)
+        CMICAExport.Text = "Export"
+        ' 
         ' ClipExplorer
         ' 
         AutoScaleMode = AutoScaleMode.None
@@ -601,4 +609,5 @@ Partial Class ClipExplorer
     Friend WithEvents SourceAppImage As DataGridViewImageColumn
     Friend WithEvents Favorite As DataGridViewCheckBoxColumn
     Friend WithEvents CMIMoveClipsToCurrentProfile As ToolStripMenuItem
+    Friend WithEvents CMICAExport As ToolStripMenuItem
 End Class

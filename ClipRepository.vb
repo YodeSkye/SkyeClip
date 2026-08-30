@@ -831,6 +831,7 @@ Friend Class ClipRepository
 
         Return list
     End Function
+
     ' Methods
     Private Shared Sub RunMigrations(conn As SQLiteConnection)
         ' Source App Pathh on Clips
