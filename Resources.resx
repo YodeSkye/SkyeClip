@@ -611,6 +611,9 @@ Automatic maintenance never interferes with manual actions.\par
   <data name="ImageExport16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>My Project\ImageExport16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImageExport32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>My Project\ImageExport32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ImageFavorites16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>My Project\ImageFavorites16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -622,6 +625,12 @@ Automatic maintenance never interferes with manual actions.\par
   </data>
   <data name="ImageHotKeys48" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>My Project\ImageHotKeys48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageImport16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>My Project\ImageImport16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageImport32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>My Project\ImageImport32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImageKeepText16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>My Project\ImageKeepText16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

@@ -62,8 +62,20 @@ Friend Class AppView
     Private Sub BtnSettings_Click(sender As Object, e As EventArgs) Handles BtnSettings.Click
         App.ShowSettings()
     End Sub
+    Private Sub BtnImport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnImport.MouseDown
+        Select Case e.Button
+            Case MouseButtons.Left
+            Case MouseButtons.Right
+        End Select
+    End Sub
+    Private Sub BtnExport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnExport.MouseDown
+        Select Case e.Button
+            Case MouseButtons.Left
+            Case MouseButtons.Right
+        End Select
+    End Sub
     Private Sub BtnLog_Click(sender As Object, e As EventArgs) Handles BtnLog.Click
-        App.ShowLog()
+        ShowLog()
     End Sub
     Private Sub BtnHelp_Click(sender As Object, e As EventArgs) Handles BtnHelp.Click
         App.ShowHelp()

@@ -29,6 +29,8 @@ Partial Class AppView
         BtnHelp = New Button()
         TipAppView = New Skye.UI.ToolTipEX(components)
         BtnExit = New Button()
+        BtnExport = New Button()
+        BtnImport = New Button()
         SuspendLayout()
         ' 
         ' BtnSettings
@@ -46,7 +48,7 @@ Partial Class AppView
         ' 
         BtnLog.Image = My.Resources.Resources.ImageLog32
         TipAppView.SetImage(BtnLog, My.Resources.Resources.ImageLog16)
-        BtnLog.Location = New Point(12, 68)
+        BtnLog.Location = New Point(12, 175)
         BtnLog.Name = "BtnLog"
         BtnLog.Size = New Size(48, 48)
         BtnLog.TabIndex = 1
@@ -57,7 +59,7 @@ Partial Class AppView
         ' 
         BtnAbout.Image = My.Resources.Resources.ImageAbout32
         TipAppView.SetImage(BtnAbout, My.Resources.Resources.ImageAbout16)
-        BtnAbout.Location = New Point(12, 176)
+        BtnAbout.Location = New Point(12, 283)
         BtnAbout.Name = "BtnAbout"
         BtnAbout.Size = New Size(48, 48)
         BtnAbout.TabIndex = 3
@@ -68,7 +70,7 @@ Partial Class AppView
         ' 
         BtnHelp.Image = My.Resources.Resources.ImageHelp32
         TipAppView.SetImage(BtnHelp, My.Resources.Resources.ImageHelp16)
-        BtnHelp.Location = New Point(12, 122)
+        BtnHelp.Location = New Point(12, 229)
         BtnHelp.Name = "BtnHelp"
         BtnHelp.Size = New Size(48, 48)
         BtnHelp.TabIndex = 2
@@ -84,18 +86,42 @@ Partial Class AppView
         ' 
         BtnExit.Image = My.Resources.Resources.ImageExit32
         TipAppView.SetImage(BtnExit, My.Resources.Resources.ImageAbout16)
-        BtnExit.Location = New Point(12, 230)
+        BtnExit.Location = New Point(12, 337)
         BtnExit.Name = "BtnExit"
         BtnExit.Size = New Size(48, 48)
         BtnExit.TabIndex = 4
         TipAppView.SetText(BtnExit, "Exit (Right-Click to Restart App)")
         BtnExit.UseVisualStyleBackColor = True
         ' 
+        ' BtnExport
+        ' 
+        BtnExport.Image = My.Resources.Resources.ImageExport32
+        TipAppView.SetImage(BtnExport, My.Resources.Resources.ImageExport16)
+        BtnExport.Location = New Point(12, 121)
+        BtnExport.Name = "BtnExport"
+        BtnExport.Size = New Size(48, 48)
+        BtnExport.TabIndex = 5
+        TipAppView.SetText(BtnExport, "Export")
+        BtnExport.UseVisualStyleBackColor = True
+        ' 
+        ' BtnImport
+        ' 
+        BtnImport.Image = My.Resources.Resources.ImageImport32
+        TipAppView.SetImage(BtnImport, My.Resources.Resources.ImageImport16)
+        BtnImport.Location = New Point(12, 68)
+        BtnImport.Name = "BtnImport"
+        BtnImport.Size = New Size(48, 48)
+        BtnImport.TabIndex = 6
+        TipAppView.SetText(BtnImport, "Import")
+        BtnImport.UseVisualStyleBackColor = True
+        ' 
         ' AppView
         ' 
         AutoScaleMode = AutoScaleMode.None
-        ClientSize = New Size(72, 289)
+        ClientSize = New Size(72, 397)
         ControlBox = False
+        Controls.Add(BtnImport)
+        Controls.Add(BtnExport)
         Controls.Add(BtnExit)
         Controls.Add(BtnAbout)
         Controls.Add(BtnHelp)
@@ -120,4 +146,6 @@ Partial Class AppView
     Friend WithEvents BtnHelp As Button
     Friend WithEvents TipAppView As Skye.UI.ToolTipEX
     Friend WithEvents BtnExit As Button
+    Friend WithEvents BtnExport As Button
+    Friend WithEvents BtnImport As Button
 End Class
