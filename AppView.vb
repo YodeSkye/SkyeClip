@@ -67,6 +67,49 @@ Friend Class AppView
             Case MouseButtons.Left
             Case MouseButtons.Right
         End Select
+        'If e.Button <> MouseButtons.Left AndAlso e.Button <> MouseButtons.Right Then Return
+
+        'Dim bringToTop As Boolean = (e.Button = MouseButtons.Right)
+
+        '' Resolve Target Profile
+        'Dim targetProfileId As Integer = 0
+        'If AppSettings.ProfilesEnabled Then
+        '    targetProfileId = AppSettings.ActiveProfileId
+        '    Dim profileName As String = AppSettings.ActiveProfileName
+
+        '    Dim dialogResult = MessageBox.Show(
+        '        $"Import clips into profile '{profileName}'?",
+        '        "Confirm Import Target",
+        '        MessageBoxButtons.OKCancel,
+        '        MessageBoxIcon.Question
+        '    )
+        '    If dialogResult <> DialogResult.OK Then Return
+        'End If
+
+        '' Select File
+        'Using ofd As New OpenFileDialog()
+        '    ofd.Filter = "SkyeClip Packages (*.skyeclip;*.zip)|*.skyeclip;*.zip|All Files (*.*)|*.*"
+        '    ofd.Title = If(bringToTop, "Import Clips (Bring to Top)", "Import Clips (Keep Timestamps)")
+
+        '    If ofd.ShowDialog() = DialogResult.OK Then
+        '        Dim importResult = App.Repository.ImportPackage(ofd.FileName, targetProfileId, bringToTop)
+
+        '        If importResult.Success Then
+        '            MessageBox.Show(
+        '                $"Import complete!{Environment.NewLine}" &
+        '                $"• Imported: {importResult.ImportedCount}{Environment.NewLine}" &
+        '                $"• Skipped (Duplicates): {importResult.SkippedDuplicates}",
+        '                "Import Results",
+        '                MessageBoxButtons.OK,
+        '                MessageBoxIcon.Information
+        '            )
+        '            ' Signal ClipExplorer to reload grid
+        '            App.Events.RaiseClipsImported()
+        '        Else
+        '            MessageBox.Show($"Import failed: {importResult.ErrorMessage}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        '        End If
+        '    End If
+        'End Using
     End Sub
     Private Sub BtnExport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnExport.MouseDown
         Select Case e.Button

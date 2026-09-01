@@ -1,13 +1,16 @@
 ﻿
 Imports System.Data.SQLite
+Imports System.IO
+Imports System.IO.Compression
 Imports System.Runtime.InteropServices
 Imports System.Security.Cryptography
 Imports System.Text
+Imports System.Text.Json
 Imports System.Text.RegularExpressions
 
 Friend Class ClipRepository
 
-    ' Declarations
+    ' DECLARATIONS
     Friend Class BasicClipInfo
         Public Property Id As Integer
         Public Property Preview As String
@@ -49,8 +52,34 @@ Friend Class ClipRepository
         Public Property FormatName As String
         Public Property DataBytes As Byte()
     End Class
+    Friend Class ImportResult
+        Public Property TotalInPackage As Integer = 0
+        Public Property ImportedCount As Integer = 0
+        Public Property SkippedDuplicates As Integer = 0
+        Public Property Success As Boolean = True
+        Public Property ErrorMessage As String = String.Empty
+    End Class
+    Public Class ManifestDto
+        Public Property Version As Integer = 1
+        Public Property ExportedAt As DateTime
+        Public Property Clips As New List(Of ClipManifestDto)
+    End Class
+    Public Class ClipManifestDto
+        Public Property OriginalId As Integer
+        Public Property CreatedAt As DateTime
+        Public Property LastUsedAt As DateTime
+        Public Property AggregateHash As String = String.Empty
+        Public Property SourceAppName As String = String.Empty
+        Public Property IconBlobPath As String = String.Empty
+        Public Property Formats As New List(Of FormatManifestDto)
+    End Class
+    Public Class FormatManifestDto
+        Public Property FormatId As Integer
+        Public Property FormatName As String = String.Empty
+        Public Property BlobPath As String = String.Empty
+    End Class
 
-    ' Constructor
+    ' CONSTRUCTOR
     Friend Sub New()
         EnsureSchema()
     End Sub
@@ -117,7 +146,7 @@ Friend Class ClipRepository
         End Using
     End Sub
 
-    ' Database Functions
+    ' DATABASE FUNCTIONS
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Sub SaveClip()
 
@@ -458,6 +487,86 @@ Friend Class ClipRepository
         Return Nothing
     End Function
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Friend Function GetClipsByIds(clipIds As IEnumerable(Of Integer)) As List(Of ExplorerClipInfo)
+        Dim list As New List(Of ExplorerClipInfo)()
+        Dim idList = clipIds.Distinct().ToList()
+
+        If idList.Count = 0 Then Return list
+
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+
+            Dim paramNames As New List(Of String)()
+            For i As Integer = 0 To idList.Count - 1
+                paramNames.Add($"@p{i}")
+            Next
+
+            Dim sql As String = $"
+            SELECT Id, ProfileID, Preview, CreatedAt, LastUsedAt, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite
+            FROM Clips
+            WHERE Id IN ({String.Join(",", paramNames)})"
+
+            Using cmd As New SQLiteCommand(sql, conn)
+                For i As Integer = 0 To idList.Count - 1
+                    cmd.Parameters.AddWithValue($"@p{i}", idList(i))
+                Next
+
+                Using r = cmd.ExecuteReader()
+                    While r.Read()
+                        list.Add(New ExplorerClipInfo With {
+                        .Id = r.GetInt32(0),
+                        .ProfileID = r.GetInt32(1),
+                        .Preview = If(r.IsDBNull(2), String.Empty, r.GetString(2)),
+                        .CreatedAt = r.GetDateTime(3),
+                        .LastUsedAt = r.GetDateTime(4),
+                        .SourceAppName = If(r.IsDBNull(5), String.Empty, r.GetString(5)),
+                        .SourceAppPath = If(r.IsDBNull(6), String.Empty, r.GetString(6)),
+                        .SourceAppIcon = TryCast(r("SourceAppIcon"), Byte()),
+                        .IsFavorite = (r.GetInt32(8) <> 0)
+                    })
+                    End While
+                End Using
+            End Using
+        End Using
+
+        Return list
+    End Function
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Friend Function GetClipsByProfile(profileId As Integer) As List(Of ExplorerClipInfo)
+        Dim list As New List(Of ExplorerClipInfo)()
+
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+
+            Dim sql As String = "
+            SELECT Id, ProfileID, Preview, CreatedAt, LastUsedAt, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite
+            FROM Clips
+            WHERE ProfileID = @profileId"
+
+            Using cmd As New SQLiteCommand(sql, conn)
+                cmd.Parameters.AddWithValue("@profileId", profileId)
+
+                Using r = cmd.ExecuteReader()
+                    While r.Read()
+                        list.Add(New ExplorerClipInfo With {
+                        .Id = r.GetInt32(0),
+                        .ProfileID = r.GetInt32(1),
+                        .Preview = If(r.IsDBNull(2), String.Empty, r.GetString(2)),
+                        .CreatedAt = r.GetDateTime(3),
+                        .LastUsedAt = r.GetDateTime(4),
+                        .SourceAppName = If(r.IsDBNull(5), String.Empty, r.GetString(5)),
+                        .SourceAppPath = If(r.IsDBNull(6), String.Empty, r.GetString(6)),
+                        .SourceAppIcon = TryCast(r("SourceAppIcon"), Byte()),
+                        .IsFavorite = (r.GetInt32(8) <> 0)
+                    })
+                    End While
+                End Using
+            End Using
+        End Using
+
+        Return list
+    End Function
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Function GetRecentClips(limit As Integer) As List(Of BasicClipInfo)
         Dim clips As New List(Of BasicClipInfo)
 
@@ -654,6 +763,17 @@ Friend Class ClipRepository
         Return list
     End Function
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Private Function GetAggregateHashForClip(clipId As Integer) As String
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+            Using cmd As New SQLiteCommand("SELECT AggregateHash FROM Clips WHERE Id = @id", conn)
+                cmd.Parameters.AddWithValue("@id", clipId)
+                Dim result = cmd.ExecuteScalar()
+                Return If(result IsNot Nothing AndAlso Not Convert.IsDBNull(result), result.ToString(), String.Empty)
+            End Using
+        End Using
+    End Function
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Function GetSearchableText(entryId As Integer, mode As App.TextSearchMode) As String
         Dim sb As New StringBuilder()
 
@@ -832,7 +952,7 @@ Friend Class ClipRepository
         Return list
     End Function
 
-    ' Methods
+    ' METHODS
     Private Shared Sub RunMigrations(conn As SQLiteConnection)
         ' Source App Pathh on Clips
         EnsureColumn(conn, "Clips", "SourceAppPath", "TEXT")
@@ -996,6 +1116,221 @@ Friend Class ClipRepository
 
         ' No markers → return whole HTML
         Return rawHtml
+    End Function
+
+    ' Export/Import
+    Friend Sub ExportClips(clipIds As IEnumerable(Of Integer), destinationZipPath As String)
+        Dim clips = GetClipsByIds(clipIds)
+        BuildExportZip(clips, destinationZipPath)
+    End Sub
+    Friend Sub ExportProfile(profileId As Integer, destinationZipPath As String)
+        Dim clips = GetClipsByProfile(profileId)
+        BuildExportZip(clips, destinationZipPath)
+    End Sub
+    Friend Sub ExportAll(destinationZipPath As String)
+        Dim clips = GetAllClips()
+        BuildExportZip(clips, destinationZipPath)
+    End Sub
+    Private Sub BuildExportZip(clips As List(Of ExplorerClipInfo), destinationPath As String)
+        If File.Exists(destinationPath) Then File.Delete(destinationPath)
+
+        Dim manifest As New ManifestDto With {
+        .Version = 1,
+        .ExportedAt = DateTime.UtcNow
+    }
+
+        Using zip As ZipArchive = ZipFile.Open(destinationPath, ZipArchiveMode.Create)
+            For Each c In clips
+                ' Pull stored AggregateHash straight from SQLite
+                Dim clipHash As String = GetAggregateHashForClip(c.Id)
+
+                Dim clipDto As New ClipManifestDto With {
+                .OriginalId = c.Id,
+                .CreatedAt = c.CreatedAt,
+                .LastUsedAt = c.LastUsedAt,
+                .AggregateHash = clipHash,
+                .SourceAppName = c.SourceAppName
+            }
+
+                ' 1. Write Icon Blob (SourceAppIcon)
+                If c.SourceAppIcon IsNot Nothing AndAlso c.SourceAppIcon.Length > 0 Then
+                    Dim iconEntryName As String = $"blobs/clip_{c.Id}_icon.bin"
+                    clipDto.IconBlobPath = iconEntryName
+                    WriteBytesToZip(zip, iconEntryName, c.SourceAppIcon)
+                End If
+
+                ' 2. Fetch & Write Format Blobs (Using GetClipFormats)
+                Dim formats As List(Of ClipData) = GetClipFormats(c.Id)
+                If formats IsNot Nothing Then
+                    For Each fmt In formats
+                        Dim fmtEntryName As String = $"blobs/clip_{c.Id}_fmt_{fmt.FormatId}.bin"
+                        WriteBytesToZip(zip, fmtEntryName, fmt.DataBytes)
+
+                        clipDto.Formats.Add(New FormatManifestDto With {
+                        .FormatId = CInt(fmt.FormatId),
+                        .FormatName = fmt.FormatName,
+                        .BlobPath = fmtEntryName
+                    })
+                    Next
+                End If
+
+                manifest.Clips.Add(clipDto)
+            Next
+
+            ' 3. Write manifest.json
+            Dim manifestEntry = zip.CreateEntry("manifest.json")
+            Using writer As New StreamWriter(manifestEntry.Open())
+                Dim json As String = JsonSerializer.Serialize(manifest, New JsonSerializerOptions With {.WriteIndented = True})
+                writer.Write(json)
+            End Using
+        End Using
+    End Sub
+    Private Shared Sub WriteBytesToZip(zip As ZipArchive, entryName As String, data As Byte())
+        Dim entry = zip.CreateEntry(entryName)
+        Using stream = entry.Open()
+            stream.Write(data, 0, data.Length)
+        End Using
+    End Sub
+    Friend Shared Function ImportPackage(zipPath As String, targetProfileId As Integer, bringToTop As Boolean) As ImportResult
+        Dim result As New ImportResult()
+
+        If Not File.Exists(zipPath) Then
+            result.Success = False
+            result.ErrorMessage = "Export package file not found."
+            Return result
+        End If
+
+        Using zip As ZipArchive = ZipFile.OpenRead(zipPath)
+            ' 1. Locate and deserialize manifest.json
+            Dim manifestEntry = zip.GetEntry("manifest.json")
+            If manifestEntry Is Nothing Then
+                result.Success = False
+                result.ErrorMessage = "Invalid archive: manifest.json is missing."
+                Return result
+            End If
+
+            Dim manifest As ManifestDto
+            Using reader As New StreamReader(manifestEntry.Open())
+                Dim json As String = reader.ReadToEnd()
+                manifest = JsonSerializer.Deserialize(Of ManifestDto)(json)
+            End Using
+
+            If manifest Is Nothing OrElse manifest.Clips Is Nothing Then
+                result.Success = False
+                result.ErrorMessage = "Failed to parse package manifest."
+                Return result
+            End If
+
+            result.TotalInPackage = manifest.Clips.Count
+
+            ' 2. Open SQLite Connection and start Transaction
+            Using conn As New SQLiteConnection(App.DBConnectionString)
+                conn.Open()
+                Using tx = conn.BeginTransaction()
+                    Try
+                        ' Prepared SQL Statements
+                        Dim checkDupSql As String = "SELECT COUNT(1) FROM Clips WHERE ProfileID = @profileId AND AggregateHash = @hash AND HashVersion = 1"
+                        Dim insertClipSql As String = "INSERT INTO Clips (ProfileID, Preview, CreatedAt, LastUsedAt, AggregateHash, HashVersion, SourceAppName, SourceAppIcon, IsFavorite) VALUES (@profileId, '', @createdAt, @lastUsedAt, @hash, 1, @appName, @icon, 0); SELECT last_insert_rowid();"
+                        Dim insertFmtSql As String = "INSERT INTO ClipFormats (EntryId, FormatId, FormatName, Data) VALUES (@entryId, @formatId, @formatName, @data)"
+                        Dim updatePreviewSql As String = "UPDATE Clips SET Preview = @preview WHERE Id = @id"
+
+                        For Each clipDto In manifest.Clips
+                            ' A. Deduplication Check
+                            Using cmd As New SQLiteCommand(checkDupSql, conn, tx)
+                                cmd.Parameters.AddWithValue("@profileId", targetProfileId)
+                                cmd.Parameters.AddWithValue("@hash", clipDto.AggregateHash)
+                                If Convert.ToInt64(cmd.ExecuteScalar()) > 0 Then
+                                    result.SkippedDuplicates += 1
+                                    Continue For
+                                End If
+                            End Using
+
+                            ' B. Resolve Timestamps & Read Icon Payload
+                            Dim createdAt As DateTime = clipDto.CreatedAt
+                            Dim lastUsedAt As DateTime = If(bringToTop, DateTime.UtcNow, clipDto.LastUsedAt)
+
+                            Dim iconBytes As Byte() = Nothing
+                            If Not String.IsNullOrEmpty(clipDto.IconBlobPath) Then
+                                Dim iconEntry = zip.GetEntry(clipDto.IconBlobPath)
+                                If iconEntry IsNot Nothing Then
+                                    Using ms As New MemoryStream(), stream = iconEntry.Open()
+                                        stream.CopyTo(ms)
+                                        iconBytes = ms.ToArray()
+                                    End Using
+                                End If
+                            End If
+
+                            ' C. Insert Clip Record & Get New ID
+                            Dim newClipId As Integer = 0
+                            Using cmd As New SQLiteCommand(insertClipSql, conn, tx)
+                                cmd.Parameters.AddWithValue("@profileId", targetProfileId)
+                                cmd.Parameters.AddWithValue("@createdAt", createdAt)
+                                cmd.Parameters.AddWithValue("@lastUsedAt", lastUsedAt)
+                                cmd.Parameters.AddWithValue("@hash", clipDto.AggregateHash)
+                                cmd.Parameters.AddWithValue("@appName", If(String.IsNullOrEmpty(clipDto.SourceAppName), DBNull.Value, CObj(clipDto.SourceAppName)))
+                                cmd.Parameters.AddWithValue("@icon", If(iconBytes Is Nothing, DBNull.Value, CObj(iconBytes)))
+                                newClipId = Convert.ToInt32(cmd.ExecuteScalar())
+                            End Using
+
+                            ' D. Insert Format Blobs & Build Preview
+                            Dim previewText As String = String.Empty
+
+                            For Each fmtDto In clipDto.Formats
+                                Dim formatEntry = zip.GetEntry(fmtDto.BlobPath)
+                                If formatEntry IsNot Nothing Then
+                                    Dim formatData As Byte() = Nothing
+                                    Using ms As New MemoryStream(), stream = formatEntry.Open()
+                                        stream.CopyTo(ms)
+                                        formatData = ms.ToArray()
+                                    End Using
+
+                                    ' Resolve dynamic Win32 format ID inline
+                                    Dim resolvedFormatId As Integer = fmtDto.FormatId
+                                    If fmtDto.FormatId >= &HC000 AndAlso Not String.IsNullOrWhiteSpace(fmtDto.FormatName) Then
+                                        Dim registeredId As UInteger = Skye.WinAPI.RegisterClipboardFormat(fmtDto.FormatName)
+                                        If registeredId <> 0 Then resolvedFormatId = CInt(registeredId)
+                                    End If
+
+                                    ' Insert Format Row
+                                    Using cmd As New SQLiteCommand(insertFmtSql, conn, tx)
+                                        cmd.Parameters.AddWithValue("@entryId", newClipId)
+                                        cmd.Parameters.AddWithValue("@formatId", resolvedFormatId)
+                                        cmd.Parameters.AddWithValue("@formatName", If(String.IsNullOrEmpty(fmtDto.FormatName), DBNull.Value, CObj(fmtDto.FormatName)))
+                                        cmd.Parameters.AddWithValue("@data", formatData)
+                                        cmd.ExecuteNonQuery()
+                                    End Using
+
+                                    ' Extract preview text from Unicode format if present
+                                    If resolvedFormatId = Skye.WinAPI.CF_UNICODETEXT AndAlso String.IsNullOrEmpty(previewText) Then
+                                        previewText = System.Text.Encoding.Unicode.GetString(formatData).TrimEnd(ChrW(0)).Trim()
+                                    End If
+                                End If
+                            Next
+
+                            ' E. Update Preview Column if text was found
+                            If Not String.IsNullOrEmpty(previewText) Then
+                                If previewText.Length > 255 Then previewText = previewText.Substring(0, 255)
+                                Using cmd As New SQLiteCommand(updatePreviewSql, conn, tx)
+                                    cmd.Parameters.AddWithValue("@preview", previewText)
+                                    cmd.Parameters.AddWithValue("@id", newClipId)
+                                    cmd.ExecuteNonQuery()
+                                End Using
+                            End If
+
+                            result.ImportedCount += 1
+                        Next
+
+                        tx.Commit()
+                    Catch ex As Exception
+                        tx.Rollback()
+                        result.Success = False
+                        result.ErrorMessage = $"Database error during import: {ex.Message}"
+                    End Try
+                End Using
+            End Using
+        End Using
+
+        Return result
     End Function
 
 End Class
