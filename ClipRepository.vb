@@ -39,10 +39,11 @@ Friend Class ClipRepository
         Public Property SourceAppIcon As Byte()
         Public Property IsFavorite As Boolean
     End Class
-    Public Class SourceAppInfo
+    Friend Class SourceAppInfo
         Public Property Name As String
         Public Property Path As String
         Public Property ProcessName As String
+
         Public Overrides Function ToString() As String
             Return Name
         End Function
@@ -59,25 +60,28 @@ Friend Class ClipRepository
         Public Property Success As Boolean = True
         Public Property ErrorMessage As String = String.Empty
     End Class
-    Public Class ManifestDto
+    Public Class ManifestDTO
         Public Property Version As Integer = 1
         Public Property ExportedAt As DateTime
-        Public Property Clips As New List(Of ClipManifestDto)
+        Public Property Clips As New List(Of ClipManifestDTO)
     End Class
-    Public Class ClipManifestDto
+    Public Class ClipManifestDTO
         Public Property OriginalId As Integer
         Public Property CreatedAt As DateTime
         Public Property LastUsedAt As DateTime
         Public Property AggregateHash As String = String.Empty
         Public Property SourceAppName As String = String.Empty
         Public Property IconBlobPath As String = String.Empty
-        Public Property Formats As New List(Of FormatManifestDto)
+        Public Property Formats As New List(Of FormatManifestDTO)
     End Class
-    Public Class FormatManifestDto
+    Public Class FormatManifestDTO
         Public Property FormatId As Integer
         Public Property FormatName As String = String.Empty
         Public Property BlobPath As String = String.Empty
     End Class
+    Private Shared ReadOnly JSONOptions As New JsonSerializerOptions With {
+        .WriteIndented = True
+    }
 
     ' CONSTRUCTOR
     Friend Sub New()
@@ -1134,7 +1138,7 @@ Friend Class ClipRepository
     Private Sub BuildExportZip(clips As List(Of ExplorerClipInfo), destinationPath As String)
         If File.Exists(destinationPath) Then File.Delete(destinationPath)
 
-        Dim manifest As New ManifestDto With {
+        Dim manifest As New ManifestDTO With {
         .Version = 1,
         .ExportedAt = DateTime.UtcNow
     }
@@ -1144,7 +1148,7 @@ Friend Class ClipRepository
                 ' Pull stored AggregateHash straight from SQLite
                 Dim clipHash As String = GetAggregateHashForClip(c.Id)
 
-                Dim clipDto As New ClipManifestDto With {
+                Dim clipDto As New ClipManifestDTO With {
                 .OriginalId = c.Id,
                 .CreatedAt = c.CreatedAt,
                 .LastUsedAt = c.LastUsedAt,
@@ -1166,7 +1170,7 @@ Friend Class ClipRepository
                         Dim fmtEntryName As String = $"blobs/clip_{c.Id}_fmt_{fmt.FormatId}.bin"
                         WriteBytesToZip(zip, fmtEntryName, fmt.DataBytes)
 
-                        clipDto.Formats.Add(New FormatManifestDto With {
+                        clipDto.Formats.Add(New FormatManifestDTO With {
                         .FormatId = CInt(fmt.FormatId),
                         .FormatName = fmt.FormatName,
                         .BlobPath = fmtEntryName
@@ -1180,7 +1184,7 @@ Friend Class ClipRepository
             ' 3. Write manifest.json
             Dim manifestEntry = zip.CreateEntry("manifest.json")
             Using writer As New StreamWriter(manifestEntry.Open())
-                Dim json As String = JsonSerializer.Serialize(manifest, New JsonSerializerOptions With {.WriteIndented = True})
+                Dim json As String = JsonSerializer.Serialize(manifest, JSONOptions)
                 writer.Write(json)
             End Using
         End Using
@@ -1191,7 +1195,8 @@ Friend Class ClipRepository
             stream.Write(data, 0, data.Length)
         End Using
     End Sub
-    Friend Shared Function ImportPackage(zipPath As String, targetProfileId As Integer, bringToTop As Boolean) As ImportResult
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Friend Function ImportPackage(zipPath As String, targetProfileId As Integer, bringToTop As Boolean) As ImportResult
         Dim result As New ImportResult()
 
         If Not File.Exists(zipPath) Then
@@ -1209,10 +1214,10 @@ Friend Class ClipRepository
                 Return result
             End If
 
-            Dim manifest As ManifestDto
+            Dim manifest As ManifestDTO
             Using reader As New StreamReader(manifestEntry.Open())
                 Dim json As String = reader.ReadToEnd()
-                manifest = JsonSerializer.Deserialize(Of ManifestDto)(json)
+                manifest = JsonSerializer.Deserialize(Of ManifestDTO)(json)
             End Using
 
             If manifest Is Nothing OrElse manifest.Clips Is Nothing Then

@@ -7,6 +7,7 @@ Friend Class AppView
     Private fadeInTimer As Timer
     Private fadeOutTimer As Timer
     Private Const FadeStep As Double = 0.08 ' adjust for speed
+    Private _suppressHideOnDeactivate As Boolean = False
 
     ' From Events
     Private Sub AppView_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -47,10 +48,14 @@ Friend Class AppView
         fadeInTimer.Start()
     End Sub
     Private Sub AppView_Deactivate(sender As Object, e As EventArgs) Handles MyBase.Deactivate
+        ' If a modal dialog or popup is active, DO NOT hide the form!
+        If _suppressHideOnDeactivate Then Return
+
         If Not IsDisposed Then
             fadeInTimer?.Stop()
             fadeOutTimer.Start()
         End If
+
     End Sub
     Private Sub AppView_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         If e.Control AndAlso e.Shift AndAlso e.KeyCode = Keys.D Then
@@ -63,59 +68,85 @@ Friend Class AppView
         App.ShowSettings()
     End Sub
     Private Sub BtnImport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnImport.MouseDown
-        Select Case e.Button
-            Case MouseButtons.Left
-            Case MouseButtons.Right
-        End Select
-        'If e.Button <> MouseButtons.Left AndAlso e.Button <> MouseButtons.Right Then Return
+        If e.Button <> MouseButtons.Left AndAlso e.Button <> MouseButtons.Right Then Return
 
-        'Dim bringToTop As Boolean = (e.Button = MouseButtons.Right)
+        Dim bringToTop As Boolean = (e.Button = MouseButtons.Right)
 
-        '' Resolve Target Profile
-        'Dim targetProfileId As Integer = 0
-        'If AppSettings.ProfilesEnabled Then
-        '    targetProfileId = AppSettings.ActiveProfileId
-        '    Dim profileName As String = AppSettings.ActiveProfileName
+        ' Resolve Target Profile
+        Dim targetProfileId As Integer = 0
+        If App.Settings.UseProfiles Then
+            targetProfileId = App.Settings.CurrentProfileID
+            Dim profileName As String = App.Settings.GetProfileName(targetProfileId)
 
-        '    Dim dialogResult = MessageBox.Show(
-        '        $"Import clips into profile '{profileName}'?",
-        '        "Confirm Import Target",
-        '        MessageBoxButtons.OKCancel,
-        '        MessageBoxIcon.Question
-        '    )
-        '    If dialogResult <> DialogResult.OK Then Return
-        'End If
+            Dim dialogResult = MessageBox.Show(
+                $"Import clips into profile '{profileName}'?",
+                "Confirm Import Target",
+                MessageBoxButtons.OKCancel,
+                MessageBoxIcon.Question
+            )
+            If dialogResult <> DialogResult.OK Then Return
+        End If
 
-        '' Select File
-        'Using ofd As New OpenFileDialog()
-        '    ofd.Filter = "SkyeClip Packages (*.skyeclip;*.zip)|*.skyeclip;*.zip|All Files (*.*)|*.*"
-        '    ofd.Title = If(bringToTop, "Import Clips (Bring to Top)", "Import Clips (Keep Timestamps)")
+        ' Select File
+        Using ofd As New OpenFileDialog()
+            ofd.Filter = "SkyeClip Packages (*.skyeclip;*.zip)|*.skyeclip;*.zip|All Files (*.*)|*.*"
+            ofd.Title = If(bringToTop, "Import Clips (Bring to Top)", "Import Clips (Keep Timestamps)")
 
-        '    If ofd.ShowDialog() = DialogResult.OK Then
-        '        Dim importResult = App.Repository.ImportPackage(ofd.FileName, targetProfileId, bringToTop)
+            If ofd.ShowDialog() = DialogResult.OK Then
+                Dim importResult = App.Tray.repo.ImportPackage(ofd.FileName, targetProfileId, bringToTop)
 
-        '        If importResult.Success Then
-        '            MessageBox.Show(
-        '                $"Import complete!{Environment.NewLine}" &
-        '                $"• Imported: {importResult.ImportedCount}{Environment.NewLine}" &
-        '                $"• Skipped (Duplicates): {importResult.SkippedDuplicates}",
-        '                "Import Results",
-        '                MessageBoxButtons.OK,
-        '                MessageBoxIcon.Information
-        '            )
-        '            ' Signal ClipExplorer to reload grid
-        '            App.Events.RaiseClipsImported()
-        '        Else
-        '            MessageBox.Show($"Import failed: {importResult.ErrorMessage}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        '        End If
-        '    End If
-        'End Using
+                If importResult.Success Then
+                    MessageBox.Show(
+                        $"Import complete!{Environment.NewLine}" &
+                        $"• Imported: {importResult.ImportedCount}{Environment.NewLine}" &
+                        $"• Skipped (Duplicates): {importResult.SkippedDuplicates}",
+                        "Import Results",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    )
+                    ' Signal ClipExplorer to reload grid
+                    'App.Events.RaiseClipsImported()
+                Else
+                    MessageBox.Show($"Import failed: {importResult.ErrorMessage}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End If
+            End If
+        End Using
     End Sub
     Private Sub BtnExport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnExport.MouseDown
-        Select Case e.Button
-            Case MouseButtons.Left
-            Case MouseButtons.Right
-        End Select
+        If e.Button <> MouseButtons.Left AndAlso e.Button <> MouseButtons.Right Then Return
+        ' 1. Freeze the Deactivate handler so AppView stays visible
+        _suppressHideOnDeactivate = True
+
+        Try
+            Using sfd As New SaveFileDialog()
+                sfd.Filter = "ZIP Archives (*.zip)|*.zip|All Files (*.*)|*.*"
+                sfd.DefaultExt = "zip"
+                sfd.AddExtension = True
+
+                If e.Button = MouseButtons.Left Then
+                    sfd.Title = "Export Current Profile"
+                    sfd.FileName = $"SkyeClip_Profile_{App.Settings.GetProfileName(App.Settings.CurrentProfileID)}_{DateTime.Now:yyyyMMdd}.zip"
+                Else
+                    sfd.Title = "Export All Clips"
+                    sfd.FileName = $"SkyeClip_All_{DateTime.Now:yyyyMMdd}.zip"
+                End If
+
+                ' Pass 'Me' (the form) as the owner window explicitly
+                If sfd.ShowDialog(Nothing) = DialogResult.OK Then
+                    If e.Button = MouseButtons.Left Then
+                        Tray.repo.ExportProfile(App.Settings.CurrentProfileID, sfd.FileName)
+                    Else
+                        Tray.repo.ExportAll(sfd.FileName)
+                    End If
+                    App.Tray.ShowToast("Export completed successfully!")
+                End If
+            End Using
+        Finally
+            ' 2. Unfreeze Deactivate handler after dialog closes
+            _suppressHideOnDeactivate = False
+            Me.Hide()
+        End Try
+
     End Sub
     Private Sub BtnLog_Click(sender As Object, e As EventArgs) Handles BtnLog.Click
         ShowLog()
