@@ -92,7 +92,7 @@ Friend Class AppView
             ofd.Filter = "SkyeClip Packages (*.skyeclip;*.zip)|*.skyeclip;*.zip|All Files (*.*)|*.*"
             ofd.Title = If(bringToTop, "Import Clips (Bring to Top)", "Import Clips (Keep Timestamps)")
 
-            If ofd.ShowDialog() = DialogResult.OK Then
+            If ofd.ShowDialog(Me) = DialogResult.OK Then
                 Dim importResult = App.Tray.repo.ImportPackage(ofd.FileName, targetProfileId, bringToTop)
 
                 If importResult.Success Then
@@ -132,7 +132,7 @@ Friend Class AppView
                 End If
 
                 ' Pass 'Me' (the form) as the owner window explicitly
-                If sfd.ShowDialog(Nothing) = DialogResult.OK Then
+                If sfd.ShowDialog(Me) = DialogResult.OK Then
                     If e.Button = MouseButtons.Left Then
                         Tray.repo.ExportProfile(App.Settings.CurrentProfileID, sfd.FileName)
                     Else
