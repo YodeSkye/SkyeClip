@@ -17,8 +17,10 @@ Friend Class AppView
         Skye.UI.ThemeManager.ApplyTheme(Me)
         If App.Settings.UseProfiles Then
             TipAppView.SetText(BtnImport, "Import Clips Into Current Profile")
+            TipAppView.SetText(BtnExport, "Export This Profile's Clips" & Environment.NewLine & "RightClick To Export All Clips")
         Else
             TipAppView.SetText(BtnImport, "Import Clips Into Root Profile")
+            TipAppView.SetText(BtnExport, "Export All Clips")
         End If
         TipAppView.SetText(BtnImport, TipAppView.GetText(BtnImport) & Environment.NewLine & "RightClick To Import To Top Of List")
 
@@ -92,7 +94,7 @@ Friend Class AppView
             End If
             ' Select File
             Using ofd As New OpenFileDialog()
-                ofd.Filter = "SkyeClip Packages (*.skyeclip;*.zip)|*.skyeclip;*.zip|All Files (*.*)|*.*"
+                ofd.Filter = "ZIP Archives (*.zip)|*.zip|All Files (*.*)|*.*"
                 ofd.Title = If(bringToTop, "Import Clips (Bring to Top)", "Import Clips (Keep Timestamps)")
                 If ofd.ShowDialog(Me) = DialogResult.OK Then
                     Dim importResult = App.Tray.repo.ImportPackage(ofd.FileName, targetProfileId, bringToTop)
@@ -122,21 +124,27 @@ Friend Class AppView
                 sfd.Filter = "ZIP Archives (*.zip)|*.zip|All Files (*.*)|*.*"
                 sfd.DefaultExt = "zip"
                 sfd.AddExtension = True
-
-                If e.Button = MouseButtons.Left Then
-                    sfd.Title = "Export Current Profile"
-                    sfd.FileName = $"SkyeClip_Profile_{App.Settings.GetProfileName(App.Settings.CurrentProfileID)}_{DateTime.Now:yyyyMMdd}.zip"
-                Else
+                If Not App.Settings.UseProfiles Then
                     sfd.Title = "Export All Clips"
-                    sfd.FileName = $"SkyeClip_All_{DateTime.Now:yyyyMMdd}.zip"
-                End If
-
-                ' Pass 'Me' (the form) as the owner window explicitly
-                If sfd.ShowDialog(Me) = DialogResult.OK Then
+                    sfd.FileName = $"SkyeClip_Export_All_{DateTime.Now:yyyyMMdd_HHmmss}.zip"
+                Else
                     If e.Button = MouseButtons.Left Then
-                        Tray.repo.ExportProfile(App.Settings.CurrentProfileID, sfd.FileName)
+                        sfd.Title = "Export Current Profile Clips"
+                        sfd.FileName = $"SkyeClip_Export_Profile_{App.Settings.CurrentProfileID}_{DateTime.Now:yyyyMMdd_HHmmss}.zip"
                     Else
+                        sfd.Title = "Export ALL Clips (All Profiles)"
+                        sfd.FileName = $"SkyeClip_Export_All_{DateTime.Now:yyyyMMdd_HHmmss}.zip"
+                    End If
+                End If
+                If sfd.ShowDialog(Me) = DialogResult.OK Then
+                    If Not App.Settings.UseProfiles Then
                         Tray.repo.ExportAll(sfd.FileName)
+                    Else
+                        If e.Button = MouseButtons.Left Then
+                            Tray.repo.ExportProfile(App.Settings.CurrentProfileID, sfd.FileName)
+                        Else
+                            Tray.repo.ExportAll(sfd.FileName)
+                        End If
                     End If
                     App.Tray.ShowToast("Export completed successfully!")
                 End If

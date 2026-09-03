@@ -126,6 +126,17 @@ Public Class ClipExplorer
         RTB.Text = preview
         RTB.BringToFront()
     End Sub
+    Private Sub DGV_CellMouseUp(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DGV.CellMouseUp
+        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
+        If DGV.Columns(e.ColumnIndex).Name = "Favorite" Then
+            Dim clipId As Integer = CInt(DGV.Rows(e.RowIndex).Cells("Id").Value)
+            Dim currentVal As Boolean = CBool(If(DGV.Rows(e.RowIndex).Cells(e.ColumnIndex).Value, False))
+            Dim newVal As Boolean = Not currentVal
+            DGV.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = newVal
+            App.Tray.repo.SetFavorite(clipId, newVal)
+            App.Tray.RefreshMenu()
+        End If
+    End Sub
     Private Sub CMClipActions_Opening(sender As Object, e As CancelEventArgs) Handles CMClipActions.Opening
         If DGV.SelectedRows.Count = 0 Then
             e.Cancel = True
@@ -300,12 +311,27 @@ Public Class ClipExplorer
 
     End Sub
     Private Sub CMICAExport_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAExport.MouseDown
+        If e.Button <> MouseButtons.Left AndAlso e.Button <> MouseButtons.Right Then Return
         If DGV.SelectedRows.Count = 0 Then Return
+        CMClipActions.Close()
+        Dim selectedIds As New List(Of Integer)()
 
         For Each row As DataGridViewRow In DGV.SelectedRows
-            Dim clipId = CInt(row.Cells("Id").Value)
-            'App.Tray.repo.SetFavorite(clipId, doFavorite)
+            If Not row.IsNewRow Then
+                selectedIds.Add(CInt(row.Cells("Id").Value))
+            End If
         Next
+        If selectedIds.Count = 0 Then Return
+
+        Using sfd As New SaveFileDialog()
+            sfd.Filter = "ZIP Archives (*.zip)|*.zip|All Files (*.*)|*.*"
+            sfd.Title = $"Export Selected Clips ({selectedIds.Count})"
+            sfd.FileName = $"SkyeClip_Export_Selected_{DateTime.Now:yyyyMMdd_HHmmss}.zip"
+            If sfd.ShowDialog(Me) = DialogResult.OK Then
+                App.Tray.repo.ExportClips(selectedIds, sfd.FileName)
+                App.Tray.ShowToast("Export completed successfully!")
+            End If
+        End Using
 
     End Sub
     Private Sub CMICAOpenSourceApp_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAOpenSourceApp.MouseDown
