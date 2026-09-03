@@ -15,8 +15,10 @@ Friend Class AppView
 
         Skye.UI.ThemeManager.RegisterComponent(TipAppView)
         Skye.UI.ThemeManager.ApplyTheme(Me)
+
+        Dim profileName As String = App.Settings.GetProfileName(App.Settings.CurrentProfileID)
         If App.Settings.UseProfiles Then
-            TipAppView.SetText(BtnImport, "Import Clips Into Current Profile")
+            TipAppView.SetText(BtnImport, $"Import Clips Into Current Profile '{profileName}'")
             TipAppView.SetText(BtnExport, "Export This Profile's Clips" & Environment.NewLine & "Right-Click To Export All Clips")
         Else
             TipAppView.SetText(BtnImport, "Import Clips Into Root Profile")
@@ -79,40 +81,29 @@ Friend Class AppView
         Dim bringToTop As Boolean = (e.Button = MouseButtons.Right)
 
         Try
-            ' Resolve Target Profile
-            Dim targetProfileId As Integer = 0
-            If App.Settings.UseProfiles Then
-                targetProfileId = App.Settings.CurrentProfileID
-                Dim profileName As String = App.Settings.GetProfileName(targetProfileId)
-                Dim dialogResult = MessageBox.Show(
-                    $"Import clips into profile '{profileName}'?",
-                    "Confirm Import Target",
-                    MessageBoxButtons.OKCancel,
-                    MessageBoxIcon.Question
-                )
-                If dialogResult <> DialogResult.OK Then Return
-            End If
-            ' Select File
+            Dim targetProfileId As Integer = App.Settings.CurrentProfileID
+            Dim profileName As String = App.Settings.GetProfileName(targetProfileId)
             Using ofd As New OpenFileDialog()
+                Dim profileSuffix As String = If(App.Settings.UseProfiles, $" into '{profileName}'", String.Empty)
                 ofd.Filter = "ZIP Archives (*.zip)|*.zip|All Files (*.*)|*.*"
-                ofd.Title = If(bringToTop, "Import Clips (Bring to Top)", "Import Clips (Keep Timestamps)")
+                ofd.Title = If(bringToTop, $"Import Clips{profileSuffix} (Bring to Top)", $"Import Clips{profileSuffix} (Keep Timestamps)")
                 If ofd.ShowDialog(Me) = DialogResult.OK Then
                     Dim importResult = App.Tray.repo.ImportPackage(ofd.FileName, targetProfileId, bringToTop)
                     If importResult.Success Then
                         App.Tray.RefreshMenu()
-                        ' Signal ClipExplorer to reload grid
-                        'App.Events.RaiseClipsImported()
-                        App.Tray.ShowToast($"Import complete!{Environment.NewLine}" & $"• Imported: {importResult.ImportedCount}{Environment.NewLine}" & $"• Skipped (Duplicates): {importResult.SkippedDuplicates}")
+                        App.Tray.ShowToast($"Import complete!{Environment.NewLine}" &
+                                          $"• Imported: {importResult.ImportedCount}{profileSuffix}{Environment.NewLine}" &
+                                          $"• Skipped (Duplicates): {importResult.SkippedDuplicates}")
                     Else
                         App.Tray.ShowToast($"Import failed: {importResult.ErrorMessage}")
                     End If
                 End If
             End Using
         Finally
-            ' 2. Unfreeze Deactivate handler after dialog closes
             _suppressHideOnDeactivate = False
-        Me.Hide()
+            Me.Hide()
         End Try
+
     End Sub
     Private Sub BtnExport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnExport.MouseDown
         If e.Button <> MouseButtons.Left AndAlso e.Button <> MouseButtons.Right Then Return

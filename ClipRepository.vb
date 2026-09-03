@@ -1209,6 +1209,11 @@ Friend Class ClipRepository
             Return result
         End If
 
+        ' Option A logic: If profiles mode is disabled, always import to Profile 0
+        ' and force the deduplication check to run globally across all profiles.
+        Dim effectiveTargetProfileId As Integer = If(App.Settings.UseProfiles, targetProfileId, 0)
+        Dim useGlobalDupCheck As Boolean = Not App.Settings.UseProfiles
+
         Using zip As ZipArchive = ZipFile.OpenRead(zipPath)
             ' 1. Locate and deserialize manifest.json
             Dim manifestEntry = zip.GetEntry("manifest.json")
@@ -1237,17 +1242,23 @@ Friend Class ClipRepository
                 conn.Open()
                 Using tx = conn.BeginTransaction()
                     Try
-                        ' Prepared SQL Statements
-                        Dim checkDupSql As String = "SELECT COUNT(1) FROM Clips WHERE ProfileID = @profileId AND AggregateHash = @hash AND HashVersion = 1"
+                        ' SQL Queries dynamically adjusting for global vs per-profile deduplication
+                        Dim checkDupSql As String = If(useGlobalDupCheck,
+                            "SELECT COUNT(1) FROM Clips WHERE AggregateHash = @hash AND HashVersion = 1",
+                            "SELECT COUNT(1) FROM Clips WHERE ProfileID = @profileId AND AggregateHash = @hash AND HashVersion = 1")
+
                         Dim insertClipSql As String = "INSERT INTO Clips (ProfileID, Preview, CreatedAt, LastUsedAt, AggregateHash, HashVersion, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite) VALUES (@profileId, @preview, @createdAt, @lastUsedAt, @hash, 1, @appName, @appPath, @icon, 0); SELECT last_insert_rowid();"
                         Dim insertFmtSql As String = "INSERT INTO ClipFormats (EntryId, FormatId, FormatName, Data) VALUES (@entryId, @formatId, @formatName, @data)"
                         Dim updatePreviewSql As String = "UPDATE Clips SET Preview = @preview WHERE Id = @id"
 
                         For Each clipDto In manifest.Clips
-                            ' A. Deduplication Check
+                            ' A. Deduplication Check (Per-Profile or Global)
                             Using cmd As New SQLiteCommand(checkDupSql, conn, tx)
-                                cmd.Parameters.AddWithValue("@profileId", targetProfileId)
+                                If Not useGlobalDupCheck Then
+                                    cmd.Parameters.AddWithValue("@profileId", effectiveTargetProfileId)
+                                End If
                                 cmd.Parameters.AddWithValue("@hash", clipDto.AggregateHash)
+
                                 If Convert.ToInt64(cmd.ExecuteScalar()) > 0 Then
                                     result.SkippedDuplicates += 1
                                     Continue For
@@ -1272,7 +1283,7 @@ Friend Class ClipRepository
                             ' C. Insert Clip Record & Get New ID
                             Dim newClipId As Integer = 0
                             Using cmd As New SQLiteCommand(insertClipSql, conn, tx)
-                                cmd.Parameters.AddWithValue("@profileId", targetProfileId)
+                                cmd.Parameters.AddWithValue("@profileId", effectiveTargetProfileId)
                                 cmd.Parameters.AddWithValue("@preview", If(String.IsNullOrEmpty(clipDto.Preview), "", clipDto.Preview))
                                 cmd.Parameters.AddWithValue("@createdAt", createdAt)
                                 cmd.Parameters.AddWithValue("@lastUsedAt", lastUsedAt)
