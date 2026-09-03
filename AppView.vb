@@ -4,9 +4,9 @@ Imports Skye.UI
 Friend Class AppView
 
     ' Declarations
+    Private Const FadeStep As Double = 0.08 ' adjust for speed
     Private fadeInTimer As Timer
     Private fadeOutTimer As Timer
-    Private Const FadeStep As Double = 0.08 ' adjust for speed
     Private _suppressHideOnDeactivate As Boolean = False
 
     ' From Events
@@ -17,12 +17,12 @@ Friend Class AppView
         Skye.UI.ThemeManager.ApplyTheme(Me)
         If App.Settings.UseProfiles Then
             TipAppView.SetText(BtnImport, "Import Clips Into Current Profile")
-            TipAppView.SetText(BtnExport, "Export This Profile's Clips" & Environment.NewLine & "RightClick To Export All Clips")
+            TipAppView.SetText(BtnExport, "Export This Profile's Clips" & Environment.NewLine & "Right-Click To Export All Clips")
         Else
             TipAppView.SetText(BtnImport, "Import Clips Into Root Profile")
             TipAppView.SetText(BtnExport, "Export All Clips")
         End If
-        TipAppView.SetText(BtnImport, TipAppView.GetText(BtnImport) & Environment.NewLine & "RightClick To Import To Top Of List")
+        TipAppView.SetText(BtnImport, TipAppView.GetText(BtnImport) & Environment.NewLine & "Right-Click To Import To Top Of List")
 
         'Ensure the form is fully on-screen
         Dim wa = Screen.FromPoint(Location).WorkingArea
