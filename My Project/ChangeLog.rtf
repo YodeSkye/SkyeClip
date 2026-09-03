@@ -1,33 +1,34 @@
-{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset0 SimSun;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil Segoe UI;}}
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset1 Segoe UI Symbol;}{\f3\fnil\fcharset0 Segoe UI Symbol;}{\f4\fnil Segoe UI Symbol;}{\f5\fnil\fcharset0 SimSun;}{\f6\fnil Segoe UI;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}\viewkind4\uc1 
 \pard\cf1\b\f0\fs28\lang9 SkyeClip v1.? What's New\par
 \cf0\fs24 Released ?? 2026\par
 \cf1\fs28\par
 \cf2\fs24 New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f2  \cf1\b\f0\fs28\lang9\par
+\cf0\b0\f1\lang1033\'a3\'ab\f0  Cross-Machine Data Portability (Import & Export): Added full import and export functionality to package clips into portable .zip archives. Users can export targeted selections from ClipExplorer or issue full profile dumps directly from the system tray via App View. The import engine includes automatic deduplication via aggregate hashing, along with flexible options to either preserve original timestamps or bring imported items straight to the top of the list. Ensured complete cross-machine visual and data fidelity across RTF, HTML, images, and custom dynamic clipboard formats. Dynamic Win32 format IDs are automatically re-registered on target host machines during import, guaranteeing that complex clips restore cleanly anywhere SkyeClip runs.\cf1\b\fs28\lang9\par
 \cf2\fs24\par
 Improvements\par
-\cf0\b0\f3\u10003?\f4\lang1033  \f5\lang9 Improved Data Storage & Automated Migration\f4\lang1033 . \f5\lang9 Core application files have moved to AppData\\Local\\Skye\\ for better system compatibility and faster file access. Existing files from Documents\\Skye are moved automatically on first launch, featuring built-in startup protection against background file locks.\par
-\f3\u10003?\f4\lang1033  \f5\lang9 Hardened application startup and shutdown sequences to eliminate resource leaks, ghost system tray icons, orphaned clipboard hooks\f4\lang1033 , and to provide necessary logging in the event of an error.\par
+\cf0\b0\f2\u10003?\f3\lang1033  Clicking the favorites column in Clip Explorer now changes the favorite status of the clip.\f2\lang9\par
+\u10003?\f3\lang1033  \f4\lang9 Improved Data Storage & Automated Migration\f3\lang1033 . \f4\lang9 Core application files have moved to AppData\\Local\\Skye\\ for better system compatibility and faster file access. Existing files from Documents\\Skye are moved automatically on first launch, featuring built-in startup protection against background file locks.\par
+\f2\u10003?\f3\lang1033  \f4\lang9 Hardened application startup and shutdown sequences to eliminate resource leaks, ghost system tray icons, orphaned clipboard hooks\f3\lang1033 , and to provide necessary logging in the event of an error.\par
 \cf2\b\f0\lang9\par
 Fixes\par
-\cf0\b0\f3\u10005?\f4\lang1033  Windows clipboard contention can cause intermittent ExternalException errors when another app temporarily locks the clipboard. SkyeClip now handles these situations safely. All clipboard access paths \f5\emdash  including text, RTF, images, and file drops \emdash  have been updated to use a unified, retry\_safe helper. This eliminates random clipboard\_related crashes and ensures smooth, predictable behavior across the entire app.\f4\par
+\cf0\b0\f2\u10005?\f3\lang1033  Windows clipboard contention can cause intermittent ExternalException errors when another app temporarily locks the clipboard. SkyeClip now handles these situations safely. All clipboard access paths \f4\emdash  including text, RTF, images, and file drops \emdash  have been updated to use a unified, retry\_safe helper. This eliminates random clipboard\_related crashes and ensures smooth, predictable behavior across the entire app.\f3\par
 \cf1\b\f0\fs28\lang9\par
 \fs24 SkyeClip v1.3\fs28\par
 \cf0\fs24 Released April 2026\par
 \cf1\fs28\par
 \cf2\fs24 New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f2  \f0 Added a new Rules system that reacts to your context. App Rules trigger actions when specific apps are active. Location Rules trigger actions based on your current network. Time Rules trigger actions based on the current time. Content Rules trigger actions based on clipboard content, keywords, or formats.\par
-\f1\'a3\'ab\f2  \f0 Added full Profile support, allowing you to maintain completely separate clipboard environments (Personal, Work, DEV, etc.). Each profile includes its own clipboard history, Favorites, theme, and behavior settings. Switching profiles updates the entire app instantly and safely. Clip Explorer now supports moving clips between profiles for easy organization.\cf2\b\lang9\par
+\cf0\b0\f1\lang1033\'a3\'ab\f5  \f0 Added a new Rules system that reacts to your context. App Rules trigger actions when specific apps are active. Location Rules trigger actions based on your current network. Time Rules trigger actions based on the current time. Content Rules trigger actions based on clipboard content, keywords, or formats.\par
+\f1\'a3\'ab\f5  \f0 Added full Profile support, allowing you to maintain completely separate clipboard environments (Personal, Work, DEV, etc.). Each profile includes its own clipboard history, Favorites, theme, and behavior settings. Switching profiles updates the entire app instantly and safely. Clip Explorer now supports moving clips between profiles for easy organization.\cf2\b\lang9\par
 \par
 Improvements\par
-\cf0\b0\f3\u10003?\f4\lang1033  Changed "Export Clip" to "Save To File" to distinguish from the Import/Export function.\f5\lang9\par
-\f3\u10003?\f4\lang1033  Added Home Page link in About window.\par
+\cf0\b0\f2\u10003?\f3\lang1033  Changed "Export Clip" to "Save To File" to distinguish from the Import/Export function.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Added Home Page link in About window.\par
 \par
 \cf2\b\f0\lang9 Fixes\par
-\cf0\b0\f3\u10005?\f4\lang1033  Fixed a rare issue where the Clip Viewer could fail to open until restarting the app. The viewer now initializes reliably on first use.\f5\lang9\par
-\f3\u10005?\f4\lang1033  \f0 Fixed an issue that prevented certain keystrokes in Scratch Pad. Keyboard now works normally.\f5\lang9\par
+\cf0\b0\f2\u10005?\f3\lang1033  Fixed a rare issue where the Clip Viewer could fail to open until restarting the app. The viewer now initializes reliably on first use.\f4\lang9\par
+\f2\u10005?\f3\lang1033  \f0 Fixed an issue that prevented certain keystrokes in Scratch Pad. Keyboard now works normally.\f4\lang9\par
 \cf2\b\f0\par
 \cf1 SkyeClip v1.2\fs28\par
 \cf0\fs24 Released February 2026\par
@@ -38,27 +39,27 @@ Improvements\par
 \f1\'a3\'ab\f0  Export Clip Support. SkyeClip now lets you export any stored clip to a file. Text clips save as TXT/RTF/HTML, images save as PNG/JPG/BMP, and FileDrop clips export as ZIP archives.\f1\par
 \'a3\'ab\f0  SkyeClip now lets you know when a new version is available. The About screen performs a quiet daily check and displays an upgrade notice right under the version number.\f1\par
 \'a3\'ab\f0  Added File Drop previews to Clip Explorer.\par
-\f1\'a3\'ab\f0  \f4 Clip Explorer now has image format previews.\f1\par
+\f1\'a3\'ab\f0  \f3 Clip Explorer now has image format previews.\f1\par
 \par
 \cf2\b\f0\lang9 Improvements\par
-\cf0\b0\f3\u10003?\f4\lang1033  \f5\lang9 Refined startup sequence to ensure timers and maintenance tasks initialize safely and predictably.\par
-\f3\u10003?\f4\lang1033  Scratch Pad now displays FIleDrops as a plain text file listing.\cf2\b\f0\lang9\par
-\cf0\b0\f3\u10003?\f4\lang1033  File size now includes folders in FileDrop previews.\f5\lang9\par
-\f3\u10003?\f4\lang1033  Unified clip previews under a single canonical function. Now both the current clipboard contents and the clip saved from that will share the same text.\f5\lang9\par
-\f3\u10003?\f4\lang1033  Enabled multi-row select in Clip Explorer. Updated context menu to work with multiple rows at a time.\f5\lang9\par
-\f3\u10003?\f4\lang1033  Added file count and size totals to FileDrop previews in both Clip Viewer and Clip Explorer.\f5\lang9\par
-\f3\u10003?\f4\lang1033  Added more Themes.\par
+\cf0\b0\f2\u10003?\f3\lang1033  \f4\lang9 Refined startup sequence to ensure timers and maintenance tasks initialize safely and predictably.\par
+\f2\u10003?\f3\lang1033  Scratch Pad now displays FIleDrops as a plain text file listing.\cf2\b\f0\lang9\par
+\cf0\b0\f2\u10003?\f3\lang1033  File size now includes folders in FileDrop previews.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Unified clip previews under a single canonical function. Now both the current clipboard contents and the clip saved from that will share the same text.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Enabled multi-row select in Clip Explorer. Updated context menu to work with multiple rows at a time.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Added file count and size totals to FileDrop previews in both Clip Viewer and Clip Explorer.\f4\lang9\par
+\f2\u10003?\f3\lang1033  Added more Themes.\par
 \par
 \cf2\b\f0\lang9 Fixes\par
-\cf0\b0\f3\u10005?\f0\lang1033  Clips now show leading spaces in the tray menu.\f5\lang9\par
-\f3\u10005?\f0\lang1033  Fixed clip preview not showing in Tray tooltip during startup.\f5\lang9\par
-\f3\u10005?\f0\lang1033  Fixed a "No Columns Exist" error in Clip Explorer when closing the window.\f5\lang9\par
+\cf0\b0\f2\u10005?\f0\lang1033  Clips now show leading spaces in the tray menu.\f4\lang9\par
+\f2\u10005?\f0\lang1033  Fixed clip preview not showing in Tray tooltip during startup.\f4\lang9\par
+\f2\u10005?\f0\lang1033  Fixed a "No Columns Exist" error in Clip Explorer when closing the window.\f4\lang9\par
 \cf1\b\f0\fs28\par
 \fs24 SkyeClip v1.1\fs28\par
 \cf0\fs24 Released January 2026\par
 \par
 \cf2 New Features\par
-\cf0\b0\f1\lang1033\'a3\'ab\f2  \f0 New Theming System. SkyeClip now includes a unified Light/Dark theme engine that optionally stays in sync with Windows, updating instantly when your system theme changes.\f1\par
+\cf0\b0\f1\lang1033\'a3\'ab\f5  \f0 New Theming System. SkyeClip now includes a unified Light/Dark theme engine that optionally stays in sync with Windows, updating instantly when your system theme changes.\f1\par
 \'a3\'ab\f0  Clip Explorer, your fast and lightweight window into everything you\rquote ve copied. It gives you a clean, organized view of your clipboard history with clear previews, helpful details, and quick actions. Clip Explorer makes it easy to find and reuse your content.\f1\par
 \'a3\'ab\f0  Added Auto-Start With Windows Feature in Settings.\f1\par
 \'a3\'ab\f0  Added Scratch Pad, a lightweight built\f6\_\f0 in editor for quick notes and temporary text. Supports rich text and plain text, import/export, full editing shortcuts, a dedicated context menu with Shift\f6\_\f0 modified actions and optional persistence via Keep Text.\f1\par
@@ -67,13 +68,13 @@ Improvements\par
 \f1\'a3\'ab\f0  Clip Action Context Menu. Introduced a dedicated right\f6\_\f0 click menu for individual clips featuring Set Clip, Favorite / Unfavorite, View Clip, and Delete. This focused interaction avoids keeping the tray menu open and significantly improves mouse\f6\_\f0 driven workflows.\par
 \cf1\b\lang9\par
 \cf2 Improvements\par
-\cf0\b0\f3\u10003?\f4\lang1033  Added "<RTF>" or "<HTML>" the the clip previews, depending on the type.\f5\lang9\par
-\f3\u10003? \f4\lang1033 Migrated the HTML preview subsystem from IE to WebView2 for modern, accurate rendering\par
-\f3\lang9\u10003?\f4\lang1033  Enhanced stability and performance of the preview window\f5\lang9\par
+\cf0\b0\f2\u10003?\f3\lang1033  Added "<RTF>" or "<HTML>" the the clip previews, depending on the type.\f4\lang9\par
+\f2\u10003? \f3\lang1033 Migrated the HTML preview subsystem from IE to WebView2 for modern, accurate rendering\par
+\f2\lang9\u10003?\f3\lang1033  Enhanced stability and performance of the preview window\f4\lang9\par
 \cf2\b\f0\par
 Fixes\par
-\cf0\b0\f3\u10005? \f4\lang1033 Fixed issues with inconsistent moving of forms.\f5\lang9\par
-\f3\u10005? \f4\lang1033 Fixed a bug with WebView2 in Clip Viewer that was preventing a clean load.\f5\lang9\par
+\cf0\b0\f2\u10005? \f3\lang1033 Fixed issues with inconsistent moving of forms.\f4\lang9\par
+\f2\u10005? \f3\lang1033 Fixed a bug with WebView2 in Clip Viewer that was preventing a clean load.\f4\lang9\par
 \cf1\b\f0\fs28\par
 \fs24 SkyeClip v1.0\fs28\par
 \cf0\fs24 Released January 2026\cf1\par
@@ -84,14 +85,14 @@ Fixes\par
 \'a3\'ab\f0  Core clipboard history with Favorites and Viewer support\cf1\b\lang9\par
 \par
 \cf2 Improvements\par
-\cf0\b0\f3\u10003? Smarter filtering of incoming clipboard content\par
+\cf0\b0\f2\u10003? Smarter filtering of incoming clipboard content\par
 \u10003? Favorites HotKey now keeps the menu open for smoother workflow\par
 \u10003? Viewer HotKey now works consistently in the Favorites menu\par
 \u10003? General performance and responsiveness improvements\par
 \cf2\b\f0\par
 Fixes\par
-\cf0\b0\f3\u10005? Resolved an issue where Windows Explorer produced duplicate text clips\par
-\u10005? Various stability fixes across clipboard capture and menu refres\f4\lang1033 h\cf2\b\f0\lang9\par
+\cf0\b0\f2\u10005? Resolved an issue where Windows Explorer produced duplicate text clips\par
+\u10005? Various stability fixes across clipboard capture and menu refres\f3\lang1033 h\cf2\b\f0\lang9\par
 \cf1\par
 \fs28 Thank you for using SkyeClip!\cf0\b0\fs24\par
 }
