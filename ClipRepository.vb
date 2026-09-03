@@ -67,10 +67,12 @@ Friend Class ClipRepository
     End Class
     Public Class ClipManifestDTO
         Public Property OriginalId As Integer
+        Public Property Preview As String = String.Empty
         Public Property CreatedAt As DateTime
         Public Property LastUsedAt As DateTime
         Public Property AggregateHash As String = String.Empty
         Public Property SourceAppName As String = String.Empty
+        Public Property SourceAppPath As String = String.Empty
         Public Property IconBlobPath As String = String.Empty
         Public Property Formats As New List(Of FormatManifestDTO)
     End Class
@@ -1149,12 +1151,14 @@ Friend Class ClipRepository
                 Dim clipHash As String = GetAggregateHashForClip(c.Id)
 
                 Dim clipDto As New ClipManifestDTO With {
-                .OriginalId = c.Id,
-                .CreatedAt = c.CreatedAt,
-                .LastUsedAt = c.LastUsedAt,
-                .AggregateHash = clipHash,
-                .SourceAppName = c.SourceAppName
-            }
+                    .OriginalId = c.Id,
+                    .Preview = c.Preview,
+                    .CreatedAt = c.CreatedAt,
+                    .LastUsedAt = c.LastUsedAt,
+                    .AggregateHash = clipHash,
+                    .SourceAppName = c.SourceAppName,
+                    .SourceAppPath = c.SourceAppPath
+                }
 
                 ' 1. Write Icon Blob (SourceAppIcon)
                 If c.SourceAppIcon IsNot Nothing AndAlso c.SourceAppIcon.Length > 0 Then
@@ -1235,7 +1239,7 @@ Friend Class ClipRepository
                     Try
                         ' Prepared SQL Statements
                         Dim checkDupSql As String = "SELECT COUNT(1) FROM Clips WHERE ProfileID = @profileId AND AggregateHash = @hash AND HashVersion = 1"
-                        Dim insertClipSql As String = "INSERT INTO Clips (ProfileID, Preview, CreatedAt, LastUsedAt, AggregateHash, HashVersion, SourceAppName, SourceAppIcon, IsFavorite) VALUES (@profileId, '', @createdAt, @lastUsedAt, @hash, 1, @appName, @icon, 0); SELECT last_insert_rowid();"
+                        Dim insertClipSql As String = "INSERT INTO Clips (ProfileID, Preview, CreatedAt, LastUsedAt, AggregateHash, HashVersion, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite) VALUES (@profileId, @preview, @createdAt, @lastUsedAt, @hash, 1, @appName, @appPath, @icon, 0); SELECT last_insert_rowid();"
                         Dim insertFmtSql As String = "INSERT INTO ClipFormats (EntryId, FormatId, FormatName, Data) VALUES (@entryId, @formatId, @formatName, @data)"
                         Dim updatePreviewSql As String = "UPDATE Clips SET Preview = @preview WHERE Id = @id"
 
@@ -1269,16 +1273,18 @@ Friend Class ClipRepository
                             Dim newClipId As Integer = 0
                             Using cmd As New SQLiteCommand(insertClipSql, conn, tx)
                                 cmd.Parameters.AddWithValue("@profileId", targetProfileId)
+                                cmd.Parameters.AddWithValue("@preview", If(String.IsNullOrEmpty(clipDto.Preview), "", clipDto.Preview))
                                 cmd.Parameters.AddWithValue("@createdAt", createdAt)
                                 cmd.Parameters.AddWithValue("@lastUsedAt", lastUsedAt)
                                 cmd.Parameters.AddWithValue("@hash", clipDto.AggregateHash)
                                 cmd.Parameters.AddWithValue("@appName", If(String.IsNullOrEmpty(clipDto.SourceAppName), DBNull.Value, CObj(clipDto.SourceAppName)))
+                                cmd.Parameters.AddWithValue("@appPath", If(String.IsNullOrEmpty(clipDto.SourceAppPath), DBNull.Value, CObj(clipDto.SourceAppPath)))
                                 cmd.Parameters.AddWithValue("@icon", If(iconBytes Is Nothing, DBNull.Value, CObj(iconBytes)))
                                 newClipId = Convert.ToInt32(cmd.ExecuteScalar())
                             End Using
 
-                            ' D. Insert Format Blobs & Build Preview
-                            Dim previewText As String = String.Empty
+                            ' D. Insert Format Blobs & Collect ClipData for Preview Generation
+                            Dim importedFormats As New List(Of ClipData)()
 
                             For Each fmtDto In clipDto.Formats
                                 Dim formatEntry = zip.GetEntry(fmtDto.BlobPath)
@@ -1305,18 +1311,20 @@ Friend Class ClipRepository
                                         cmd.ExecuteNonQuery()
                                     End Using
 
-                                    ' Extract preview text from Unicode format if present
-                                    If resolvedFormatId = Skye.WinAPI.CF_UNICODETEXT AndAlso String.IsNullOrEmpty(previewText) Then
-                                        previewText = System.Text.Encoding.Unicode.GetString(formatData).TrimEnd(ChrW(0)).Trim()
-                                    End If
+                                    ' Collect ClipData object for BuildPreviewFromFormats
+                                    importedFormats.Add(New ClipData With {
+                                        .FormatId = CUInt(resolvedFormatId),
+                                        .FormatName = fmtDto.FormatName,
+                                        .DataBytes = formatData
+                                    })
                                 End If
                             Next
 
-                            ' E. Update Preview Column if text was found
-                            If Not String.IsNullOrEmpty(previewText) Then
-                                If previewText.Length > 255 Then previewText = previewText.Substring(0, 255)
+                            ' E. Update Preview Column if manifest didn't contain one
+                            If String.IsNullOrEmpty(clipDto.Preview) AndAlso importedFormats.Count > 0 Then
+                                Dim cleanPreview As String = BuildPreviewFromFormats(importedFormats)
                                 Using cmd As New SQLiteCommand(updatePreviewSql, conn, tx)
-                                    cmd.Parameters.AddWithValue("@preview", previewText)
+                                    cmd.Parameters.AddWithValue("@preview", If(cleanPreview, ""))
                                     cmd.Parameters.AddWithValue("@id", newClipId)
                                     cmd.ExecuteNonQuery()
                                 End Using

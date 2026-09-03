@@ -533,7 +533,7 @@ Friend Class TrayAppContext
                                     .BackColor = Skye.UI.ThemeManager.CurrentTheme.BackColor,
                                     .BorderColor = Skye.UI.ThemeManager.CurrentTheme.BorderColor,
                                     .ForeColor = Skye.UI.ThemeManager.CurrentTheme.ForeColor,
-                                    .Duration = 4000,
+                                    .Duration = 6000,
                                     .PlaySound = App.Settings.PlaySoundWithNotify
                                 }
                              Skye.UI.Toast.ShowToast(t)

@@ -101,7 +101,7 @@ Partial Class AppView
         BtnExport.Name = "BtnExport"
         BtnExport.Size = New Size(48, 48)
         BtnExport.TabIndex = 5
-        TipAppView.SetText(BtnExport, "Export")
+        TipAppView.SetText(BtnExport, "Export This Profile's Clips" & vbCrLf & "RightClick To Export All Clips")
         BtnExport.UseVisualStyleBackColor = True
         ' 
         ' BtnImport

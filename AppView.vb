@@ -15,8 +15,12 @@ Friend Class AppView
 
         Skye.UI.ThemeManager.RegisterComponent(TipAppView)
         Skye.UI.ThemeManager.ApplyTheme(Me)
-        'Skye.UI.ThemeManager.ApplyToTooltip(TipAppView)
-        'AddHandler ThemeManager.ThemeChanged, AddressOf OnThemeChanged
+        If App.Settings.UseProfiles Then
+            TipAppView.SetText(BtnImport, "Import Clips Into Current Profile")
+        Else
+            TipAppView.SetText(BtnImport, "Import Clips Into Root Profile")
+        End If
+        TipAppView.SetText(BtnImport, TipAppView.GetText(BtnImport) & Environment.NewLine & "RightClick To Import To Top Of List")
 
         'Ensure the form is fully on-screen
         Dim wa = Screen.FromPoint(Location).WorkingArea
@@ -69,48 +73,44 @@ Friend Class AppView
     End Sub
     Private Sub BtnImport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnImport.MouseDown
         If e.Button <> MouseButtons.Left AndAlso e.Button <> MouseButtons.Right Then Return
-
+        _suppressHideOnDeactivate = True
         Dim bringToTop As Boolean = (e.Button = MouseButtons.Right)
 
-        ' Resolve Target Profile
-        Dim targetProfileId As Integer = 0
-        If App.Settings.UseProfiles Then
-            targetProfileId = App.Settings.CurrentProfileID
-            Dim profileName As String = App.Settings.GetProfileName(targetProfileId)
-
-            Dim dialogResult = MessageBox.Show(
-                $"Import clips into profile '{profileName}'?",
-                "Confirm Import Target",
-                MessageBoxButtons.OKCancel,
-                MessageBoxIcon.Question
-            )
-            If dialogResult <> DialogResult.OK Then Return
-        End If
-
-        ' Select File
-        Using ofd As New OpenFileDialog()
-            ofd.Filter = "SkyeClip Packages (*.skyeclip;*.zip)|*.skyeclip;*.zip|All Files (*.*)|*.*"
-            ofd.Title = If(bringToTop, "Import Clips (Bring to Top)", "Import Clips (Keep Timestamps)")
-
-            If ofd.ShowDialog(Me) = DialogResult.OK Then
-                Dim importResult = App.Tray.repo.ImportPackage(ofd.FileName, targetProfileId, bringToTop)
-
-                If importResult.Success Then
-                    MessageBox.Show(
-                        $"Import complete!{Environment.NewLine}" &
-                        $"• Imported: {importResult.ImportedCount}{Environment.NewLine}" &
-                        $"• Skipped (Duplicates): {importResult.SkippedDuplicates}",
-                        "Import Results",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
-                    )
-                    ' Signal ClipExplorer to reload grid
-                    'App.Events.RaiseClipsImported()
-                Else
-                    MessageBox.Show($"Import failed: {importResult.ErrorMessage}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                End If
+        Try
+            ' Resolve Target Profile
+            Dim targetProfileId As Integer = 0
+            If App.Settings.UseProfiles Then
+                targetProfileId = App.Settings.CurrentProfileID
+                Dim profileName As String = App.Settings.GetProfileName(targetProfileId)
+                Dim dialogResult = MessageBox.Show(
+                    $"Import clips into profile '{profileName}'?",
+                    "Confirm Import Target",
+                    MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Question
+                )
+                If dialogResult <> DialogResult.OK Then Return
             End If
-        End Using
+            ' Select File
+            Using ofd As New OpenFileDialog()
+                ofd.Filter = "SkyeClip Packages (*.skyeclip;*.zip)|*.skyeclip;*.zip|All Files (*.*)|*.*"
+                ofd.Title = If(bringToTop, "Import Clips (Bring to Top)", "Import Clips (Keep Timestamps)")
+                If ofd.ShowDialog(Me) = DialogResult.OK Then
+                    Dim importResult = App.Tray.repo.ImportPackage(ofd.FileName, targetProfileId, bringToTop)
+                    If importResult.Success Then
+                        App.Tray.RefreshMenu()
+                        ' Signal ClipExplorer to reload grid
+                        'App.Events.RaiseClipsImported()
+                        App.Tray.ShowToast($"Import complete!{Environment.NewLine}" & $"• Imported: {importResult.ImportedCount}{Environment.NewLine}" & $"• Skipped (Duplicates): {importResult.SkippedDuplicates}")
+                    Else
+                        App.Tray.ShowToast($"Import failed: {importResult.ErrorMessage}")
+                    End If
+                End If
+            End Using
+        Finally
+            ' 2. Unfreeze Deactivate handler after dialog closes
+            _suppressHideOnDeactivate = False
+        Me.Hide()
+        End Try
     End Sub
     Private Sub BtnExport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnExport.MouseDown
         If e.Button <> MouseButtons.Left AndAlso e.Button <> MouseButtons.Right Then Return
