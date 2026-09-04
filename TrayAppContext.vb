@@ -104,6 +104,7 @@ Friend Class TrayAppContext
         AddHandler Watcher.ClipboardChanged, AddressOf OnClipboardChanged
 
         ' Clip Context Menu
+        ClipCM.Renderer = New SkyeMenuRenderer()
         ClipCM.Font = App.MenuFont
         Dim cmi As ToolStripMenuItem
         cmi = New ToolStripMenuItem("Preview", My.Resources.IconApp.ToBitmap, AddressOf OnClipCMPreviewClick) With {.Name = "Preview"}

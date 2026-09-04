@@ -2396,34 +2396,33 @@ Friend Module App
             Return bmp
     End Function
     Friend Function CreatePinMenuIcon() As Bitmap
-        Dim bmp As New Bitmap(16, 16)
+        Dim bmp As New Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppArgb)
+
         Using g As Graphics = Graphics.FromImage(bmp)
             g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+            g.Clear(Color.Transparent)
 
-            ' Color Palette (Matches dark/light modern UI)
-            Using bodyBrush As New SolidBrush(Color.FromArgb(220, 70, 70)), ' Accent Red Head
-                  borderPen As New Pen(Color.FromArgb(40, 40, 40), 1.2F),
-                  needlePen As New Pen(Color.FromArgb(160, 160, 160), 1.8F)
+            Using bodyBrush As New SolidBrush(Color.FromArgb(255, 230, 40, 40)),
+              borderPen As New Pen(Color.FromArgb(255, 30, 30, 30), 1.0F),
+              needlePen As New Pen(Color.FromArgb(255, 180, 180, 180), 1.5F),
+              collarBrush As New SolidBrush(Color.FromArgb(255, 180, 30, 30))
 
-                ' 1. Draw Needle (Angled down-left)
-                g.DrawLine(needlePen, 7.0F, 9.0F, 3.0F, 13.0F)
+                ' 1. Needle (Moved Y-start south 1px to 9.0, 9.0 for perfect center alignment)
+                g.DrawLine(needlePen, 9.0F, 9.0F, 3.0F, 15.0F)
 
-                ' 2. Draw Pin Head (Angled Pushpin shape)
-                Dim headPoints As PointF() = {
-                    New PointF(5.0F, 6.0F),
-                    New PointF(10.0F, 1.0F),
-                    New PointF(15.0F, 6.0F),
-                    New PointF(10.0F, 11.0F)
-                }
-                g.FillPolygon(bodyBrush, headPoints)
-                g.DrawPolygon(borderPen, headPoints)
+                ' 2. Collar / Base ring under head
+                g.FillEllipse(collarBrush, 5.5F, 7.5F, 5.0F, 5.0F)
+                g.DrawEllipse(borderPen, 5.5F, 7.5F, 5.0F, 5.0F)
 
-                ' 3. Draw Center Ridge Accent
-                Using ridgePen As New Pen(Color.White, 1.0F)
-                    g.DrawLine(ridgePen, 7.5F, 4.5F, 11.5F, 8.5F)
-                End Using
+                ' 3. Main Rounded Pin Head
+                g.FillEllipse(bodyBrush, 7.0F, 2.0F, 8.0F, 8.0F)
+                g.DrawEllipse(borderPen, 7.0F, 2.0F, 8.0F, 8.0F)
+
+                ' 4. Specular Highlight
+                g.FillEllipse(Brushes.White, 8.5F, 3.5F, 2.5F, 2.5F)
             End Using
         End Using
+
         Return bmp
     End Function
 
