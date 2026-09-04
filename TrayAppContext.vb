@@ -109,6 +109,8 @@ Friend Class TrayAppContext
         cmi = New ToolStripMenuItem("Preview", My.Resources.IconApp.ToBitmap, AddressOf OnClipCMPreviewClick) With {.Name = "Preview"}
         ClipCM.Items.Add(cmi)
         ClipCM.Items.Add(New ToolStripSeparator())
+        cmi = New ToolStripMenuItem("Pin", App.CreatePinMenuIcon, AddressOf OnClipCMPinned) With {.Name = "Pinned"}
+        ClipCM.Items.Add(cmi)
         cmi = New ToolStripMenuItem("Favorite", My.Resources.ImageFavorites16, AddressOf OnClipCMFavorite) With {.Name = "Favorite"}
         ClipCM.Items.Add(cmi)
         ClipCM.Items.Add("View Clip", My.Resources.imageClipViewer16, AddressOf OnClipCMViewClip)
@@ -219,6 +221,11 @@ Friend Class TrayAppContext
             Case MouseButtons.Right
                 If Integer.TryParse(item.Tag.ToString(), ClipCMCurrentClipId) Then
                     ClipCM.Items("Preview").Text = item.Text
+                    Dim pinItem = DirectCast(ClipCM.Items("Pinned"), ToolStripMenuItem)
+                    Dim clickedClipItem = TryCast(sender, MenuBuilder.ClipMenuItem)
+                    If clickedClipItem IsNot Nothing Then
+                        pinItem.Text = If(clickedClipItem.IsPinned, "Unpin", "Pin")
+                    End If
                     Dim favItem = DirectCast(ClipCM.Items("Favorite"), ToolStripMenuItem)
                     favItem.Checked = item.Checked
                     If favItem.Checked Then
@@ -354,6 +361,10 @@ Friend Class TrayAppContext
         repo.RestoreClip(ClipCMCurrentClipId)
         RefreshMenu()
     End Sub
+    Private Sub OnClipCMPinned(sender As Object, e As EventArgs)
+        repo.TogglePinned(ClipCMCurrentClipId)
+        RefreshMenu()
+    End Sub
     Private Sub OnClipCMFavorite(sender As Object, e As EventArgs)
         repo.ToggleFavorite(ClipCMCurrentClipId)
         RefreshMenu()
@@ -403,7 +414,10 @@ Friend Class TrayAppContext
     ' Methods
     Private Sub BuildMenu()
         App.CMTray = MenuBuilder.BuildMenu(repo, commonActions, AddressOf OnClipSelected, AddressOf OnMenuKeyDown)
-        App.CMTray.Renderer = New Skye.UI.SkyeMenuRenderer
+        Dim renderer = New Skye.UI.SkyeMenuRenderer With {
+            .OverlayCallback = AddressOf MenuBuilder.ProvideClipBadge
+        }
+        App.CMTray.Renderer = renderer
         NIClipboard.ContextMenuStrip = App.CMTray
         AddHandler NIClipboard.ContextMenuStrip.KeyDown, AddressOf OnMenuKeyDown
         AddHandler NIClipboard.ContextMenuStrip.Closing, AddressOf OnMenuClosing

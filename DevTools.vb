@@ -29,7 +29,10 @@ Public Class DevTools
             conn.Open()
 
             Dim da As New SQLiteDataAdapter("SELECT * FROM Clips", conn)
-            Dim cb As New SQLiteCommandBuilder(da)
+            ' Force CommandBuilder to generate UPDATE WHERE Id = @Id only
+            Dim cb As New SQLiteCommandBuilder(da) With {
+                .ConflictOption = ConflictOption.OverwriteChanges
+            }
 
             da.Update(dt)
         End Using
@@ -117,7 +120,8 @@ Public Class DevTools
                                                 SourceAppName,
                                                 SourceAppPath,
                                                 SourceAppIcon,
-                                                IsFavorite
+                                                IsFavorite,
+                                                IsPinned
                                             FROM Clips ORDER BY ID DESC", conn)
             Dim dt As New DataTable()
             da.Fill(dt)

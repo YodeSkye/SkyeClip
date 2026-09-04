@@ -17,6 +17,7 @@ Friend Class ClipRepository
         Public Property LastUsedAt As DateTime
         Public Property SourceAppIcon As Byte()
         Public Property IsFavorite As Boolean
+        Public Property IsPinned As Boolean
     End Class
     Friend Class FullClipInfo
         Public Property Id As Integer
@@ -106,7 +107,8 @@ Friend Class ClipRepository
                 SourceAppName TEXT,
                 SourceAppPath TEXT,
                 SourceAppIcon BLOB,
-                IsFavorite INTEGER DEFAULT 0
+                IsFavorite INTEGER DEFAULT 0,
+                IsPinned INTEGER NOT NULL DEFAULT 0
             )", conn)
             createClipsCmd.ExecuteNonQuery()
 
@@ -138,6 +140,9 @@ Friend Class ClipRepository
 
             Dim idxLastUsedCmd As New SQLiteCommand("CREATE INDEX IF NOT EXISTS idx_clips_lastused ON Clips(LastUsedAt)", conn)
             idxLastUsedCmd.ExecuteNonQuery()
+
+            Dim idxPinnedCmd As New SQLiteCommand("CREATE INDEX IF NOT EXISTS idx_clips_pinned ON Clips(IsPinned, LastUsedAt)", conn)
+            idxPinnedCmd.ExecuteNonQuery()
 
             ' Drop old unique index if it exists (release DBs only)
             Dim dropOldIdx As New SQLiteCommand("DROP INDEX IF EXISTS idx_clips_hash", conn)
@@ -247,6 +252,16 @@ Friend Class ClipRepository
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
             Using cmd As New SQLiteCommand("UPDATE Clips SET IsFavorite = CASE IsFavorite WHEN 1 THEN 0 ELSE 1 END WHERE Id=@id", conn)
+                cmd.Parameters.AddWithValue("@id", clipID)
+                cmd.ExecuteNonQuery()
+            End Using
+        End Using
+    End Sub
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Friend Sub TogglePinned(clipID As Integer)
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+            Using cmd As New SQLiteCommand("UPDATE Clips SET IsPinned = CASE IsPinned WHEN 1 THEN 0 ELSE 1 END WHERE Id=@id", conn)
                 cmd.Parameters.AddWithValue("@id", clipID)
                 cmd.ExecuteNonQuery()
             End Using
@@ -578,26 +593,24 @@ Friend Class ClipRepository
 
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
-
             Dim sql As String
 
             If App.Settings.UseProfiles Then
                 ' Profiles ON → only show clips from the active profile
                 sql = "
-                SELECT Id, Preview, LastUsedAt, SourceAppIcon, IsFavorite
-                FROM Clips
-                WHERE ProfileID = @pid
-                ORDER BY LastUsedAt DESC
-                LIMIT @l"
+            SELECT Id, Preview, LastUsedAt, SourceAppIcon, IsFavorite, IsPinned
+            FROM Clips
+            WHERE ProfileID = @pid
+            ORDER BY IsPinned DESC, LastUsedAt DESC
+            LIMIT @l"
             Else
                 ' Profiles OFF → show ALL clips (no filter)
                 sql = "
-                SELECT Id, Preview, LastUsedAt, SourceAppIcon, IsFavorite
-                FROM Clips
-                ORDER BY LastUsedAt DESC
-                LIMIT @l"
+            SELECT Id, Preview, LastUsedAt, SourceAppIcon, IsFavorite, IsPinned
+            FROM Clips
+            ORDER BY IsPinned DESC, LastUsedAt DESC
+            LIMIT @l"
             End If
-
             Using cmd As New SQLiteCommand(sql, conn)
                 cmd.Parameters.AddWithValue("@l", limit)
 
@@ -625,6 +638,11 @@ Friend Class ClipRepository
 
                         If Not reader.IsDBNull(4) Then
                             ci.IsFavorite = (reader.GetInt32(4) = 1)
+                        End If
+
+                        ' Read IsPinned (Column 5)
+                        If Not reader.IsDBNull(5) Then
+                            ci.IsPinned = (reader.GetInt32(5) = 1)
                         End If
 
                         clips.Add(ci)
@@ -968,6 +986,9 @@ Friend Class ClipRepository
 
         ' Profile ID on Clips (for multi-profile support)
         EnsureColumn(conn, "Clips", "ProfileID", "INTEGER NOT NULL DEFAULT 0")
+
+        ' IsPinned on Clips
+        EnsureColumn(conn, "Clips", "IsPinned", "INTEGER NOT NULL DEFAULT 0")
 
         ' Ensure Meta rows
         EnsureMeta(conn, "DatabaseVersion", "1")

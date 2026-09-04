@@ -1,5 +1,15 @@
 ﻿
+Imports System.ComponentModel
+
 Public Class MenuBuilder
+
+    Friend Class ClipMenuItem
+        Inherits ToolStripMenuItem
+
+        <Browsable(False), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
+        Public Property IsPinned As Boolean
+
+    End Class
 
     Friend Shared Function BuildMenu(repo As ClipRepository, commonActions As List(Of App.CommonAction), clipClickHandler As MouseEventHandler, menuKeyHandler As KeyEventHandler) As ContextMenuStrip
         Dim menu As New ContextMenuStrip With {
@@ -27,20 +37,15 @@ Public Class MenuBuilder
         Else
             For Each clip In clips
                 Dim previewText = clip.Preview
-                'Dim previewText = System.Text.RegularExpressions.Regex.Replace(
-                '    rawText.Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " "),
-                '    "\s+", " ").Trim()
                 Dim preview = If(String.IsNullOrWhiteSpace(previewText), "< No Preview >", previewText)
 
-                Dim item As New ToolStripMenuItem(preview) With {
+                Dim item As New ClipMenuItem() With {
+                    .Text = preview,
                     .Tag = clip.Id,
                     .Checked = clip.IsFavorite,
+                    .IsPinned = clip.IsPinned,
                     .Font = App.MenuFont
                 }
-
-                'If Not String.Equals(preview, rawText, StringComparison.Ordinal) Then
-                '    item.ToolTipText = rawText
-                'End If
 
                 If clip.SourceAppIcon IsNot Nothing AndAlso clip.SourceAppIcon.Length > 0 Then
                     Using ms As New IO.MemoryStream(clip.SourceAppIcon)
@@ -151,4 +156,13 @@ Public Class MenuBuilder
         Return menu
         End
     End Function
+
+    Friend Shared Function ProvideClipBadge(item As ToolStripItem) As Image
+        Dim clipItem = TryCast(item, ClipMenuItem)
+        If clipItem IsNot Nothing AndAlso clipItem.IsPinned Then
+            Return App.PinOverlayBadge
+        End If
+        Return Nothing
+    End Function
+
 End Class

@@ -50,6 +50,7 @@ Friend Module App
     Friend ReadOnly AttributionIcons8 As String = "https://icons8.com/" 'AttributionIcons8 is the URL for Icons8, which provides icons used in the application.
     Friend ReadOnly SponsorGitHub As String = "https://github.com/sponsors/YodeSkye" 'SponsorGitHub is the URL for the GitHub Sponsors page of the application's developer.
     Friend ReadOnly SponsorPayPal As String = "https://www.paypal.com/donate/?hosted_button_id=RVH5T9H69G6CS" 'SponsorPayPal is the URL for the PayPal donation page for the application's developer.
+    Friend ReadOnly PinOverlayBadge As Image = CreatePinBadgeIcon()
     Friend ScratchPadText As String = String.Empty
     Friend Property ChangeLogLastVersionShown As String = String.Empty
     Friend Property CBLivePreview As String
@@ -2369,5 +2370,61 @@ Friend Module App
         dt.Columns.Add("Warmup", GetType(Integer))
         dt.Rows.Add(1)
     End Sub
+    Friend Function CreatePinBadgeIcon() As Bitmap
+        Dim bmp As New Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppArgb)
+
+        Using g As Graphics = Graphics.FromImage(bmp)
+            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+            ' 1. Clear background to fully transparent
+            g.Clear(Color.Transparent)
+            ' 2. Target the bottom-right corner (X: 7-15, Y: 7-15)
+            ' Draw pin head (Red accent with dark border for contrast)
+            ' With Opaque, high-contrast tweak
+            Using borderPen As New Pen(Color.FromArgb(255, 20, 20, 20), 1.0F),
+                  headBrush As New SolidBrush(Color.FromArgb(255, 230, 40, 40)), ' Bold Red
+                  needlePen As New Pen(Color.FromArgb(255, 220, 220, 220), 1.5F)
+                ' Draw needle pointing down-left
+                g.DrawLine(needlePen, 10, 10, 7, 13)
+                ' Draw pin head circle
+                g.FillEllipse(headBrush, 9, 7, 6, 6)
+                g.DrawEllipse(borderPen, 9, 7, 6, 6)
+                ' Tiny white highlight spot on head
+                g.FillEllipse(Brushes.White, 10, 8, 2, 2)
+            End Using
+        End Using
+
+            Return bmp
+    End Function
+    Friend Function CreatePinMenuIcon() As Bitmap
+        Dim bmp As New Bitmap(16, 16)
+        Using g As Graphics = Graphics.FromImage(bmp)
+            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+
+            ' Color Palette (Matches dark/light modern UI)
+            Using bodyBrush As New SolidBrush(Color.FromArgb(220, 70, 70)), ' Accent Red Head
+                  borderPen As New Pen(Color.FromArgb(40, 40, 40), 1.2F),
+                  needlePen As New Pen(Color.FromArgb(160, 160, 160), 1.8F)
+
+                ' 1. Draw Needle (Angled down-left)
+                g.DrawLine(needlePen, 7.0F, 9.0F, 3.0F, 13.0F)
+
+                ' 2. Draw Pin Head (Angled Pushpin shape)
+                Dim headPoints As PointF() = {
+                    New PointF(5.0F, 6.0F),
+                    New PointF(10.0F, 1.0F),
+                    New PointF(15.0F, 6.0F),
+                    New PointF(10.0F, 11.0F)
+                }
+                g.FillPolygon(bodyBrush, headPoints)
+                g.DrawPolygon(borderPen, headPoints)
+
+                ' 3. Draw Center Ridge Accent
+                Using ridgePen As New Pen(Color.White, 1.0F)
+                    g.DrawLine(ridgePen, 7.5F, 4.5F, 11.5F, 8.5F)
+                End Using
+            End Using
+        End Using
+        Return bmp
+    End Function
 
 End Module
