@@ -51,6 +51,7 @@ Friend Module App
     Friend ReadOnly SponsorGitHub As String = "https://github.com/sponsors/YodeSkye" 'SponsorGitHub is the URL for the GitHub Sponsors page of the application's developer.
     Friend ReadOnly SponsorPayPal As String = "https://www.paypal.com/donate/?hosted_button_id=RVH5T9H69G6CS" 'SponsorPayPal is the URL for the PayPal donation page for the application's developer.
     Friend ReadOnly PinOverlayBadge As Image = CreatePinBadgeIcon()
+    Friend ReadOnly PinMenuIcon As Image = CreatePinMenuIcon()
     Friend ScratchPadText As String = String.Empty
     Friend Property ChangeLogLastVersionShown As String = String.Empty
     Friend Property CBLivePreview As String

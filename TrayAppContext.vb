@@ -110,7 +110,7 @@ Friend Class TrayAppContext
         cmi = New ToolStripMenuItem("Preview", My.Resources.IconApp.ToBitmap, AddressOf OnClipCMPreviewClick) With {.Name = "Preview"}
         ClipCM.Items.Add(cmi)
         ClipCM.Items.Add(New ToolStripSeparator())
-        cmi = New ToolStripMenuItem("Pin", App.CreatePinMenuIcon, AddressOf OnClipCMPinned) With {.Name = "Pinned"}
+        cmi = New ToolStripMenuItem("Pin", App.PinMenuIcon, AddressOf OnClipCMPinned) With {.Name = "Pinned"}
         ClipCM.Items.Add(cmi)
         cmi = New ToolStripMenuItem("Favorite", My.Resources.ImageFavorites16, AddressOf OnClipCMFavorite) With {.Name = "Favorite"}
         ClipCM.Items.Add(cmi)
