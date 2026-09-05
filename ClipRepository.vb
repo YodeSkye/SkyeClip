@@ -39,6 +39,7 @@ Friend Class ClipRepository
         Public Property SourceAppPath As String
         Public Property SourceAppIcon As Byte()
         Public Property IsFavorite As Boolean
+        Public Property IsPinned As Boolean
     End Class
     Friend Class SourceAppInfo
         Public Property Name As String
@@ -69,6 +70,8 @@ Friend Class ClipRepository
     Public Class ClipManifestDTO
         Public Property OriginalId As Integer
         Public Property Preview As String = String.Empty
+        Public Property IsFavorite As Boolean
+        Public Property IsPinned As Boolean
         Public Property CreatedAt As DateTime
         Public Property LastUsedAt As DateTime
         Public Property AggregateHash As String = String.Empty
@@ -523,7 +526,7 @@ Friend Class ClipRepository
             Next
 
             Dim sql As String = $"
-            SELECT Id, ProfileID, Preview, CreatedAt, LastUsedAt, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite
+            SELECT Id, ProfileID, Preview, CreatedAt, LastUsedAt, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite, IsPinned
             FROM Clips
             WHERE Id IN ({String.Join(",", paramNames)})"
 
@@ -543,7 +546,8 @@ Friend Class ClipRepository
                         .SourceAppName = If(r.IsDBNull(5), String.Empty, r.GetString(5)),
                         .SourceAppPath = If(r.IsDBNull(6), String.Empty, r.GetString(6)),
                         .SourceAppIcon = TryCast(r("SourceAppIcon"), Byte()),
-                        .IsFavorite = (r.GetInt32(8) <> 0)
+                        .IsFavorite = (r.GetInt32(8) <> 0),
+                        .IsPinned = (r.GetInt32(9) <> 0)
                     })
                     End While
                 End Using
@@ -560,7 +564,7 @@ Friend Class ClipRepository
             conn.Open()
 
             Dim sql As String = "
-            SELECT Id, ProfileID, Preview, CreatedAt, LastUsedAt, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite
+            SELECT Id, ProfileID, Preview, CreatedAt, LastUsedAt, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite, IsPinned
             FROM Clips
             WHERE ProfileID = @profileId"
 
@@ -578,7 +582,8 @@ Friend Class ClipRepository
                         .SourceAppName = If(r.IsDBNull(5), String.Empty, r.GetString(5)),
                         .SourceAppPath = If(r.IsDBNull(6), String.Empty, r.GetString(6)),
                         .SourceAppIcon = TryCast(r("SourceAppIcon"), Byte()),
-                        .IsFavorite = (r.GetInt32(8) <> 0)
+                        .IsFavorite = (r.GetInt32(8) <> 0),
+                        .IsPinned = (r.GetInt32(9) <> 0)
                     })
                     End While
                 End Using
@@ -726,7 +731,7 @@ Friend Class ClipRepository
             conn.Open()
 
             Dim cmd As New SQLiteCommand("
-            SELECT Id, ProfileID, Preview, CreatedAt, LastUsedAt, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite
+            SELECT Id, ProfileID, Preview, CreatedAt, LastUsedAt, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite, IsPinned
             FROM Clips
             ORDER BY LastUsedAt DESC", conn)
 
@@ -740,7 +745,8 @@ Friend Class ClipRepository
                     .LastUsedAt = If(reader.IsDBNull(4), Date.MinValue, reader.GetDateTime(4)),
                     .SourceAppName = If(reader.IsDBNull(5), "", reader.GetString(5)),
                     .SourceAppPath = If(reader.IsDBNull(6), "", reader.GetString(6)),
-                    .IsFavorite = (Not reader.IsDBNull(8) AndAlso reader.GetInt32(8) = 1)
+                    .IsFavorite = (Not reader.IsDBNull(8) AndAlso reader.GetInt32(8) = 1),
+                    .IsPinned = (Not reader.IsDBNull(9) AndAlso reader.GetInt32(9) = 1)
                 }
 
                     ' Icon
@@ -1174,6 +1180,8 @@ Friend Class ClipRepository
                 Dim clipDto As New ClipManifestDTO With {
                     .OriginalId = c.Id,
                     .Preview = c.Preview,
+                    .IsFavorite = c.IsFavorite,
+                    .IsPinned = c.IsPinned,
                     .CreatedAt = c.CreatedAt,
                     .LastUsedAt = c.LastUsedAt,
                     .AggregateHash = clipHash,
@@ -1268,7 +1276,9 @@ Friend Class ClipRepository
                             "SELECT COUNT(1) FROM Clips WHERE AggregateHash = @hash AND HashVersion = 1",
                             "SELECT COUNT(1) FROM Clips WHERE ProfileID = @profileId AND AggregateHash = @hash AND HashVersion = 1")
 
-                        Dim insertClipSql As String = "INSERT INTO Clips (ProfileID, Preview, CreatedAt, LastUsedAt, AggregateHash, HashVersion, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite) VALUES (@profileId, @preview, @createdAt, @lastUsedAt, @hash, 1, @appName, @appPath, @icon, 0); SELECT last_insert_rowid();"
+                        ' Added IsPinned and parameterized IsFavorite / IsPinned
+                        Dim insertClipSql As String = "INSERT INTO Clips (ProfileID, Preview, CreatedAt, LastUsedAt, AggregateHash, HashVersion, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite, IsPinned) " &
+                                                      "VALUES (@profileId, @preview, @createdAt, @lastUsedAt, @hash, 1, @appName, @appPath, @icon, @isFavorite, @isPinned); SELECT last_insert_rowid();"
                         Dim insertFmtSql As String = "INSERT INTO ClipFormats (EntryId, FormatId, FormatName, Data) VALUES (@entryId, @formatId, @formatName, @data)"
                         Dim updatePreviewSql As String = "UPDATE Clips SET Preview = @preview WHERE Id = @id"
 
@@ -1312,6 +1322,11 @@ Friend Class ClipRepository
                                 cmd.Parameters.AddWithValue("@appName", If(String.IsNullOrEmpty(clipDto.SourceAppName), DBNull.Value, CObj(clipDto.SourceAppName)))
                                 cmd.Parameters.AddWithValue("@appPath", If(String.IsNullOrEmpty(clipDto.SourceAppPath), DBNull.Value, CObj(clipDto.SourceAppPath)))
                                 cmd.Parameters.AddWithValue("@icon", If(iconBytes Is Nothing, DBNull.Value, CObj(iconBytes)))
+
+                                ' Map Favorites and Pinned flags (converts Boolean to SQLite Integer 1/0)
+                                cmd.Parameters.AddWithValue("@isFavorite", If(clipDto.IsFavorite, 1, 0))
+                                cmd.Parameters.AddWithValue("@isPinned", If(clipDto.IsPinned, 1, 0))
+
                                 newClipId = Convert.ToInt32(cmd.ExecuteScalar())
                             End Using
 
@@ -1345,11 +1360,11 @@ Friend Class ClipRepository
 
                                     ' Collect ClipData object for BuildPreviewFromFormats
                                     importedFormats.Add(New ClipData With {
-                                        .FormatId = CUInt(resolvedFormatId),
-                                        .FormatName = fmtDto.FormatName,
-                                        .DataBytes = formatData
-                                    })
-                                End If
+                                    .FormatId = CUInt(resolvedFormatId),
+                                    .FormatName = fmtDto.FormatName,
+                                    .DataBytes = formatData
+                                })
+                            End If
                             Next
 
                             ' E. Update Preview Column if manifest didn't contain one
