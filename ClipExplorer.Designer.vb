@@ -69,8 +69,8 @@ Partial Class ClipExplorer
         LastUsedDate = New DataGridViewTextBoxColumn()
         SourceApp = New DataGridViewTextBoxColumn()
         SourceAppImage = New DataGridViewImageColumn()
-        Favorite = New DataGridViewCheckBoxColumn()
         Pinned = New DataGridViewCheckBoxColumn()
+        Favorite = New DataGridViewCheckBoxColumn()
         StatusStripCE.SuspendLayout()
         PanelCE.SuspendLayout()
         GrpBoxSearch.SuspendLayout()
@@ -293,7 +293,7 @@ Partial Class ClipExplorer
         DGV.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells
         DGV.BorderStyle = BorderStyle.None
         DGV.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DGV.Columns.AddRange(New DataGridViewColumn() {ID, ProfileID, ProfileName, Preview, CreatedDate, LastUsedDate, SourceApp, SourceAppImage, Favorite, Pinned})
+        DGV.Columns.AddRange(New DataGridViewColumn() {ID, ProfileID, ProfileName, Preview, CreatedDate, LastUsedDate, SourceApp, SourceAppImage, Pinned, Favorite})
         DGV.ContextMenuStrip = CMClipActions
         DGV.Dock = DockStyle.Fill
         TipClipExplorer.SetImage(DGV, Nothing)
@@ -526,14 +526,6 @@ Partial Class ClipExplorer
         SourceAppImage.ReadOnly = True
         SourceAppImage.Width = 45
         ' 
-        ' Favorite
-        ' 
-        Favorite.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        Favorite.HeaderText = "Fav"
-        Favorite.Name = "Favorite"
-        Favorite.ReadOnly = True
-        Favorite.Width = 39
-        ' 
         ' Pinned
         ' 
         Pinned.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
@@ -541,6 +533,14 @@ Partial Class ClipExplorer
         Pinned.Name = "Pinned"
         Pinned.ReadOnly = True
         Pinned.Width = 38
+        ' 
+        ' Favorite
+        ' 
+        Favorite.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        Favorite.HeaderText = "Fav"
+        Favorite.Name = "Favorite"
+        Favorite.ReadOnly = True
+        Favorite.Width = 39
         ' 
         ' ClipExplorer
         ' 
@@ -619,6 +619,6 @@ Partial Class ClipExplorer
     Friend WithEvents LastUsedDate As DataGridViewTextBoxColumn
     Friend WithEvents SourceApp As DataGridViewTextBoxColumn
     Friend WithEvents SourceAppImage As DataGridViewImageColumn
-    Friend WithEvents Favorite As DataGridViewCheckBoxColumn
     Friend WithEvents Pinned As DataGridViewCheckBoxColumn
+    Friend WithEvents Favorite As DataGridViewCheckBoxColumn
 End Class

@@ -515,8 +515,8 @@ Public Class ClipExplorer
             c.LastUsedAt.ToString("g"),
             c.SourceAppName,
             iconImg,
-            c.IsFavorite,
-            c.IsPinned
+            c.IsPinned,
+            c.IsFavorite
         })
         Next
 
