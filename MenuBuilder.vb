@@ -155,7 +155,8 @@ Public Class MenuBuilder
                 Dim item As New ToolStripMenuItem(profile.Name) With {
                     .Tag = profile.ID,
                     .Checked = profile.ID = App.Settings.CurrentProfileID,
-                    .Font = App.MenuFont
+                    .Font = If(profile.ID = App.Settings.CurrentProfileID, App.MenuFontBold, App.MenuFont),
+                    .Image = My.Resources.ImageProfiles16
                 }
                 AddHandler item.MouseDown, profileClickHandler
                 menu.Items.Add(item)

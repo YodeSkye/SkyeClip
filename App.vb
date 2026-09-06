@@ -44,6 +44,7 @@ Friend Module App
     Friend ReadOnly CBRTFSuffix As String = " <RTF>"
     Friend ReadOnly CBHTMLSuffix As String = " <HTML>"
     Friend ReadOnly MenuFont As New Font("Segoe UI", 12, FontStyle.Regular) ' MenuFont is the font used for context menus.
+    Friend ReadOnly MenuFontBold As New Font("Segoe UI", 12, FontStyle.Bold) ' MenuFontBold is the bold font used for context menus.
     Friend ReadOnly AttributionSkye As String = "https://github.com/YodeSkye/SkyeClip" ' AttributionSkye is the URL for the SkyeClip project.
     Friend ReadOnly AttributionMicrosoft As String = "https://www.microsoft.com" 'AttributionMicrosoft is the URL for Microsoft, which provides various APIs and libraries used in the application.
     Friend ReadOnly AttributionSQLite As String = "https://www.sqlite.org/index.html" 'AttributionSQLite is the URL for SQLite, which provides database functionality in the application.
