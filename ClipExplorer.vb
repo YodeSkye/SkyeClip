@@ -128,14 +128,21 @@ Public Class ClipExplorer
     End Sub
     Private Sub DGV_CellMouseUp(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DGV.CellMouseUp
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
-        If DGV.Columns(e.ColumnIndex).Name = "Favorite" Then
+        If DGV.Columns(e.ColumnIndex).Name = "Pinned" Then
             Dim clipId As Integer = CInt(DGV.Rows(e.RowIndex).Cells("Id").Value)
             Dim currentVal As Boolean = CBool(If(DGV.Rows(e.RowIndex).Cells(e.ColumnIndex).Value, False))
             Dim newVal As Boolean = Not currentVal
             DGV.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = newVal
-            App.Tray.repo.SetFavorite(clipId, newVal)
+            App.Tray.repo.SetPinned(clipId, newVal)
             App.Tray.RefreshMenu()
-        End If
+        ElseIf DGV.Columns(e.ColumnIndex).Name = "Favorite" Then
+            Dim clipId As Integer = CInt(DGV.Rows(e.RowIndex).Cells("Id").Value)
+                Dim currentVal As Boolean = CBool(If(DGV.Rows(e.RowIndex).Cells(e.ColumnIndex).Value, False))
+                Dim newVal As Boolean = Not currentVal
+                DGV.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = newVal
+                App.Tray.repo.SetFavorite(clipId, newVal)
+                App.Tray.RefreshMenu()
+            End If
     End Sub
     Private Sub CMClipActions_Opening(sender As Object, e As CancelEventArgs) Handles CMClipActions.Opening
         If DGV.SelectedRows.Count = 0 Then
@@ -452,8 +459,7 @@ Public Class ClipExplorer
                 allClips = App.Tray.repo.GetAllClips()
             Else
                 ' Profiles ON + Show only current profile
-                allClips = App.Tray.repo.GetAllClips().
-            Where(Function(c) c.ProfileID = App.Settings.CurrentProfileID).ToList()
+                allClips = App.Tray.repo.GetAllClips().Where(Function(c) c.ProfileID = App.Settings.CurrentProfileID).ToList()
             End If
         Else
             ' Profiles OFF → always show everything
@@ -509,7 +515,8 @@ Public Class ClipExplorer
             c.LastUsedAt.ToString("g"),
             c.SourceAppName,
             iconImg,
-            c.IsFavorite
+            c.IsFavorite,
+            c.IsPinned
         })
         Next
 

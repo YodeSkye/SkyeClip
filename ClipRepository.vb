@@ -251,20 +251,31 @@ Friend Class ClipRepository
         End Using
     End Sub
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
-    Friend Sub ToggleFavorite(clipID As Integer)
+    Friend Sub TogglePinned(clipID As Integer)
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
-            Using cmd As New SQLiteCommand("UPDATE Clips SET IsFavorite = CASE IsFavorite WHEN 1 THEN 0 ELSE 1 END WHERE Id=@id", conn)
+            Using cmd As New SQLiteCommand("UPDATE Clips SET IsPinned = CASE IsPinned WHEN 1 THEN 0 ELSE 1 END WHERE Id=@id", conn)
                 cmd.Parameters.AddWithValue("@id", clipID)
                 cmd.ExecuteNonQuery()
             End Using
         End Using
     End Sub
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
-    Friend Sub TogglePinned(clipID As Integer)
+    Friend Sub SetPinned(clipID As Integer, isPinned As Boolean)
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
-            Using cmd As New SQLiteCommand("UPDATE Clips SET IsPinned = CASE IsPinned WHEN 1 THEN 0 ELSE 1 END WHERE Id=@id", conn)
+            Using cmd As New SQLiteCommand("UPDATE Clips SET IsPinned = @pinned WHERE Id=@id", conn)
+                cmd.Parameters.AddWithValue("@pinned", If(isPinned, 1, 0))
+                cmd.Parameters.AddWithValue("@id", clipID)
+                cmd.ExecuteNonQuery()
+            End Using
+        End Using
+    End Sub
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Friend Sub ToggleFavorite(clipID As Integer)
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+            Using cmd As New SQLiteCommand("UPDATE Clips SET IsFavorite = CASE IsFavorite WHEN 1 THEN 0 ELSE 1 END WHERE Id=@id", conn)
                 cmd.Parameters.AddWithValue("@id", clipID)
                 cmd.ExecuteNonQuery()
             End Using

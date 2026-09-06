@@ -16,16 +16,13 @@ Public Class MenuBuilder
             .Font = App.MenuFont,
             .ShowItemToolTips = False}
 
-        ' ============================================================
         ' --- LIVE CLIPBOARD ITEM (always first) ---
-        ' ============================================================
         Dim liveItem As New ToolStripMenuItem(App.CBLivePreview) With {
             .Tag = Nothing,
             .Font = New Font(App.MenuFont, FontStyle.Bold),
             .Image = My.Resources.IconApp.ToBitmap}
         menu.Items.Add(liveItem)
         menu.Items.Add(New ToolStripSeparator())
-        ' ============================================================
 
         ' --- Recents ---
         Dim clips = repo.GetRecentClips(App.Settings.MaxClips)
@@ -35,7 +32,17 @@ Public Class MenuBuilder
                 .Font = App.MenuFont}
             menu.Items.Add(none)
         Else
-            For Each clip In clips
+            Dim hasPinnedSeparatorBeenAdded As Boolean = False
+
+            For i As Integer = 0 To clips.Count - 1
+                Dim clip = clips(i)
+
+                ' If we encounter our first UNPINNED clip, and at least one PINNED clip preceded it, insert the separator
+                If Not clip.IsPinned AndAlso i > 0 AndAlso clips(i - 1).IsPinned AndAlso Not hasPinnedSeparatorBeenAdded Then
+                    menu.Items.Add(New ToolStripSeparator() With {.Name = "PinnedSeparator"})
+                    hasPinnedSeparatorBeenAdded = True
+                End If
+
                 Dim previewText = clip.Preview
                 Dim preview = If(String.IsNullOrWhiteSpace(previewText), "< No Preview >", previewText)
 
@@ -56,6 +63,7 @@ Public Class MenuBuilder
                 AddHandler item.MouseDown, clipClickHandler
                 menu.Items.Add(item)
             Next
+
         End If
 
         ' --- Favorites submenu ---

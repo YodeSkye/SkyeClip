@@ -536,6 +536,7 @@ Partial Class ClipExplorer
         ' 
         ' Pinned
         ' 
+        Pinned.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
         Pinned.HeaderText = "Pin"
         Pinned.Name = "Pinned"
         Pinned.ReadOnly = True
