@@ -444,12 +444,21 @@ Public Class Settings
             TxtBoxMaxClipPreviewLength.SelectAll()
         End If
     End Sub
+    Private Sub TxtBoxHotKeyTogglePin_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHotKeyTogglePin.KeyDown
+        e.SuppressKeyPress = True
+        Dim mods = e.Modifiers
+        Dim key = e.KeyCode
+        If key = Keys.ControlKey OrElse key = Keys.ShiftKey OrElse key = Keys.Menu Then Return 'Ignore modifier-only presses
+        Dim combo = mods Or key
+        TxtBoxHotKeyTogglePin.Text = FormatHotKey(combo)
+        App.Settings.HotKeys.TogglePin = combo
+    End Sub
     Private Sub TxtBoxHotKeyToggleFavorite_KeyDown(sender As Object, e As KeyEventArgs) Handles TxtBoxHotKeyToggleFavorite.KeyDown
         e.SuppressKeyPress = True
-        Dim mods As Keys = e.Modifiers
-        Dim key As Keys = e.KeyCode
+        Dim mods = e.Modifiers
+        Dim key = e.KeyCode
         If key = Keys.ControlKey OrElse key = Keys.ShiftKey OrElse key = Keys.Menu Then Return 'Ignore modifier-only presses
-        Dim combo As Keys = mods Or key
+        Dim combo = mods Or key
         TxtBoxHotKeyToggleFavorite.Text = FormatHotKey(combo)
         App.Settings.HotKeys.ToggleFavorite = combo
     End Sub
@@ -632,6 +641,7 @@ Public Class Settings
         ChkBoxPlaySoundWithNotify.Checked = App.Settings.PlaySoundWithNotify
         ChkBoxShowOpenSourceApp.Checked = App.Settings.ShowOpenSourceApp
         SetKeepText()
+        TxtBoxHotKeyTogglePin.Text = FormatHotKey(App.Settings.HotKeys.TogglePin)
         TxtBoxHotKeyToggleFavorite.Text = FormatHotKey(App.Settings.HotKeys.ToggleFavorite)
         TxtBoxHotKeyShowViewer.Text = FormatHotKey(App.Settings.HotKeys.ShowViewer)
         TxtBoxHotKeyShowScratchPad.Text = FormatHotKey(App.Settings.HotKeys.ShowScratchPad)

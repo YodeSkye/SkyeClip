@@ -88,6 +88,8 @@ Partial Class Settings
         ColCondition = New ColumnHeader()
         ColAction = New ColumnHeader()
         ColSummary = New ColumnHeader()
+        TxtBoxHotKeyTogglePin = New TextBox()
+        LblHotKeyTogglePin = New Label()
         PanelPageSelector.SuspendLayout()
         PanelGeneral.SuspendLayout()
         PanelClips.SuspendLayout()
@@ -197,7 +199,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyToggleFavorite.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyToggleFavorite, My.Resources.Resources.ImageFavorites16)
-        TxtBoxHotKeyToggleFavorite.Location = New Point(146, 96)
+        TxtBoxHotKeyToggleFavorite.Location = New Point(146, 159)
         TxtBoxHotKeyToggleFavorite.Name = "TxtBoxHotKeyToggleFavorite"
         TxtBoxHotKeyToggleFavorite.ReadOnly = True
         TxtBoxHotKeyToggleFavorite.ShortcutsEnabled = False
@@ -209,7 +211,7 @@ Partial Class Settings
         ' LblHotKeyToggleFavorite
         ' 
         TipSettings.SetImage(LblHotKeyToggleFavorite, Nothing)
-        LblHotKeyToggleFavorite.Location = New Point(144, 75)
+        LblHotKeyToggleFavorite.Location = New Point(144, 138)
         LblHotKeyToggleFavorite.Name = "LblHotKeyToggleFavorite"
         LblHotKeyToggleFavorite.Size = New Size(146, 24)
         LblHotKeyToggleFavorite.TabIndex = 7
@@ -233,7 +235,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyShowViewer.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyShowViewer, My.Resources.Resources.imageClipViewer16)
-        TxtBoxHotKeyShowViewer.Location = New Point(146, 149)
+        TxtBoxHotKeyShowViewer.Location = New Point(146, 212)
         TxtBoxHotKeyShowViewer.Name = "TxtBoxHotKeyShowViewer"
         TxtBoxHotKeyShowViewer.ReadOnly = True
         TxtBoxHotKeyShowViewer.ShortcutsEnabled = False
@@ -245,7 +247,7 @@ Partial Class Settings
         ' LblHotKeyShowViewer
         ' 
         TipSettings.SetImage(LblHotKeyShowViewer, Nothing)
-        LblHotKeyShowViewer.Location = New Point(144, 128)
+        LblHotKeyShowViewer.Location = New Point(144, 191)
         LblHotKeyShowViewer.Name = "LblHotKeyShowViewer"
         LblHotKeyShowViewer.Size = New Size(146, 24)
         LblHotKeyShowViewer.TabIndex = 10
@@ -337,7 +339,7 @@ Partial Class Settings
         ' 
         TxtBoxHotKeyShowScratchPad.BorderStyle = BorderStyle.FixedSingle
         TipSettings.SetImage(TxtBoxHotKeyShowScratchPad, My.Resources.Resources.imageScratchPad16)
-        TxtBoxHotKeyShowScratchPad.Location = New Point(146, 202)
+        TxtBoxHotKeyShowScratchPad.Location = New Point(146, 265)
         TxtBoxHotKeyShowScratchPad.Name = "TxtBoxHotKeyShowScratchPad"
         TxtBoxHotKeyShowScratchPad.ReadOnly = True
         TxtBoxHotKeyShowScratchPad.ShortcutsEnabled = False
@@ -349,7 +351,7 @@ Partial Class Settings
         ' LblHotKeyShowScratchPad
         ' 
         TipSettings.SetImage(LblHotKeyShowScratchPad, Nothing)
-        LblHotKeyShowScratchPad.Location = New Point(144, 181)
+        LblHotKeyShowScratchPad.Location = New Point(144, 244)
         LblHotKeyShowScratchPad.Name = "LblHotKeyShowScratchPad"
         LblHotKeyShowScratchPad.Size = New Size(146, 24)
         LblHotKeyShowScratchPad.TabIndex = 1101
@@ -637,6 +639,8 @@ Partial Class Settings
         ' 
         ' PanelHotKeys
         ' 
+        PanelHotKeys.Controls.Add(TxtBoxHotKeyTogglePin)
+        PanelHotKeys.Controls.Add(LblHotKeyTogglePin)
         PanelHotKeys.Controls.Add(LblHotKeys)
         PanelHotKeys.Controls.Add(TxtBoxHotKeyToggleFavorite)
         PanelHotKeys.Controls.Add(TxtBoxHotKeyShowViewer)
@@ -645,9 +649,9 @@ Partial Class Settings
         PanelHotKeys.Controls.Add(LblHotKeyToggleFavorite)
         PanelHotKeys.Controls.Add(LblHotKeyShowScratchPad)
         TipSettings.SetImage(PanelHotKeys, Nothing)
-        PanelHotKeys.Location = New Point(215, 0)
+        PanelHotKeys.Location = New Point(93, 0)
         PanelHotKeys.Name = "PanelHotKeys"
-        PanelHotKeys.Size = New Size(241, 86)
+        PanelHotKeys.Size = New Size(435, 440)
         PanelHotKeys.TabIndex = 1113
         TipSettings.SetText(PanelHotKeys, Nothing)
         ' 
@@ -848,17 +852,41 @@ Partial Class Settings
         ColSummary.Text = "Summary"
         ColSummary.Width = 350
         ' 
+        ' TxtBoxHotKeyTogglePin
+        ' 
+        TxtBoxHotKeyTogglePin.BorderStyle = BorderStyle.FixedSingle
+        TipSettings.SetImage(TxtBoxHotKeyTogglePin, My.Resources.Resources.ImageFavorites16)
+        TxtBoxHotKeyTogglePin.Location = New Point(146, 106)
+        TxtBoxHotKeyTogglePin.Name = "TxtBoxHotKeyTogglePin"
+        TxtBoxHotKeyTogglePin.ReadOnly = True
+        TxtBoxHotKeyTogglePin.ShortcutsEnabled = False
+        TxtBoxHotKeyTogglePin.Size = New Size(144, 29)
+        TxtBoxHotKeyTogglePin.TabIndex = 1103
+        TipSettings.SetText(TxtBoxHotKeyTogglePin, "Key or Key Combination to use on the tray menu to Favorite a clip.")
+        TxtBoxHotKeyTogglePin.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' LblHotKeyTogglePin
+        ' 
+        TipSettings.SetImage(LblHotKeyTogglePin, Nothing)
+        LblHotKeyTogglePin.Location = New Point(144, 85)
+        LblHotKeyTogglePin.Name = "LblHotKeyTogglePin"
+        LblHotKeyTogglePin.Size = New Size(146, 24)
+        LblHotKeyTogglePin.TabIndex = 1102
+        LblHotKeyTogglePin.Text = "Toggle Pin"
+        TipSettings.SetText(LblHotKeyTogglePin, Nothing)
+        LblHotKeyTogglePin.TextAlign = ContentAlignment.TopCenter
+        ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(528, 531)
+        Controls.Add(PanelHotKeys)
         Controls.Add(PanelAutomation)
         Controls.Add(PanelGeneral)
         Controls.Add(PanelClips)
         Controls.Add(PanelProfiles)
         Controls.Add(PanelBackup)
-        Controls.Add(PanelHotKeys)
         Controls.Add(PanelControls)
         Controls.Add(PanelPageSelector)
         Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
@@ -951,4 +979,6 @@ Partial Class Settings
     Friend WithEvents CoBoxRuleTypes As Skye.UI.ComboBox
     Friend WithEvents BtnRuleDelete As Button
     Friend WithEvents PanelRule As Panel
+    Friend WithEvents TxtBoxHotKeyTogglePin As TextBox
+    Friend WithEvents LblHotKeyTogglePin As Label
 End Class

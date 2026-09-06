@@ -305,6 +305,7 @@ Friend Module App
         Friend Shared Profiles As List(Of Profile) ' the list of profiles, used when profiles are enabled. The default profile with ID 0 is not stored in this list but is implicitly available.
 
         Friend Class HotKeys
+            Friend Shared TogglePin As Keys
             Friend Shared ToggleFavorite As Keys
             Friend Shared ShowViewer As Keys
             Friend Shared ShowScratchPad As Keys
@@ -420,6 +421,7 @@ Friend Module App
             Settings.Profiles = profiles
 
             ' HotKeys
+            HotKeys.TogglePin = CType(Skye.Common.RegistryHelper.GetInt("HotKeyTogglePin", CInt(Keys.P)), Keys)
             HotKeys.ToggleFavorite = CType(Skye.Common.RegistryHelper.GetInt("HotKeyToggleFavorite", CInt(Keys.F)), Keys)
             HotKeys.ShowViewer = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowViewer", CInt(Keys.V)), Keys)
             HotKeys.ShowScratchPad = CType(Skye.Common.RegistryHelper.GetInt("HotKeyShowScratchPad", CInt(Keys.S)), Keys)
@@ -482,6 +484,7 @@ Friend Module App
             Next
 
             ' HotKeys
+            Skye.Common.RegistryHelper.SetInt("HotKeyTogglePin", CInt(HotKeys.TogglePin))
             Skye.Common.RegistryHelper.SetInt("HotKeyToggleFavorite", CInt(HotKeys.ToggleFavorite))
             Skye.Common.RegistryHelper.SetInt("HotKeyShowViewer", CInt(HotKeys.ShowViewer))
             Skye.Common.RegistryHelper.SetInt("HotKeyShowScratchPad", CInt(HotKeys.ShowScratchPad))

@@ -266,7 +266,22 @@ Friend Class TrayAppContext
         suppressClose = False
     End Sub
     Private Sub OnMenuKeyDown(sender As Object, e As KeyEventArgs)
-        If e.KeyCode = App.Settings.HotKeys.ToggleFavorite Then
+        If e.KeyCode = App.Settings.HotKeys.TogglePin Then
+            Dim cms = DirectCast(sender, ContextMenuStrip)
+            Dim pos = cms.PointToClient(Cursor.Position)
+            Dim item As ToolStripItem = cms.GetItemAt(pos)
+            Dim hovered As ToolStripMenuItem = TryCast(item, ToolStripMenuItem)
+            If hovered IsNot Nothing AndAlso hovered.Tag IsNot Nothing Then
+                Dim clipID As Integer
+                If Integer.TryParse(hovered.Tag.ToString(), clipID) Then
+                    repo.TogglePinned(clipID)
+                    Dim loc = CMTray.Location
+                    CMTray.Close()
+                    RefreshMenu()
+                    CMTray.Show(loc)
+                End If
+            End If
+        ElseIf e.KeyCode = App.Settings.HotKeys.ToggleFavorite Then
             Dim cms = DirectCast(sender, ContextMenuStrip)
             Dim pos = cms.PointToClient(Cursor.Position)
             Dim item As ToolStripItem = cms.GetItemAt(pos)
