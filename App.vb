@@ -858,6 +858,8 @@ Friend Module App
                         If Context.Clip.IsNewClip Then
                             repo.DeleteClip(clip.Id)
                         End If
+                    Case ContentAction.AutoPin
+                        repo.SetPinned(clip.Id, True)
                 End Select
             End If
         End Sub
@@ -905,6 +907,8 @@ Friend Module App
                         If Context.Clip.IsNewClip Then
                             repo.DeleteClip(clip.Id)
                         End If
+                    Case ContentAction.AutoPin
+                        repo.SetPinned(clip.Id, True)
                 End Select
             End If
         End Sub
@@ -951,6 +955,8 @@ Friend Module App
                         If Context.Clip.IsNewClip Then
                             repo.DeleteClip(clip.Id)
                         End If
+                    Case ContentAction.AutoPin
+                        repo.SetPinned(clip.Id, True)
                 End Select
             End If
         End Sub
@@ -959,6 +965,7 @@ Friend Module App
     Friend Enum ContentAction
         AutoFavorite
         AutoIgnore
+        AutoPin
     End Enum
     Friend Enum RuleType
         <Description("Active App (Profile Switch)")>
