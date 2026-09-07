@@ -1,5 +1,6 @@
 ﻿
 Imports Skye.UI
+Imports SkyeClip.ClipRepository
 
 Friend Class AppView
 
@@ -75,7 +76,7 @@ Friend Class AppView
     Private Sub BtnSettings_Click(sender As Object, e As EventArgs) Handles BtnSettings.Click
         App.ShowSettings()
     End Sub
-    Private Sub BtnImport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnImport.MouseDown
+    Private Async Sub BtnImport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnImport.MouseDown
         If e.Button <> MouseButtons.Left AndAlso e.Button <> MouseButtons.Right Then Return
         _suppressHideOnDeactivate = True
         Dim bringToTop As Boolean = (e.Button = MouseButtons.Right)
@@ -88,7 +89,10 @@ Friend Class AppView
                 ofd.Filter = "ZIP Archives (*.zip)|*.zip|All Files (*.*)|*.*"
                 ofd.Title = If(bringToTop, $"Import Clips{profileSuffix} (Bring to Top)", $"Import Clips{profileSuffix} (Keep Timestamps)")
                 If ofd.ShowDialog(Me) = DialogResult.OK Then
-                    Dim importResult = App.Tray.repo.ImportPackage(ofd.FileName, targetProfileId, bringToTop)
+                    Dim importResult As ImportResult = Nothing
+                    Await App.RunWithProgressAsync("Importing Package...", Async Function(p)
+                                                                               importResult = Await Tray.repo.ImportPackageAsync(ofd.FileName, App.Settings.CurrentProfileID, True, p)
+                                                                           End Function)
                     If importResult.Success Then
                         App.Tray.RefreshMenu()
                         App.Tray.ShowToast($"Import complete!{Environment.NewLine}" &

@@ -1192,6 +1192,8 @@ Friend Class ClipRepository
                 For i As Integer = 0 To totalClips - 1
                     Dim c = clips(i)
 
+                    'Threading.Thread.Sleep(50) ' Simulate work for testing progress reporting UI
+
                     ' Report progress back to the UI thread
                     progress?.Report(New App.ProgressInfo With {
                             .CurrentIndex = i + 1,
@@ -1255,168 +1257,180 @@ Friend Class ClipRepository
         End Using
     End Sub
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
-    Friend Function ImportPackage(zipPath As String, targetProfileId As Integer, bringToTop As Boolean) As ImportResult
-        Dim result As New ImportResult()
+    Friend Async Function ImportPackageAsync(zipPath As String, targetProfileId As Integer, bringToTop As Boolean, progress As IProgress(Of App.ProgressInfo)) As Task(Of ImportResult)
+        Return Await Task.Run(
+            Function()
+                Dim result As New ImportResult()
 
-        If Not File.Exists(zipPath) Then
-            result.Success = False
-            result.ErrorMessage = "Export package file not found."
-            Return result
-        End If
+                If Not File.Exists(zipPath) Then
+                    result.Success = False
+                    result.ErrorMessage = "Export package file not found."
+                    Return result
+                End If
 
-        ' Option A logic: If profiles mode is disabled, always import to Profile 0
-        ' and force the deduplication check to run globally across all profiles.
-        Dim effectiveTargetProfileId As Integer = If(App.Settings.UseProfiles, targetProfileId, 0)
-        Dim useGlobalDupCheck As Boolean = Not App.Settings.UseProfiles
+                Dim effectiveTargetProfileId As Integer = If(App.Settings.UseProfiles, targetProfileId, 0)
+                Dim useGlobalDupCheck As Boolean = Not App.Settings.UseProfiles
 
-        Using zip As ZipArchive = ZipFile.OpenRead(zipPath)
-            ' 1. Locate and deserialize manifest.json
-            Dim manifestEntry = zip.GetEntry("manifest.json")
-            If manifestEntry Is Nothing Then
-                result.Success = False
-                result.ErrorMessage = "Invalid archive: manifest.json is missing."
-                Return result
-            End If
+                Using zip As ZipArchive = ZipFile.OpenRead(zipPath)
+                    ' 1. Locate and deserialize manifest.json
+                    Dim manifestEntry = zip.GetEntry("manifest.json")
+                    If manifestEntry Is Nothing Then
+                        result.Success = False
+                        result.ErrorMessage = "Invalid archive: manifest.json is missing."
+                        Return result
+                    End If
 
-            Dim manifest As ManifestDTO
-            Using reader As New StreamReader(manifestEntry.Open())
-                Dim json As String = reader.ReadToEnd()
-                manifest = JsonSerializer.Deserialize(Of ManifestDTO)(json)
-            End Using
+                    Dim manifest As ManifestDTO
+                    Using reader As New StreamReader(manifestEntry.Open())
+                        Dim json As String = reader.ReadToEnd()
+                        manifest = JsonSerializer.Deserialize(Of ManifestDTO)(json)
+                    End Using
 
-            If manifest Is Nothing OrElse manifest.Clips Is Nothing Then
-                result.Success = False
-                result.ErrorMessage = "Failed to parse package manifest."
-                Return result
-            End If
+                    If manifest Is Nothing OrElse manifest.Clips Is Nothing Then
+                        result.Success = False
+                        result.ErrorMessage = "Failed to parse package manifest."
+                        Return result
+                    End If
 
-            result.TotalInPackage = manifest.Clips.Count
+                    result.TotalInPackage = manifest.Clips.Count
 
-            ' 2. Open SQLite Connection and start Transaction
-            Using conn As New SQLiteConnection(App.DBConnectionString)
-                conn.Open()
-                Using tx = conn.BeginTransaction()
-                    Try
-                        ' SQL Queries dynamically adjusting for global vs per-profile deduplication
-                        Dim checkDupSql As String = If(useGlobalDupCheck,
-                            "SELECT COUNT(1) FROM Clips WHERE AggregateHash = @hash AND HashVersion = 1",
-                            "SELECT COUNT(1) FROM Clips WHERE ProfileID = @profileId AND AggregateHash = @hash AND HashVersion = 1")
+                    ' Initial progress report
+                    progress?.Report(New App.ProgressInfo With {
+                            .CurrentIndex = 0,
+                            .TotalCount = result.TotalInPackage,
+                            .Message = $"Preparing to import {result.TotalInPackage} clips..."
+                        })
 
-                        ' Added IsPinned and parameterized IsFavorite / IsPinned
-                        Dim insertClipSql As String = "INSERT INTO Clips (ProfileID, Preview, CreatedAt, LastUsedAt, AggregateHash, HashVersion, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite, IsPinned) " &
-                                                      "VALUES (@profileId, @preview, @createdAt, @lastUsedAt, @hash, 1, @appName, @appPath, @icon, @isFavorite, @isPinned); SELECT last_insert_rowid();"
-                        Dim insertFmtSql As String = "INSERT INTO ClipFormats (EntryId, FormatId, FormatName, Data) VALUES (@entryId, @formatId, @formatName, @data)"
-                        Dim updatePreviewSql As String = "UPDATE Clips SET Preview = @preview WHERE Id = @id"
+                    ' 2. Open SQLite Connection and start Transaction
+                    Using conn As New SQLiteConnection(App.DBConnectionString)
+                        conn.Open()
+                        Using tx = conn.BeginTransaction()
+                            Try
+                                Dim checkDupSql As String = If(useGlobalDupCheck,
+                                    "SELECT COUNT(1) FROM Clips WHERE AggregateHash = @hash AND HashVersion = 1",
+                                    "SELECT COUNT(1) FROM Clips WHERE ProfileID = @profileId AND AggregateHash = @hash AND HashVersion = 1")
 
-                        For Each clipDto In manifest.Clips
-                            ' A. Deduplication Check (Per-Profile or Global)
-                            Using cmd As New SQLiteCommand(checkDupSql, conn, tx)
-                                If Not useGlobalDupCheck Then
-                                    cmd.Parameters.AddWithValue("@profileId", effectiveTargetProfileId)
-                                End If
-                                cmd.Parameters.AddWithValue("@hash", clipDto.AggregateHash)
+                                Dim insertClipSql As String = "INSERT INTO Clips (ProfileID, Preview, CreatedAt, LastUsedAt, AggregateHash, HashVersion, SourceAppName, SourceAppPath, SourceAppIcon, IsFavorite, IsPinned) " &
+                                                              "VALUES (@profileId, @preview, @createdAt, @lastUsedAt, @hash, 1, @appName, @appPath, @icon, @isFavorite, @isPinned); SELECT last_insert_rowid();"
+                                Dim insertFmtSql As String = "INSERT INTO ClipFormats (EntryId, FormatId, FormatName, Data) VALUES (@entryId, @formatId, @formatName, @data)"
+                                Dim updatePreviewSql As String = "UPDATE Clips SET Preview = @preview WHERE Id = @id"
 
-                                If Convert.ToInt64(cmd.ExecuteScalar()) > 0 Then
-                                    result.SkippedDuplicates += 1
-                                    Continue For
-                                End If
-                            End Using
+                                For i As Integer = 0 To result.TotalInPackage - 1
+                                    Dim clipDto = manifest.Clips(i)
 
-                            ' B. Resolve Timestamps & Read Icon Payload
-                            Dim createdAt As DateTime = clipDto.CreatedAt
-                            Dim lastUsedAt As DateTime = If(bringToTop, DateTime.UtcNow, clipDto.LastUsedAt)
+                                    'Threading.Thread.Sleep(50) ' Simulate work for testing progress reporting UI
 
-                            Dim iconBytes As Byte() = Nothing
-                            If Not String.IsNullOrEmpty(clipDto.IconBlobPath) Then
-                                Dim iconEntry = zip.GetEntry(clipDto.IconBlobPath)
-                                If iconEntry IsNot Nothing Then
-                                    Using ms As New MemoryStream(), stream = iconEntry.Open()
-                                        stream.CopyTo(ms)
-                                        iconBytes = ms.ToArray()
-                                    End Using
-                                End If
-                            End If
+                                    ' Report progress for the current item
+                                    progress?.Report(New App.ProgressInfo With {
+                                            .CurrentIndex = i + 1,
+                                            .TotalCount = result.TotalInPackage,
+                                            .Message = $"Importing clip {i + 1} of {result.TotalInPackage}..."
+                                        })
 
-                            ' C. Insert Clip Record & Get New ID
-                            Dim newClipId As Integer = 0
-                            Using cmd As New SQLiteCommand(insertClipSql, conn, tx)
-                                cmd.Parameters.AddWithValue("@profileId", effectiveTargetProfileId)
-                                cmd.Parameters.AddWithValue("@preview", If(String.IsNullOrEmpty(clipDto.Preview), "", clipDto.Preview))
-                                cmd.Parameters.AddWithValue("@createdAt", createdAt)
-                                cmd.Parameters.AddWithValue("@lastUsedAt", lastUsedAt)
-                                cmd.Parameters.AddWithValue("@hash", clipDto.AggregateHash)
-                                cmd.Parameters.AddWithValue("@appName", If(String.IsNullOrEmpty(clipDto.SourceAppName), DBNull.Value, CObj(clipDto.SourceAppName)))
-                                cmd.Parameters.AddWithValue("@appPath", If(String.IsNullOrEmpty(clipDto.SourceAppPath), DBNull.Value, CObj(clipDto.SourceAppPath)))
-                                cmd.Parameters.AddWithValue("@icon", If(iconBytes Is Nothing, DBNull.Value, CObj(iconBytes)))
+                                    ' A. Deduplication Check
+                                    Using cmd As New SQLiteCommand(checkDupSql, conn, tx)
+                                        If Not useGlobalDupCheck Then
+                                            cmd.Parameters.AddWithValue("@profileId", effectiveTargetProfileId)
+                                        End If
+                                        cmd.Parameters.AddWithValue("@hash", clipDto.AggregateHash)
 
-                                ' Map Favorites and Pinned flags (converts Boolean to SQLite Integer 1/0)
-                                cmd.Parameters.AddWithValue("@isFavorite", If(clipDto.IsFavorite, 1, 0))
-                                cmd.Parameters.AddWithValue("@isPinned", If(clipDto.IsPinned, 1, 0))
-
-                                newClipId = Convert.ToInt32(cmd.ExecuteScalar())
-                            End Using
-
-                            ' D. Insert Format Blobs & Collect ClipData for Preview Generation
-                            Dim importedFormats As New List(Of ClipData)()
-
-                            For Each fmtDto In clipDto.Formats
-                                Dim formatEntry = zip.GetEntry(fmtDto.BlobPath)
-                                If formatEntry IsNot Nothing Then
-                                    Dim formatData As Byte() = Nothing
-                                    Using ms As New MemoryStream(), stream = formatEntry.Open()
-                                        stream.CopyTo(ms)
-                                        formatData = ms.ToArray()
+                                        If Convert.ToInt64(cmd.ExecuteScalar()) > 0 Then
+                                            result.SkippedDuplicates += 1
+                                            Continue For
+                                        End If
                                     End Using
 
-                                    ' Resolve dynamic Win32 format ID inline
-                                    Dim resolvedFormatId As Integer = fmtDto.FormatId
-                                    If fmtDto.FormatId >= &HC000 AndAlso Not String.IsNullOrWhiteSpace(fmtDto.FormatName) Then
-                                        Dim registeredId As UInteger = Skye.WinAPI.RegisterClipboardFormat(fmtDto.FormatName)
-                                        If registeredId <> 0 Then resolvedFormatId = CInt(registeredId)
+                                    ' B. Resolve Timestamps & Read Icon Payload
+                                    Dim createdAt As DateTime = clipDto.CreatedAt
+                                    Dim lastUsedAt As DateTime = If(bringToTop, DateTime.UtcNow, clipDto.LastUsedAt)
+
+                                    Dim iconBytes As Byte() = Nothing
+                                    If Not String.IsNullOrEmpty(clipDto.IconBlobPath) Then
+                                        Dim iconEntry = zip.GetEntry(clipDto.IconBlobPath)
+                                        If iconEntry IsNot Nothing Then
+                                            Using ms As New MemoryStream(), stream = iconEntry.Open()
+                                                stream.CopyTo(ms)
+                                                iconBytes = ms.ToArray()
+                                            End Using
+                                        End If
                                     End If
 
-                                    ' Insert Format Row
-                                    Using cmd As New SQLiteCommand(insertFmtSql, conn, tx)
-                                        cmd.Parameters.AddWithValue("@entryId", newClipId)
-                                        cmd.Parameters.AddWithValue("@formatId", resolvedFormatId)
-                                        cmd.Parameters.AddWithValue("@formatName", If(String.IsNullOrEmpty(fmtDto.FormatName), DBNull.Value, CObj(fmtDto.FormatName)))
-                                        cmd.Parameters.AddWithValue("@data", formatData)
-                                        cmd.ExecuteNonQuery()
+                                    ' C. Insert Clip Record & Get New ID
+                                    Dim newClipId As Integer = 0
+                                    Using cmd As New SQLiteCommand(insertClipSql, conn, tx)
+                                        cmd.Parameters.AddWithValue("@profileId", effectiveTargetProfileId)
+                                        cmd.Parameters.AddWithValue("@preview", If(String.IsNullOrEmpty(clipDto.Preview), "", clipDto.Preview))
+                                        cmd.Parameters.AddWithValue("@createdAt", createdAt)
+                                        cmd.Parameters.AddWithValue("@lastUsedAt", lastUsedAt)
+                                        cmd.Parameters.AddWithValue("@hash", clipDto.AggregateHash)
+                                        cmd.Parameters.AddWithValue("@appName", If(String.IsNullOrEmpty(clipDto.SourceAppName), DBNull.Value, CObj(clipDto.SourceAppName)))
+                                        cmd.Parameters.AddWithValue("@appPath", If(String.IsNullOrEmpty(clipDto.SourceAppPath), DBNull.Value, CObj(clipDto.SourceAppPath)))
+                                        cmd.Parameters.AddWithValue("@icon", If(iconBytes Is Nothing, DBNull.Value, CObj(iconBytes)))
+                                        cmd.Parameters.AddWithValue("@isFavorite", If(clipDto.IsFavorite, 1, 0))
+                                        cmd.Parameters.AddWithValue("@isPinned", If(clipDto.IsPinned, 1, 0))
+
+                                        newClipId = Convert.ToInt32(cmd.ExecuteScalar())
                                     End Using
 
-                                    ' Collect ClipData object for BuildPreviewFromFormats
-                                    importedFormats.Add(New ClipData With {
-                                    .FormatId = CUInt(resolvedFormatId),
-                                    .FormatName = fmtDto.FormatName,
-                                    .DataBytes = formatData
-                                })
-                            End If
-                            Next
+                                    ' D. Insert Format Blobs & Collect ClipData for Preview Generation
+                                    Dim importedFormats As New List(Of ClipData)()
 
-                            ' E. Update Preview Column if manifest didn't contain one
-                            If String.IsNullOrEmpty(clipDto.Preview) AndAlso importedFormats.Count > 0 Then
-                                Dim cleanPreview As String = BuildPreviewFromFormats(importedFormats)
-                                Using cmd As New SQLiteCommand(updatePreviewSql, conn, tx)
-                                    cmd.Parameters.AddWithValue("@preview", If(cleanPreview, ""))
-                                    cmd.Parameters.AddWithValue("@id", newClipId)
-                                    cmd.ExecuteNonQuery()
-                                End Using
-                            End If
+                                    For Each fmtDto In clipDto.Formats
+                                        Dim formatEntry = zip.GetEntry(fmtDto.BlobPath)
+                                        If formatEntry IsNot Nothing Then
+                                            Dim formatData As Byte() = Nothing
+                                            Using ms As New MemoryStream(), stream = formatEntry.Open()
+                                                stream.CopyTo(ms)
+                                                formatData = ms.ToArray()
+                                            End Using
 
-                            result.ImportedCount += 1
-                        Next
+                                            Dim resolvedFormatId As Integer = fmtDto.FormatId
+                                            If fmtDto.FormatId >= &HC000 AndAlso Not String.IsNullOrWhiteSpace(fmtDto.FormatName) Then
+                                                Dim registeredId As UInteger = Skye.WinAPI.RegisterClipboardFormat(fmtDto.FormatName)
+                                                If registeredId <> 0 Then resolvedFormatId = CInt(registeredId)
+                                            End If
 
-                        tx.Commit()
-                    Catch ex As Exception
-                        tx.Rollback()
-                        result.Success = False
-                        result.ErrorMessage = $"Database error during import: {ex.Message}"
-                    End Try
+                                            Using cmd As New SQLiteCommand(insertFmtSql, conn, tx)
+                                                cmd.Parameters.AddWithValue("@entryId", newClipId)
+                                                cmd.Parameters.AddWithValue("@formatId", resolvedFormatId)
+                                                cmd.Parameters.AddWithValue("@formatName", If(String.IsNullOrEmpty(fmtDto.FormatName), DBNull.Value, CObj(fmtDto.FormatName)))
+                                                cmd.Parameters.AddWithValue("@data", formatData)
+                                                cmd.ExecuteNonQuery()
+                                            End Using
+
+                                            importedFormats.Add(New ClipData With {
+                                                .FormatId = CUInt(resolvedFormatId),
+                                                .FormatName = fmtDto.FormatName,
+                                                .DataBytes = formatData
+                                            })
+                                        End If
+                                    Next
+
+                                    ' E. Update Preview Column if manifest didn't contain one
+                                    If String.IsNullOrEmpty(clipDto.Preview) AndAlso importedFormats.Count > 0 Then
+                                        Dim cleanPreview As String = BuildPreviewFromFormats(importedFormats)
+                                        Using cmd As New SQLiteCommand(updatePreviewSql, conn, tx)
+                                            cmd.Parameters.AddWithValue("@preview", If(cleanPreview, ""))
+                                            cmd.Parameters.AddWithValue("@id", newClipId)
+                                            cmd.ExecuteNonQuery()
+                                        End Using
+                                    End If
+
+                                    result.ImportedCount += 1
+                                Next
+
+                                tx.Commit()
+                            Catch ex As Exception
+                                tx.Rollback()
+                                result.Success = False
+                                result.ErrorMessage = $"Database error during import: {ex.Message}"
+                            End Try
+                        End Using
+                    End Using
                 End Using
-            End Using
-        End Using
 
-        Return result
+                Return result
+            End Function)
     End Function
 
 End Class
