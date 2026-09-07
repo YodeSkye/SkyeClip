@@ -1192,9 +1192,6 @@ Friend Class ClipRepository
                 For i As Integer = 0 To totalClips - 1
                     Dim c = clips(i)
 
-                    ' TEMPORARY: Slow down loop by 50ms per item for UI testing
-                    System.Threading.Thread.Sleep(50)
-
                     ' Report progress back to the UI thread
                     progress?.Report(New App.ProgressInfo With {
                             .CurrentIndex = i + 1,
