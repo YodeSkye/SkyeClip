@@ -1163,76 +1163,94 @@ Friend Class ClipRepository
     End Function
 
     ' Export/Import
-    Friend Sub ExportClips(clipIds As IEnumerable(Of Integer), destinationZipPath As String)
+    Friend Async Function ExportClipsAsync(clipIds As IEnumerable(Of Integer), destinationZipPath As String, progress As IProgress(Of App.ProgressInfo)) As Task
         Dim clips = GetClipsByIds(clipIds)
-        BuildExportZip(clips, destinationZipPath)
-    End Sub
-    Friend Sub ExportProfile(profileId As Integer, destinationZipPath As String)
+        Await BuildExportZipAsync(clips, destinationZipPath, progress)
+    End Function
+    Friend Async Function ExportProfileAsync(profileId As Integer, destinationZipPath As String, progress As IProgress(Of App.ProgressInfo)) As Task
         Dim clips = GetClipsByProfile(profileId)
-        BuildExportZip(clips, destinationZipPath)
-    End Sub
-    Friend Sub ExportAll(destinationZipPath As String)
+        Await BuildExportZipAsync(clips, destinationZipPath, progress)
+    End Function
+    Friend Async Function ExportAllAsync(destinationZipPath As String, progress As IProgress(Of App.ProgressInfo)) As Task
         Dim clips = GetAllClips()
-        BuildExportZip(clips, destinationZipPath)
-    End Sub
-    Private Sub BuildExportZip(clips As List(Of ExplorerClipInfo), destinationPath As String)
-        If File.Exists(destinationPath) Then File.Delete(destinationPath)
+        Await BuildExportZipAsync(clips, destinationZipPath, progress)
+    End Function
+    Private Async Function BuildExportZipAsync(clips As List(Of ExplorerClipInfo), destinationPath As String, progress As IProgress(Of App.ProgressInfo)) As Task
+        ' Task.Run pushes all disk IO, database queries, and ZIP creation off the UI thread
+        Await Task.Run(
+        Sub()
+            If File.Exists(destinationPath) Then File.Delete(destinationPath)
 
-        Dim manifest As New ManifestDTO With {
-        .Version = 1,
-        .ExportedAt = DateTime.UtcNow
-    }
+            Dim manifest As New ManifestDTO With {
+                .Version = 1,
+                .ExportedAt = DateTime.UtcNow
+            }
 
-        Using zip As ZipArchive = ZipFile.Open(destinationPath, ZipArchiveMode.Create)
-            For Each c In clips
-                ' Pull stored AggregateHash straight from SQLite
-                Dim clipHash As String = GetAggregateHashForClip(c.Id)
+            Dim totalClips As Integer = clips.Count
 
-                Dim clipDto As New ClipManifestDTO With {
-                    .OriginalId = c.Id,
-                    .Preview = c.Preview,
-                    .IsFavorite = c.IsFavorite,
-                    .IsPinned = c.IsPinned,
-                    .CreatedAt = c.CreatedAt,
-                    .LastUsedAt = c.LastUsedAt,
-                    .AggregateHash = clipHash,
-                    .SourceAppName = c.SourceAppName,
-                    .SourceAppPath = c.SourceAppPath
-                }
+            Using zip As ZipArchive = ZipFile.Open(destinationPath, ZipArchiveMode.Create)
+                For i As Integer = 0 To totalClips - 1
+                    Dim c = clips(i)
 
-                ' 1. Write Icon Blob (SourceAppIcon)
-                If c.SourceAppIcon IsNot Nothing AndAlso c.SourceAppIcon.Length > 0 Then
-                    Dim iconEntryName As String = $"blobs/clip_{c.Id}_icon.bin"
-                    clipDto.IconBlobPath = iconEntryName
-                    WriteBytesToZip(zip, iconEntryName, c.SourceAppIcon)
-                End If
+                    ' TEMPORARY: Slow down loop by 50ms per item for UI testing
+                    System.Threading.Thread.Sleep(50)
 
-                ' 2. Fetch & Write Format Blobs (Using GetClipFormats)
-                Dim formats As List(Of ClipData) = GetClipFormats(c.Id)
-                If formats IsNot Nothing Then
-                    For Each fmt In formats
-                        Dim fmtEntryName As String = $"blobs/clip_{c.Id}_fmt_{fmt.FormatId}.bin"
-                        WriteBytesToZip(zip, fmtEntryName, fmt.DataBytes)
+                    ' Report progress back to the UI thread
+                    progress?.Report(New App.ProgressInfo With {
+                            .CurrentIndex = i + 1,
+                            .TotalCount = totalClips,
+                            .Message = $"Exporting clip {i + 1} of {totalClips}..."
+                        })
 
-                        clipDto.Formats.Add(New FormatManifestDTO With {
-                        .FormatId = CInt(fmt.FormatId),
-                        .FormatName = fmt.FormatName,
-                        .BlobPath = fmtEntryName
-                    })
-                    Next
-                End If
+                    ' Pull stored AggregateHash straight from SQLite
+                    Dim clipHash As String = GetAggregateHashForClip(c.Id)
 
-                manifest.Clips.Add(clipDto)
-            Next
+                    Dim clipDto As New ClipManifestDTO With {
+                        .OriginalId = c.Id,
+                        .Preview = c.Preview,
+                        .IsFavorite = c.IsFavorite,
+                        .IsPinned = c.IsPinned,
+                        .CreatedAt = c.CreatedAt,
+                        .LastUsedAt = c.LastUsedAt,
+                        .AggregateHash = clipHash,
+                        .SourceAppName = c.SourceAppName,
+                        .SourceAppPath = c.SourceAppPath
+                    }
 
-            ' 3. Write manifest.json
-            Dim manifestEntry = zip.CreateEntry("manifest.json")
-            Using writer As New StreamWriter(manifestEntry.Open())
-                Dim json As String = JsonSerializer.Serialize(manifest, JSONOptions)
-                writer.Write(json)
+                    ' 1. Write Icon Blob (SourceAppIcon)
+                    If c.SourceAppIcon IsNot Nothing AndAlso c.SourceAppIcon.Length > 0 Then
+                        Dim iconEntryName As String = $"blobs/clip_{c.Id}_icon.bin"
+                        clipDto.IconBlobPath = iconEntryName
+                        WriteBytesToZip(zip, iconEntryName, c.SourceAppIcon)
+                    End If
+
+                    ' 2. Fetch & Write Format Blobs (Using GetClipFormats)
+                    Dim formats As List(Of ClipData) = GetClipFormats(c.Id)
+                    If formats IsNot Nothing Then
+                        For Each fmt In formats
+                            Dim fmtEntryName As String = $"blobs/clip_{c.Id}_fmt_{fmt.FormatId}.bin"
+                            WriteBytesToZip(zip, fmtEntryName, fmt.DataBytes)
+
+                            clipDto.Formats.Add(New FormatManifestDTO With {
+                                .FormatId = CInt(fmt.FormatId),
+                                .FormatName = fmt.FormatName,
+                                .BlobPath = fmtEntryName
+                            })
+                        Next
+                    End If
+
+                    manifest.Clips.Add(clipDto)
+                Next
+
+                ' 3. Write manifest.json
+                Dim manifestEntry = zip.CreateEntry("manifest.json")
+                Using writer As New StreamWriter(manifestEntry.Open())
+                    Dim json As String = JsonSerializer.Serialize(manifest, JSONOptions)
+                    writer.Write(json)
+                End Using
             End Using
-        End Using
-    End Sub
+        End Sub)
+    End Function
     Private Shared Sub WriteBytesToZip(zip As ZipArchive, entryName As String, data As Byte())
         Dim entry = zip.CreateEntry(entryName)
         Using stream = entry.Open()

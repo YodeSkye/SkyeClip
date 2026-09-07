@@ -317,7 +317,7 @@ Public Class ClipExplorer
         App.SaveClipToFile(clipId)
 
     End Sub
-    Private Sub CMICAExport_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAExport.MouseDown
+    Private Async Sub CMICAExport_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAExport.MouseDown
         If e.Button <> MouseButtons.Left AndAlso e.Button <> MouseButtons.Right Then Return
         If DGV.SelectedRows.Count = 0 Then Return
         CMClipActions.Close()
@@ -335,7 +335,7 @@ Public Class ClipExplorer
             sfd.Title = $"Export Selected Clips ({selectedIds.Count})"
             sfd.FileName = $"SkyeClip_Export_Selected_{DateTime.Now:yyyyMMdd_HHmmss}.zip"
             If sfd.ShowDialog(Me) = DialogResult.OK Then
-                App.Tray.repo.ExportClips(selectedIds, sfd.FileName)
+                Await App.RunWithProgressAsync("Exporting Clips...", Function(p) Tray.repo.ExportClipsAsync(selectedIds, sfd.FileName, p))
                 App.Tray.ShowToast("Export completed successfully!")
             End If
         End Using

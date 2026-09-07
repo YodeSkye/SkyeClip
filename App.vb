@@ -77,6 +77,11 @@ Friend Module App
         .Interval = 60000, ' 1 minute
         .Enabled = False
     }
+    Friend Structure ProgressInfo
+        Public Property CurrentIndex As Integer
+        Public Property TotalCount As Integer
+        Public Property Message As String
+    End Structure
 
     ' Paths
     Friend ReadOnly UserPath As String = Skye.Common.StorageManager.GetAppDirectory ' UserPath is the base path for user-specific files.
@@ -2436,6 +2441,26 @@ Friend Module App
         End Using
 
         Return bmp
+    End Function
+    ''' <summary>
+    ''' Shows a bottom-right progress toast, executes an async task off the UI thread,
+    ''' and automatically handles form updates and cleanup.
+    ''' </summary>
+    Public Async Function RunWithProgressAsync(title As String, taskFunc As Func(Of IProgress(Of App.ProgressInfo), Task)) As Task
+        Dim progressForm As New ProgressToast(title)
+        progressForm.Show()
+
+        ' Setup progress handler to route updates to the toast UI
+        Dim progress = New Progress(Of App.ProgressInfo)(Sub(info)
+                                                             progressForm.UpdateProgress(info)
+                                                         End Sub)
+
+        Try
+            Await taskFunc(progress)
+        Finally
+            progressForm.Close()
+            progressForm.Dispose()
+        End Try
     End Function
 
 End Module

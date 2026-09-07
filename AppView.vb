@@ -105,8 +105,9 @@ Friend Class AppView
         End Try
 
     End Sub
-    Private Sub BtnExport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnExport.MouseDown
+    Private Async Sub BtnExport_MouseDown(sender As Object, e As MouseEventArgs) Handles BtnExport.MouseDown
         If e.Button <> MouseButtons.Left AndAlso e.Button <> MouseButtons.Right Then Return
+
         ' 1. Freeze the Deactivate handler so AppView stays visible
         _suppressHideOnDeactivate = True
 
@@ -115,6 +116,7 @@ Friend Class AppView
                 sfd.Filter = "ZIP Archives (*.zip)|*.zip|All Files (*.*)|*.*"
                 sfd.DefaultExt = "zip"
                 sfd.AddExtension = True
+
                 If Not App.Settings.UseProfiles Then
                     sfd.Title = "Export All Clips"
                     sfd.FileName = $"SkyeClip_Export_All_{DateTime.Now:yyyyMMdd_HHmmss}.zip"
@@ -127,25 +129,28 @@ Friend Class AppView
                         sfd.FileName = $"SkyeClip_Export_All_{DateTime.Now:yyyyMMdd_HHmmss}.zip"
                     End If
                 End If
+
                 If sfd.ShowDialog(Me) = DialogResult.OK Then
+                    Dim exportPath As String = sfd.FileName
+
                     If Not App.Settings.UseProfiles Then
-                        Tray.repo.ExportAll(sfd.FileName)
+                        Await App.RunWithProgressAsync("Exporting All Clips...", Function(p) Tray.repo.ExportAllAsync(exportPath, p))
                     Else
                         If e.Button = MouseButtons.Left Then
-                            Tray.repo.ExportProfile(App.Settings.CurrentProfileID, sfd.FileName)
+                            Await App.RunWithProgressAsync("Exporting Profile...", Function(p) Tray.repo.ExportProfileAsync(App.Settings.CurrentProfileID, exportPath, p))
                         Else
-                            Tray.repo.ExportAll(sfd.FileName)
+                            Await App.RunWithProgressAsync("Exporting All Profiles...", Function(p) Tray.repo.ExportAllAsync(exportPath, p))
                         End If
                     End If
+
                     App.Tray.ShowToast("Export completed successfully!")
                 End If
             End Using
         Finally
-            ' 2. Unfreeze Deactivate handler after dialog closes
+            ' 2. Unfreeze Deactivate handler after export completes and dialog closes
             _suppressHideOnDeactivate = False
             Me.Hide()
         End Try
-
     End Sub
     Private Sub BtnLog_Click(sender As Object, e As EventArgs) Handles BtnLog.Click
         ShowLog()
