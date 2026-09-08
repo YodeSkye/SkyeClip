@@ -16,6 +16,7 @@ Public Class ClipExplorer
     Private _searchMode As App.TextSearchMode
     Private _searchCache As New Dictionary(Of Integer, String)
     Private _primaryRowIndex As Integer = -1
+    Private ReadOnly _selectionOrder As New List(Of Integer)()
     Private Class ClipLoadResult
         Public Property Rows As List(Of Object())
         Public Property TotalCount As Integer
@@ -86,6 +87,7 @@ Public Class ClipExplorer
     ' Control Events
     Private Sub DGV_SelectionChanged(sender As Object, e As EventArgs) Handles DGV.SelectionChanged
         If DGV.SelectedRows.Count = 0 Then
+            _selectionOrder.Clear()
             RTB.Text = String.Empty
             RTB.BringToFront()
             Return
@@ -126,6 +128,42 @@ Public Class ClipExplorer
         RTB.Text = preview
         RTB.BringToFront()
     End Sub
+    Private Sub DGV_CellMouseDown(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DGV.CellMouseDown
+        If e.RowIndex < 0 Then Return
+
+        Dim clipId = CInt(DGV.Rows(e.RowIndex).Cells("Id").Value)
+
+        ' 1. IF RIGHT-CLICKING: Preserve existing multi-selection
+        If e.Button = MouseButtons.Right Then
+            ' If the user right-clicked a row that is ALREADY part of our multi-selection,
+            ' do NOT clear or change the selection. Let the Context Menu open!
+            If DGV.Rows(e.RowIndex).Selected Then
+                Return
+            Else
+                ' Right-clicked outside the current selection: reset to just this row
+                _selectionOrder.Clear()
+                _selectionOrder.Add(clipId)
+                Return
+            End If
+        End If
+
+        ' 2. IF LEFT-CLICKING: Handle selection tracking
+        Dim isMultiSelect As Boolean = (Control.ModifierKeys And Keys.Control) = Keys.Control OrElse
+                                   (Control.ModifierKeys And Keys.Shift) = Keys.Shift
+
+        If Not isMultiSelect Then
+            ' Standard left-click: reset tracking
+            _selectionOrder.Clear()
+            _selectionOrder.Add(clipId)
+        Else
+            ' Ctrl/Shift left-click: add or remove
+            If _selectionOrder.Contains(clipId) Then
+                _selectionOrder.Remove(clipId)
+            Else
+                _selectionOrder.Add(clipId)
+            End If
+        End If
+    End Sub
     Private Sub DGV_CellMouseUp(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DGV.CellMouseUp
         If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Return
         If DGV.Columns(e.ColumnIndex).Name = "Pinned" Then
@@ -137,12 +175,12 @@ Public Class ClipExplorer
             App.Tray.RefreshMenu()
         ElseIf DGV.Columns(e.ColumnIndex).Name = "Favorite" Then
             Dim clipId As Integer = CInt(DGV.Rows(e.RowIndex).Cells("Id").Value)
-                Dim currentVal As Boolean = CBool(If(DGV.Rows(e.RowIndex).Cells(e.ColumnIndex).Value, False))
-                Dim newVal As Boolean = Not currentVal
-                DGV.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = newVal
-                App.Tray.repo.SetFavorite(clipId, newVal)
-                App.Tray.RefreshMenu()
-            End If
+            Dim currentVal As Boolean = CBool(If(DGV.Rows(e.RowIndex).Cells(e.ColumnIndex).Value, False))
+            Dim newVal As Boolean = Not currentVal
+            DGV.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = newVal
+            App.Tray.repo.SetFavorite(clipId, newVal)
+            App.Tray.RefreshMenu()
+        End If
     End Sub
     Private Sub CMClipActions_Opening(sender As Object, e As CancelEventArgs) Handles CMClipActions.Opening
         If DGV.SelectedRows.Count = 0 Then
@@ -172,7 +210,7 @@ Public Class ClipExplorer
         CMICAFavorite.Text = If(clip.IsFavorite, "Unfavorite", "Favorite")
 
         ' --- Open Source App ---
-        If App.Settings.ShowOpenSourceApp Then
+        If App.Settings.ShowOpenSourceApp AndAlso clip.SourceAppIcon IsNot Nothing Then
             CMICAOpenSourceApp.Visible = True
             If App.IsLegitimateSourceApp(clip.SourceAppPath) Then
                 CMICAOpenSourceApp.Enabled = True
@@ -295,6 +333,9 @@ Public Class ClipExplorer
         Dim clipId = CInt(row.Cells("Id").Value)
         App.ShowClipViewer(clipId, Nothing, Nothing, True)
 
+    End Sub
+    Private Sub CMICAMergeClips_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAMergeClips.MouseDown
+        MergeSelectedClips()
     End Sub
     Private Sub CMICAScratchPad_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAScratchPad.MouseDown
         If DGV.SelectedRows.Count = 0 Then Return
@@ -639,6 +680,53 @@ Public Class ClipExplorer
 
         Return result
     End Function
+    Public Sub MergeSelectedClips(Optional delimiter As String = vbCrLf & vbCrLf)
+        ' Filter out any leftover IDs that are no longer selected in DGV
+        Dim selectedIds As New HashSet(Of Integer)(DGV.SelectedRows.Cast(Of DataGridViewRow)().Select(Function(r) CInt(r.Cells("Id").Value)))
+        Dim orderedClipsToMerge = _selectionOrder.Where(Function(id) selectedIds.Contains(id)).ToList()
+        If orderedClipsToMerge.Count < 2 Then Return
+
+        Dim plainTextResult As String = ""
+        Dim rtfTextResult As String = ""
+
+        ' 1. Build merged payload using in-memory RichTextBox
+        Using rtb As New System.Windows.Forms.RichTextBox()
+            For i As Integer = 0 To orderedClipsToMerge.Count - 1
+                Dim id = orderedClipsToMerge(i)
+
+                ' Fetch stored clip data for this specific ID
+                Dim clipData = App.Tray.repo.GetClipFormats(id)
+
+                Dim rtfBytes = clipData.FirstOrDefault(Function(f) f.FormatName = "Rich Text Format" OrElse f.FormatId = 227UI)?.DataBytes
+                Dim unicodeBytes = clipData.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_UNICODETEXT)?.DataBytes
+
+                ' Append content
+                If rtfBytes IsNot Nothing AndAlso rtfBytes.Length > 0 Then
+                    rtb.SelectionStart = rtb.TextLength
+                    rtb.SelectedRtf = System.Text.Encoding.UTF8.GetString(rtfBytes)
+                ElseIf unicodeBytes IsNot Nothing AndAlso unicodeBytes.Length > 0 Then
+                    rtb.SelectionStart = rtb.TextLength
+                    rtb.SelectedText = System.Text.Encoding.Unicode.GetString(unicodeBytes).TrimEnd(ChrW(0))
+                End If
+
+                ' Append delimiter between entries
+                If i < orderedClipsToMerge.Count - 1 Then
+                    rtb.SelectionStart = rtb.TextLength
+                    rtb.SelectedText = delimiter
+                End If
+            Next
+
+            plainTextResult = rtb.Text
+            rtfTextResult = rtb.Rtf
+        End Using
+
+        ' 2. Save as a brand-new entry in SQLite DB
+        Dim newEntryId As Integer = App.Tray.repo.SaveMergedClip(plainTextResult, rtfTextResult)
+
+        ' 3. Restore to System Clipboard (both CF_UNICODETEXT and RTF)
+        ' Calls your existing RestoreClip method!
+        App.Tray.repo.RestoreClip(newEntryId)
+    End Sub
     Private Function GetCachedSearchText(clipId As Integer) As String
         Dim cached As String = Nothing
         If _searchCache.TryGetValue(clipId, cached) Then

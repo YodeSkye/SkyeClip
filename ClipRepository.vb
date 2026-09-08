@@ -251,6 +251,87 @@ Friend Class ClipRepository
         End Using
     End Sub
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Friend Function SaveMergedClip(plainText As String, rtfText As String) As Integer
+        ' 1. Build ClipData list for formats
+        Dim formats As New List(Of ClipData)()
+
+        ' Unicode Plain Text (CF_UNICODETEXT = 13)
+        If Not String.IsNullOrEmpty(plainText) Then
+            Dim unicodeBytes = EnsureUnicodeNull(System.Text.Encoding.Unicode.GetBytes(plainText))
+            formats.Add(New ClipData With {
+            .FormatId = Skye.WinAPI.CF_UNICODETEXT,
+            .FormatName = "CF_UNICODETEXT",
+            .DataBytes = unicodeBytes
+        })
+        End If
+
+        ' Rich Text Format
+        If Not String.IsNullOrEmpty(rtfText) Then
+            Dim rtfBytes = System.Text.Encoding.UTF8.GetBytes(rtfText)
+            Dim rtfFmtId = Skye.WinAPI.RegisterClipboardFormat("Rich Text Format")
+            formats.Add(New ClipData With {
+            .FormatId = rtfFmtId,
+            .FormatName = "Rich Text Format",
+            .DataBytes = rtfBytes
+        })
+        End If
+
+        If formats.Count = 0 Then Return -1
+
+        ' 2. Generate Preview & Timestamps
+        Dim preview As String = If(plainText.Length > App.Settings.MaxClipPreviewLength, String.Concat(plainText.AsSpan(0, App.Settings.MaxClipPreviewLength), "..."), plainText)
+        Dim nowVal As DateTime = DateTime.UtcNow
+        Dim entryId As Integer = -1
+
+        ' 3. Insert into SQLite
+        Using conn As New SQLiteConnection(App.DBConnectionString)
+            conn.Open()
+            Using trans = conn.BeginTransaction()
+
+                ' Insert parent record (Source app marked as SkyeClip)
+                Using insertCmd As New SQLiteCommand("
+                INSERT INTO Clips
+                    (ProfileID, Preview, CreatedAt, LastUsedAt, AggregateHash, HashVersion,
+                     SourceAppName, SourceAppPath, SourceAppIcon)
+                VALUES
+                    (@pid, @p, @c, @l, @hash, @hv, @app, @apppath, @icon);
+                SELECT last_insert_rowid();", conn, trans)
+
+                    insertCmd.Parameters.AddWithValue("@pid", App.Settings.CurrentProfileID)
+                    insertCmd.Parameters.AddWithValue("@p", preview)
+                    insertCmd.Parameters.AddWithValue("@c", nowVal)
+                    insertCmd.Parameters.AddWithValue("@l", nowVal)
+                    insertCmd.Parameters.AddWithValue("@hash", "MERGED_" & Guid.NewGuid().ToString("N"))
+                    insertCmd.Parameters.AddWithValue("@hv", App.Hash.CurrentHashVersion)
+                    insertCmd.Parameters.AddWithValue("@app", "SkyeClip (Merged)")
+                    insertCmd.Parameters.AddWithValue("@apppath", Application.ExecutablePath)
+                    insertCmd.Parameters.Add("@icon", DbType.Binary).Value = DBNull.Value
+
+                    entryId = Convert.ToInt32(insertCmd.ExecuteScalar())
+                End Using
+
+                ' Insert child formats
+                For Each cd In formats
+                    Using fmtCmd As New SQLiteCommand("
+                    INSERT INTO ClipFormats (EntryId, FormatId, FormatName, Data)
+                    VALUES (@e, @fid, @fname, @data)", conn, trans)
+
+                        fmtCmd.Parameters.AddWithValue("@e", entryId)
+                        fmtCmd.Parameters.AddWithValue("@fid", cd.FormatId)
+                        fmtCmd.Parameters.AddWithValue("@fname", If(cd.FormatName, ""))
+                        fmtCmd.Parameters.Add("@data", DbType.Binary).Value = cd.DataBytes
+                        fmtCmd.ExecuteNonQuery()
+                    End Using
+                Next
+
+                trans.Commit()
+            End Using
+        End Using
+
+        Skye.Common.Log.Write("Merged Clip Saved: ID=" & entryId)
+        Return entryId
+    End Function
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
     Friend Sub TogglePinned(clipID As Integer)
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()

@@ -40,6 +40,16 @@ Partial Class ClipExplorer
         TxtBoxSearch = New TextBox()
         SplitContainerCE = New SplitContainer()
         DGV = New DataGridView()
+        ID = New DataGridViewTextBoxColumn()
+        ProfileID = New DataGridViewTextBoxColumn()
+        ProfileName = New DataGridViewTextBoxColumn()
+        Preview = New DataGridViewTextBoxColumn()
+        CreatedDate = New DataGridViewTextBoxColumn()
+        LastUsedDate = New DataGridViewTextBoxColumn()
+        SourceApp = New DataGridViewTextBoxColumn()
+        SourceAppImage = New DataGridViewImageColumn()
+        Pinned = New DataGridViewCheckBoxColumn()
+        Favorite = New DataGridViewCheckBoxColumn()
         CMClipActions = New ContextMenuStrip(components)
         CMICAUseClip = New ToolStripMenuItem()
         CMIUseClipAndToSetCurrentProfile = New ToolStripMenuItem()
@@ -61,16 +71,7 @@ Partial Class ClipExplorer
         ILFileDrop = New ImageList(components)
         RTB = New Skye.UI.RichTextBox()
         TipClipExplorer = New Skye.UI.ToolTipEX(components)
-        ID = New DataGridViewTextBoxColumn()
-        ProfileID = New DataGridViewTextBoxColumn()
-        ProfileName = New DataGridViewTextBoxColumn()
-        Preview = New DataGridViewTextBoxColumn()
-        CreatedDate = New DataGridViewTextBoxColumn()
-        LastUsedDate = New DataGridViewTextBoxColumn()
-        SourceApp = New DataGridViewTextBoxColumn()
-        SourceAppImage = New DataGridViewImageColumn()
-        Pinned = New DataGridViewCheckBoxColumn()
-        Favorite = New DataGridViewCheckBoxColumn()
+        CMICAMergeClips = New ToolStripMenuItem()
         StatusStripCE.SuspendLayout()
         PanelCE.SuspendLayout()
         GrpBoxSearch.SuspendLayout()
@@ -304,13 +305,93 @@ Partial Class ClipExplorer
         DGV.TabIndex = 0
         TipClipExplorer.SetText(DGV, Nothing)
         ' 
+        ' ID
+        ' 
+        ID.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        ID.HeaderText = "ID"
+        ID.Name = "ID"
+        ID.ReadOnly = True
+        ID.Width = 50
+        ' 
+        ' ProfileID
+        ' 
+        ProfileID.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        ProfileID.HeaderText = "PID"
+        ProfileID.Name = "ProfileID"
+        ProfileID.ReadOnly = True
+        ProfileID.Visible = False
+        ' 
+        ' ProfileName
+        ' 
+        ProfileName.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        ProfileName.HeaderText = "Profile"
+        ProfileName.Name = "ProfileName"
+        ProfileName.ReadOnly = True
+        ProfileName.Width = 80
+        ' 
+        ' Preview
+        ' 
+        Preview.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        Preview.HeaderText = "Preview"
+        Preview.Name = "Preview"
+        Preview.ReadOnly = True
+        Preview.Width = 90
+        ' 
+        ' CreatedDate
+        ' 
+        CreatedDate.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        CreatedDate.HeaderText = "Created"
+        CreatedDate.Name = "CreatedDate"
+        CreatedDate.ReadOnly = True
+        CreatedDate.Width = 89
+        ' 
+        ' LastUsedDate
+        ' 
+        LastUsedDate.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        LastUsedDate.HeaderText = "Last Used"
+        LastUsedDate.Name = "LastUsedDate"
+        LastUsedDate.ReadOnly = True
+        LastUsedDate.Width = 102
+        ' 
+        ' SourceApp
+        ' 
+        SourceApp.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        SourceApp.HeaderText = "Source App"
+        SourceApp.Name = "SourceApp"
+        SourceApp.ReadOnly = True
+        SourceApp.Width = 115
+        ' 
+        ' SourceAppImage
+        ' 
+        SourceAppImage.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        SourceAppImage.HeaderText = "Icon"
+        SourceAppImage.Name = "SourceAppImage"
+        SourceAppImage.ReadOnly = True
+        SourceAppImage.Width = 45
+        ' 
+        ' Pinned
+        ' 
+        Pinned.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        Pinned.HeaderText = "Pin"
+        Pinned.Name = "Pinned"
+        Pinned.ReadOnly = True
+        Pinned.Width = 38
+        ' 
+        ' Favorite
+        ' 
+        Favorite.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+        Favorite.HeaderText = "Fav"
+        Favorite.Name = "Favorite"
+        Favorite.ReadOnly = True
+        Favorite.Width = 39
+        ' 
         ' CMClipActions
         ' 
         CMClipActions.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.SetImage(CMClipActions, Nothing)
-        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, CMIUseClipAndToSetCurrentProfile, CMIMoveClipsToCurrentProfile, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAScratchPad, CMICASaveAs, CMICAExport, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
+        CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, CMIUseClipAndToSetCurrentProfile, CMIMoveClipsToCurrentProfile, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAMergeClips, CMICAScratchPad, CMICASaveAs, CMICAExport, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
         CMClipActions.Name = "CMClipActions"
-        CMClipActions.Size = New Size(277, 236)
+        CMClipActions.Size = New Size(277, 280)
         TipClipExplorer.SetText(CMClipActions, Nothing)
         ' 
         ' CMICAUseClip
@@ -461,86 +542,11 @@ Partial Class ClipExplorer
         TipClipExplorer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.ShadowThickness = 0
         ' 
-        ' ID
+        ' CMICAMergeClips
         ' 
-        ID.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        ID.HeaderText = "ID"
-        ID.Name = "ID"
-        ID.ReadOnly = True
-        ID.Width = 50
-        ' 
-        ' ProfileID
-        ' 
-        ProfileID.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        ProfileID.HeaderText = "PID"
-        ProfileID.Name = "ProfileID"
-        ProfileID.ReadOnly = True
-        ProfileID.Visible = False
-        ProfileID.Width = 59
-        ' 
-        ' ProfileName
-        ' 
-        ProfileName.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        ProfileName.HeaderText = "Profile"
-        ProfileName.Name = "ProfileName"
-        ProfileName.ReadOnly = True
-        ProfileName.Width = 80
-        ' 
-        ' Preview
-        ' 
-        Preview.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        Preview.HeaderText = "Preview"
-        Preview.Name = "Preview"
-        Preview.ReadOnly = True
-        Preview.Width = 90
-        ' 
-        ' CreatedDate
-        ' 
-        CreatedDate.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        CreatedDate.HeaderText = "Created"
-        CreatedDate.Name = "CreatedDate"
-        CreatedDate.ReadOnly = True
-        CreatedDate.Width = 89
-        ' 
-        ' LastUsedDate
-        ' 
-        LastUsedDate.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        LastUsedDate.HeaderText = "Last Used"
-        LastUsedDate.Name = "LastUsedDate"
-        LastUsedDate.ReadOnly = True
-        LastUsedDate.Width = 102
-        ' 
-        ' SourceApp
-        ' 
-        SourceApp.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        SourceApp.HeaderText = "Source App"
-        SourceApp.Name = "SourceApp"
-        SourceApp.ReadOnly = True
-        SourceApp.Width = 115
-        ' 
-        ' SourceAppImage
-        ' 
-        SourceAppImage.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        SourceAppImage.HeaderText = "Icon"
-        SourceAppImage.Name = "SourceAppImage"
-        SourceAppImage.ReadOnly = True
-        SourceAppImage.Width = 45
-        ' 
-        ' Pinned
-        ' 
-        Pinned.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        Pinned.HeaderText = "Pin"
-        Pinned.Name = "Pinned"
-        Pinned.ReadOnly = True
-        Pinned.Width = 38
-        ' 
-        ' Favorite
-        ' 
-        Favorite.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-        Favorite.HeaderText = "Fav"
-        Favorite.Name = "Favorite"
-        Favorite.ReadOnly = True
-        Favorite.Width = 39
+        CMICAMergeClips.Name = "CMICAMergeClips"
+        CMICAMergeClips.Size = New Size(276, 22)
+        CMICAMergeClips.Text = "Merge Clips"
         ' 
         ' ClipExplorer
         ' 
@@ -621,4 +627,5 @@ Partial Class ClipExplorer
     Friend WithEvents SourceAppImage As DataGridViewImageColumn
     Friend WithEvents Pinned As DataGridViewCheckBoxColumn
     Friend WithEvents Favorite As DataGridViewCheckBoxColumn
+    Friend WithEvents CMICAMergeClips As ToolStripMenuItem
 End Class

@@ -238,7 +238,7 @@ Friend Class TrayAppContext
                         Dim clip = repo.GetClipById(ClipCMCurrentClipId)
                         Dim openItem = DirectCast(ClipCM.Items("OpenSourceApp"), ToolStripMenuItem)
                         openItem.Visible = True
-                        If App.IsLegitimateSourceApp(clip.SourceAppPath) Then
+                        If App.IsLegitimateSourceApp(clip.SourceAppPath) AndAlso clip.SourceAppIcon IsNot Nothing Then
                             openItem.Enabled = True
                             Using ms As New MemoryStream(clip.SourceAppIcon)
                                 openItem.Image = Image.FromStream(ms)

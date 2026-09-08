@@ -8,6 +8,9 @@ Module Startup
 
     <STAThread>
     Friend Sub Main()
+        AddHandler Application.ThreadException, AddressOf OnUIThreadException
+        AddHandler AppDomain.CurrentDomain.UnhandledException, AddressOf OnUnhandledException
+        Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException)
 
         ' SINGLE INSTANCE CHECK
 #If DEBUG Then
@@ -117,6 +120,31 @@ Module Startup
             Catch
             End Try
         End Try
+    End Sub
+
+    Private Sub OnUIThreadException(sender As Object, e As ThreadExceptionEventArgs)
+        Dim ex = e.Exception
+        Try
+            Skye.Common.Log.Write($"UNHANDLED UI EXCEPTION: {ex}")
+        Catch
+        End Try
+        MessageBox.Show($"An unexpected error occurred:" & vbCrLf & vbCrLf & ex.Message & vbCrLf & vbCrLf &
+                    "Details have been logged. The application will attempt to remain open.",
+                    $"{Application.ProductName} - Unhandled Exception",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error)
+    End Sub
+    Private Sub OnUnhandledException(sender As Object, e As UnhandledExceptionEventArgs)
+        Dim ex As Exception = TryCast(e.ExceptionObject, Exception)
+        Dim exMessage As String = If(ex IsNot Nothing, ex.Message, "Unknown system error.")
+        Try
+            Skye.Common.Log.Write($"CRITICAL DOMAIN EXCEPTION (IsTerminating={e.IsTerminating}): {ex}")
+        Catch
+        End Try
+        MessageBox.Show($"A critical background error occurred:" & vbCrLf & vbCrLf & exMessage,
+                    $"{Application.ProductName} - Fatal Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error)
     End Sub
 
     Friend Sub ExitApp()
