@@ -57,6 +57,7 @@ Partial Class ClipExplorer
         ToolStripSeparator1 = New ToolStripSeparator()
         CMICAFavorite = New ToolStripMenuItem()
         CMICAClipViewer = New ToolStripMenuItem()
+        CMICAMergeClips = New ToolStripMenuItem()
         CMICAScratchPad = New ToolStripMenuItem()
         CMICASaveAs = New ToolStripMenuItem()
         CMICAExport = New ToolStripMenuItem()
@@ -71,7 +72,6 @@ Partial Class ClipExplorer
         ILFileDrop = New ImageList(components)
         RTB = New Skye.UI.RichTextBox()
         TipClipExplorer = New Skye.UI.ToolTipEX(components)
-        CMICAMergeClips = New ToolStripMenuItem()
         StatusStripCE.SuspendLayout()
         PanelCE.SuspendLayout()
         GrpBoxSearch.SuspendLayout()
@@ -434,6 +434,13 @@ Partial Class ClipExplorer
         CMICAClipViewer.Size = New Size(276, 22)
         CMICAClipViewer.Text = "Clip Viewer"
         ' 
+        ' CMICAMergeClips
+        ' 
+        CMICAMergeClips.Image = My.Resources.Resources.ImageMerge16
+        CMICAMergeClips.Name = "CMICAMergeClips"
+        CMICAMergeClips.Size = New Size(276, 22)
+        CMICAMergeClips.Text = "Merge Clips"
+        ' 
         ' CMICAScratchPad
         ' 
         CMICAScratchPad.Image = My.Resources.Resources.imageScratchPad16
@@ -541,12 +548,6 @@ Partial Class ClipExplorer
         ' 
         TipClipExplorer.Font = New Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         TipClipExplorer.ShadowThickness = 0
-        ' 
-        ' CMICAMergeClips
-        ' 
-        CMICAMergeClips.Name = "CMICAMergeClips"
-        CMICAMergeClips.Size = New Size(276, 22)
-        CMICAMergeClips.Text = "Merge Clips"
         ' 
         ' ClipExplorer
         ' 
