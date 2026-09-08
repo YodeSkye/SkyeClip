@@ -128,35 +128,44 @@ Public Class ClipExplorer
         RTB.Text = preview
         RTB.BringToFront()
     End Sub
+    Private Sub DGV_CellMouseEnter(sender As Object, e As DataGridViewCellEventArgs) Handles DGV.CellMouseEnter
+        ' Only track if mouse left button is currently pressed down and row is valid
+        If e.RowIndex < 0 OrElse Control.MouseButtons <> MouseButtons.Left Then Return
+
+        Dim clipId = CInt(DGV.Rows(e.RowIndex).Cells("Id").Value)
+
+        ' If this row is not yet in our sequence list, append it in the exact order swept
+        If Not _selectionOrder.Contains(clipId) Then
+            _selectionOrder.Add(clipId)
+        End If
+    End Sub
     Private Sub DGV_CellMouseDown(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DGV.CellMouseDown
         If e.RowIndex < 0 Then Return
 
         Dim clipId = CInt(DGV.Rows(e.RowIndex).Cells("Id").Value)
 
-        ' 1. IF RIGHT-CLICKING: Preserve existing multi-selection
+        ' RIGHT-CLICK: Preserve existing multi-selection if clicking inside it
         If e.Button = MouseButtons.Right Then
-            ' If the user right-clicked a row that is ALREADY part of our multi-selection,
-            ' do NOT clear or change the selection. Let the Context Menu open!
             If DGV.Rows(e.RowIndex).Selected Then
-                Return
+                Return ' Leave selection and _selectionOrder untouched!
             Else
-                ' Right-clicked outside the current selection: reset to just this row
+                ' Right-clicked outside current selection: reset to clicked row
+                DGV.ClearSelection()
+                DGV.Rows(e.RowIndex).Selected = True
                 _selectionOrder.Clear()
                 _selectionOrder.Add(clipId)
                 Return
             End If
         End If
 
-        ' 2. IF LEFT-CLICKING: Handle selection tracking
+        ' LEFT-CLICK: Track order
         Dim isMultiSelect As Boolean = (Control.ModifierKeys And Keys.Control) = Keys.Control OrElse
                                    (Control.ModifierKeys And Keys.Shift) = Keys.Shift
 
         If Not isMultiSelect Then
-            ' Standard left-click: reset tracking
             _selectionOrder.Clear()
             _selectionOrder.Add(clipId)
         Else
-            ' Ctrl/Shift left-click: add or remove
             If _selectionOrder.Contains(clipId) Then
                 _selectionOrder.Remove(clipId)
             Else
@@ -208,6 +217,10 @@ Public Class ClipExplorer
         ' --- Favorite toggle ---
         CMICAFavorite.Checked = clip.IsFavorite
         CMICAFavorite.Text = If(clip.IsFavorite, "Unfavorite", "Favorite")
+
+        ' --- Merge Clips ---
+        SyncSelectionOrder()
+        CMICAMergeClips.Visible = (_selectionOrder.Count >= 2)
 
         ' --- Open Source App ---
         If App.Settings.ShowOpenSourceApp AndAlso clip.SourceAppIcon IsNot Nothing Then
@@ -335,6 +348,7 @@ Public Class ClipExplorer
 
     End Sub
     Private Sub CMICAMergeClips_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAMergeClips.MouseDown
+        SyncSelectionOrder()
         MergeSelectedClips()
     End Sub
     Private Sub CMICAScratchPad_MouseDown(sender As Object, e As MouseEventArgs) Handles CMICAScratchPad.MouseDown
@@ -540,11 +554,23 @@ Public Class ClipExplorer
                 profileName = If(p IsNot Nothing, p.Name, "Unknown")
             End If
 
+            ' Extract App Icon (with fallback for Merged clips / missing icons)
             Dim iconImg As Image = Nothing
             If c.SourceAppIcon IsNot Nothing AndAlso c.SourceAppIcon.Length > 0 Then
-                Using ms As New MemoryStream(c.SourceAppIcon)
-                    iconImg = Image.FromStream(ms)
-                End Using
+                Try
+                    Using ms As New MemoryStream(c.SourceAppIcon)
+                        ' Create a standalone Bitmap copy so GDI doesn't crash when MemoryStream disposes
+                        Using tempImg = Image.FromStream(ms)
+                            iconImg = New Bitmap(tempImg)
+                        End Using
+                    End Using
+                Catch ex As Exception
+                    ' Fallback if byte buffer is corrupted or invalid
+                    iconImg = My.Resources.ImageApp16
+                End Try
+            Else
+                ' Default icon for Merged clips, no icon, or unknown applications
+                iconImg = My.Resources.ImageApp16
             End If
 
             rows.Add({
@@ -680,7 +706,7 @@ Public Class ClipExplorer
 
         Return result
     End Function
-    Public Sub MergeSelectedClips(Optional delimiter As String = vbCrLf & vbCrLf)
+    Private Sub MergeSelectedClips(Optional delimiter As String = vbCrLf & vbCrLf)
         ' Filter out any leftover IDs that are no longer selected in DGV
         Dim selectedIds As New HashSet(Of Integer)(DGV.SelectedRows.Cast(Of DataGridViewRow)().Select(Function(r) CInt(r.Cells("Id").Value)))
         Dim orderedClipsToMerge = _selectionOrder.Where(Function(id) selectedIds.Contains(id)).ToList()
@@ -726,6 +752,27 @@ Public Class ClipExplorer
         ' 3. Restore to System Clipboard (both CF_UNICODETEXT and RTF)
         ' Calls your existing RestoreClip method!
         App.Tray.repo.RestoreClip(newEntryId)
+    End Sub
+    Private Sub SyncSelectionOrder()
+        ' 1. Get all currently selected Clip IDs from the DataGridView UI
+        Dim currentlySelectedIds As New HashSet(Of Integer)(
+            DGV.SelectedRows.Cast(Of DataGridViewRow)().
+            Where(Function(r) r.Cells("Id").Value IsNot Nothing).
+            Select(Function(r) CInt(r.Cells("Id").Value))
+        )
+
+        ' 2. Remove any IDs from _selectionOrder that are no longer selected in the grid
+        _selectionOrder.RemoveAll(Function(id) Not currentlySelectedIds.Contains(id))
+
+        ' 3. Fallback: Add any selected rows that were missed, sorting them by physical RowIndex 
+        ' to preserve a natural top-to-bottom flow if mouse tracking missed one
+        Dim missedRows = DGV.SelectedRows.Cast(Of DataGridViewRow)().
+        Where(Function(r) r.Cells("Id").Value IsNot Nothing AndAlso Not _selectionOrder.Contains(CInt(r.Cells("Id").Value))).
+        OrderBy(Function(r) r.Index)
+
+        For Each row In missedRows
+            _selectionOrder.Add(CInt(row.Cells("Id").Value))
+        Next
     End Sub
     Private Function GetCachedSearchText(clipId As Integer) As String
         Dim cached As String = Nothing

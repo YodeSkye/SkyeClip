@@ -279,7 +279,7 @@ Friend Class ClipRepository
         If formats.Count = 0 Then Return -1
 
         ' 2. Generate Preview & Timestamps
-        Dim preview As String = If(plainText.Length > App.Settings.MaxClipPreviewLength, String.Concat(plainText.AsSpan(0, App.Settings.MaxClipPreviewLength), "..."), plainText)
+        Dim preview As String = App.BuildTextPreview(formats, formats(0))
         Dim nowVal As DateTime = DateTime.UtcNow
         Dim entryId As Integer = -1
 
@@ -303,7 +303,7 @@ Friend Class ClipRepository
                     insertCmd.Parameters.AddWithValue("@l", nowVal)
                     insertCmd.Parameters.AddWithValue("@hash", "MERGED_" & Guid.NewGuid().ToString("N"))
                     insertCmd.Parameters.AddWithValue("@hv", App.Hash.CurrentHashVersion)
-                    insertCmd.Parameters.AddWithValue("@app", "SkyeClip (Merged)")
+                    insertCmd.Parameters.AddWithValue("@app", App.CBMergedString)
                     insertCmd.Parameters.AddWithValue("@apppath", Application.ExecutablePath)
                     insertCmd.Parameters.Add("@icon", DbType.Binary).Value = DBNull.Value
 

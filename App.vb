@@ -43,6 +43,7 @@ Friend Module App
     Friend ReadOnly CBUnknownFormatString As String = "< Unknown Format >"
     Friend ReadOnly CBRTFSuffix As String = " <RTF>"
     Friend ReadOnly CBHTMLSuffix As String = " <HTML>"
+    Friend ReadOnly CBMergedString As String = "SkyeClip (Merged)"
     Friend ReadOnly MenuFont As New Font("Segoe UI", 12, FontStyle.Regular) ' MenuFont is the font used for context menus.
     Friend ReadOnly MenuFontBold As New Font("Segoe UI", 12, FontStyle.Bold) ' MenuFontBold is the bold font used for context menus.
     Friend ReadOnly AttributionSkye As String = "https://github.com/YodeSkye/SkyeClip" ' AttributionSkye is the URL for the SkyeClip project.
@@ -1277,11 +1278,8 @@ Friend Module App
         Dim f0 = formats.First()
         Return If(String.IsNullOrWhiteSpace(f0.FormatName), App.CBUnknownFormatString, f0.FormatName)
 
-
-        'Dim f0 = formats.First()
-        'Return If(String.IsNullOrWhiteSpace(f0.FormatName), $"Format {f0.FormatId}", f0.FormatName)
     End Function
-    Private Function BuildTextPreview(formats As List(Of ClipData), uni As ClipData) As String
+    Friend Function BuildTextPreview(formats As List(Of ClipData), uni As ClipData) As String
         Dim s = Encoding.Unicode.GetString(Skye.Common.TrimUnicodeNull(uni.DataBytes))
 
         ' Normalize whitespace
@@ -1296,8 +1294,6 @@ Friend Module App
         Dim preview = Skye.Common.Trunc(s, App.Settings.MaxClipPreviewLength)
 
         ' Detect RTF/HTML
-        'Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").ToLower().Contains("rtf"))
-        'Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").ToLower().Contains("html"))
         Dim hasRtf As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_RTF OrElse (f.FormatName & "").Contains("rtf", StringComparison.OrdinalIgnoreCase))
         Dim hasHtml As Boolean = formats.Any(Function(f) f.FormatId = Skye.WinAPI.CF_HTML OrElse (f.FormatName & "").Contains("html", StringComparison.OrdinalIgnoreCase))
         If hasRtf Then preview &= App.CBRTFSuffix

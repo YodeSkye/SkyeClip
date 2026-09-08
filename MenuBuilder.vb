@@ -54,10 +54,20 @@ Public Class MenuBuilder
                     .Font = App.MenuFont
                 }
 
+                ' Extract App Icon for Menu Item (with fallback for Merged clips / missing icons)
                 If clip.SourceAppIcon IsNot Nothing AndAlso clip.SourceAppIcon.Length > 0 Then
-                    Using ms As New IO.MemoryStream(clip.SourceAppIcon)
-                        item.Image = Image.FromStream(ms)
-                    End Using
+                    Try
+                        Using ms As New IO.MemoryStream(clip.SourceAppIcon)
+                            Using tempImg = Image.FromStream(ms)
+                                item.Image = New Bitmap(tempImg)
+                            End Using
+                        End Using
+                    Catch ex As Exception
+                        item.Image = My.Resources.ImageApp16
+                    End Try
+                Else
+                    ' Covers merged clips, unknown applications, and missing bytes uniformly
+                    item.Image = My.Resources.ImageApp16
                 End If
 
                 AddHandler item.MouseDown, clipClickHandler
