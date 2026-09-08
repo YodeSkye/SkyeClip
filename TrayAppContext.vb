@@ -175,7 +175,6 @@ Friend Class TrayAppContext
 
     ' Handlers
     Private Sub OnClipboardChanged()
-        'Debug.Print(App.SuppressNextClipboardEvent.ToString)
         If App.SuppressNextClipboardEvent Then
             App.SuppressNextClipboardEvent = False
             UpdateUI()
@@ -217,7 +216,8 @@ Friend Class TrayAppContext
             Case MouseButtons.Left
                 Dim clipID As Integer
                 If Not Integer.TryParse(item.Tag.ToString(), clipID) Then Exit Sub
-                repo.RestoreClip(clipID)
+                Dim isShiftHeld As Boolean = (Control.ModifierKeys And Keys.Shift) = Keys.Shift
+                repo.RestoreClip(clipID, isShiftHeld)
                 BuildMenu()
             Case MouseButtons.Right
                 If Integer.TryParse(item.Tag.ToString(), ClipCMCurrentClipId) Then

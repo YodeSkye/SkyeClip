@@ -351,46 +351,50 @@ Friend Class ClipRepository
         End Using
     End Function
     <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
-    Friend Sub RestoreClip(entryId As Integer)
+    Friend Sub RestoreClip(entryId As Integer, Optional plainTextOnly As Boolean = False)
 
-        ' ---------------------------------------------------------
         ' 1. Mark Suppress var ON for the next clipboard event
-        ' ---------------------------------------------------------
         App.SuppressNextClipboardEvent = True
-        'Debug.Print("setting App.IsRestoring to True")
 
-        ' ---------------------------------------------------------
         ' 2. Load stored formats for this entry
-        ' ---------------------------------------------------------
         Dim formats As New List(Of ClipData)
-
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
-
-            Using cmd As New SQLiteCommand("
-                SELECT FormatId, IFNULL(FormatName,''), Data
-                FROM ClipFormats
-                WHERE EntryId=@id", conn)
-
+            Dim sql As String = "SELECT FormatId, IFNULL(FormatName,''), Data " &
+                        "FROM ClipFormats " &
+                        "WHERE EntryId=@id"
+            If plainTextOnly Then
+                ' Include Unicode, ANSI, and OEM text IDs in the DB query
+                sql &= $" AND FormatId IN ({Skye.WinAPI.CF_UNICODETEXT}, {Skye.WinAPI.CF_TEXT}, {Skye.WinAPI.CF_OEMTEXT})"
+            End If
+            Using cmd As New SQLiteCommand(sql, conn)
                 cmd.Parameters.AddWithValue("@id", entryId)
-
                 Using r = cmd.ExecuteReader()
                     While r.Read()
                         formats.Add(New ClipData With {
-                            .FormatId = CUInt(r.GetInt32(0)),
-                            .FormatName = r.GetString(1),
-                            .DataBytes = DirectCast(r("Data"), Byte())
-                        })
+                    .FormatId = CUInt(r.GetInt32(0)),
+                    .FormatName = r.GetString(1),
+                    .DataBytes = DirectCast(r("Data"), Byte())
+                })
                     End While
                 End Using
             End Using
         End Using
-
+        If plainTextOnly Then
+            ' 1. Look for standard Unicode text, falling back to ANSI / OEM if missing
+            Dim selectedFormat = If(formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_UNICODETEXT), formats.FirstOrDefault(Function(f) f.FormatId = Skye.WinAPI.CF_TEXT OrElse f.FormatId = Skye.WinAPI.CF_OEMTEXT))
+            ' Swap formats list with only the selected plain text format
+            formats.Clear()
+            If selectedFormat IsNot Nothing Then
+                formats.Add(selectedFormat)
+            Else
+                ' Entry contains no text formats (e.g. Image or File Drop)
+                Exit Sub
+            End If
+        End If
         If formats.Count = 0 Then Exit Sub
 
-        ' ---------------------------------------------------------
         ' 3. Defensive fixups for text formats
-        ' ---------------------------------------------------------
         For Each cd In formats
             If cd.FormatId = Skye.WinAPI.CF_UNICODETEXT Then
                 cd.DataBytes = EnsureUnicodeNull(cd.DataBytes)
@@ -399,11 +403,8 @@ Friend Class ClipRepository
             End If
         Next
 
-        ' ---------------------------------------------------------
         ' 4. Open clipboard and replay formats
-        ' ---------------------------------------------------------
         If Not Skye.WinAPI.OpenClipboard(App.AppHandle) Then Exit Sub
-
         Try
             Skye.WinAPI.EmptyClipboard()
 
@@ -460,17 +461,13 @@ Friend Class ClipRepository
             Skye.WinAPI.CloseClipboard()
         End Try
 
-        ' ---------------------------------------------------------
         ' 5. Promote clip (update LastUsedAt)
-        ' ---------------------------------------------------------
         Using conn As New SQLiteConnection(App.DBConnectionString)
             conn.Open()
-
             Using cmd As New SQLiteCommand("
                 UPDATE Clips
                 SET LastUsedAt = @now
                 WHERE Id = @id", conn)
-
                 cmd.Parameters.AddWithValue("@now", DateTime.UtcNow)
                 cmd.Parameters.AddWithValue("@id", entryId)
                 cmd.ExecuteNonQuery()

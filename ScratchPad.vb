@@ -424,7 +424,6 @@ Friend Class ScratchPad
     Private Sub CopyPlain()
         If RTB.SelectionLength = 0 Then Return
 
-        ' Clipboard.SetText(RTB.SelectedText, TextDataFormat.UnicodeText)
         Dim data As New DataObject()
         data.SetData(DataFormats.UnicodeText, RTB.SelectedText)
         Clipboard.SetDataObject(data, True)
