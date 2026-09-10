@@ -85,49 +85,6 @@ Public Class ClipExplorer
     End Sub
 
     ' Control Events
-    Private Sub DGV_SelectionChanged(sender As Object, e As EventArgs) Handles DGV.SelectionChanged
-        If DGV.SelectedRows.Count = 0 Then
-            _selectionOrder.Clear()
-            RTB.Text = String.Empty
-            RTB.BringToFront()
-            Return
-        End If
-
-        Dim row = DGV.SelectedRows(0)
-        Dim clipId = CInt(row.Cells("Id").Value)
-        Dim formats = App.Tray.repo.GetClipFormats(clipId)
-
-        ' Detect FileDrop
-        Dim fileDrop = formats.FirstOrDefault(Function(f) f.FormatName = "FileDrop")
-        If fileDrop IsNot Nothing Then
-            ' Show FileDrop preview
-            Dim entries = App.ParseFileDrop(fileDrop.DataBytes)
-            ShowFileDrop(entries)
-            LVFileDrop.BringToFront()
-            Return
-        End If
-
-        ' Detect Image formats
-        Dim img = formats.FirstOrDefault(Function(f) _
-            f.FormatId = Skye.WinAPI.CF_DIB OrElse
-            f.FormatId = Skye.WinAPI.CF_DIBV5 OrElse
-            f.FormatId = Skye.WinAPI.CF_BITMAP OrElse
-            f.FormatName.Contains("PNG", StringComparison.OrdinalIgnoreCase) OrElse
-            f.FormatName.Contains("JFIF", StringComparison.OrdinalIgnoreCase) OrElse
-            f.FormatName.Contains("JPEG", StringComparison.OrdinalIgnoreCase) OrElse
-            f.FormatName.Contains("JPG", StringComparison.OrdinalIgnoreCase) OrElse
-            f.FormatName.Contains("Bitmap", StringComparison.OrdinalIgnoreCase) OrElse
-            f.FormatName.Contains("DeviceIndependentBitmap", StringComparison.OrdinalIgnoreCase))
-        If img IsNot Nothing Then
-            ShowImage(img.DataBytes, img)
-            Return
-        End If
-
-        ' Otherwise show text/HTML/RTF preview
-        Dim preview = BuildPreviewText(formats)
-        RTB.Text = preview
-        RTB.BringToFront()
-    End Sub
     Private Sub DGV_CellMouseEnter(sender As Object, e As DataGridViewCellEventArgs) Handles DGV.CellMouseEnter
         ' Only track if mouse left button is currently pressed down and row is valid
         If e.RowIndex < 0 OrElse Control.MouseButtons <> MouseButtons.Left Then Return
@@ -190,6 +147,49 @@ Public Class ClipExplorer
             App.Tray.repo.SetFavorite(clipId, newVal)
             App.Tray.RefreshMenu()
         End If
+    End Sub
+    Private Sub DGV_SelectionChanged(sender As Object, e As EventArgs) Handles DGV.SelectionChanged
+        If DGV.SelectedRows.Count = 0 Then
+            _selectionOrder.Clear()
+            RTB.Text = String.Empty
+            RTB.BringToFront()
+            Return
+        End If
+
+        Dim row = DGV.SelectedRows(0)
+        Dim clipId = CInt(row.Cells("Id").Value)
+        Dim formats = App.Tray.repo.GetClipFormats(clipId)
+
+        ' Detect FileDrop
+        Dim fileDrop = formats.FirstOrDefault(Function(f) f.FormatName = "FileDrop")
+        If fileDrop IsNot Nothing Then
+            ' Show FileDrop preview
+            Dim entries = App.ParseFileDrop(fileDrop.DataBytes)
+            ShowFileDrop(entries)
+            LVFileDrop.BringToFront()
+            Return
+        End If
+
+        ' Detect Image formats
+        Dim img = formats.FirstOrDefault(Function(f) _
+            f.FormatId = Skye.WinAPI.CF_DIB OrElse
+            f.FormatId = Skye.WinAPI.CF_DIBV5 OrElse
+            f.FormatId = Skye.WinAPI.CF_BITMAP OrElse
+            f.FormatName.Contains("PNG", StringComparison.OrdinalIgnoreCase) OrElse
+            f.FormatName.Contains("JFIF", StringComparison.OrdinalIgnoreCase) OrElse
+            f.FormatName.Contains("JPEG", StringComparison.OrdinalIgnoreCase) OrElse
+            f.FormatName.Contains("JPG", StringComparison.OrdinalIgnoreCase) OrElse
+            f.FormatName.Contains("Bitmap", StringComparison.OrdinalIgnoreCase) OrElse
+            f.FormatName.Contains("DeviceIndependentBitmap", StringComparison.OrdinalIgnoreCase))
+        If img IsNot Nothing Then
+            ShowImage(img.DataBytes, img)
+            Return
+        End If
+
+        ' Otherwise show text/HTML/RTF preview
+        Dim preview = BuildPreviewText(formats)
+        RTB.Text = preview
+        RTB.BringToFront()
     End Sub
     Private Sub CMClipActions_Opening(sender As Object, e As CancelEventArgs) Handles CMClipActions.Opening
         If DGV.SelectedRows.Count = 0 Then
