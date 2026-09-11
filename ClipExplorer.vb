@@ -523,7 +523,8 @@ Public Class ClipExplorer
             DGV.Rows.Add(r)
         Next
 
-        TSSLabelStatus.Text = $"Showing {result.FilteredCount} of {result.TotalCount} Clips"
+        Dim profiletext As String = If(Not Me.ChkBoxShowAll.Checked AndAlso App.Settings.UseProfiles, $"in {App.Settings.GetProfileName(App.Settings.CurrentProfileID)}", "Total")
+        TSSLabelStatus.Text = $"Showing {result.FilteredCount} of {result.TotalCount} {If(result.TotalCount = 1, "Clip", "Clips")} {profiletext}"
         TSSLabelStatus.ResetForeColor()
     End Sub
     Private Function BuildClipList() As ClipLoadResult

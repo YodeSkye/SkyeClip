@@ -391,7 +391,7 @@ Partial Class ClipExplorer
         TipClipExplorer.SetImage(CMClipActions, Nothing)
         CMClipActions.Items.AddRange(New ToolStripItem() {CMICAUseClip, CMIUseClipAndToSetCurrentProfile, CMIMoveClipsToCurrentProfile, ToolStripSeparator1, CMICAFavorite, CMICAClipViewer, CMICAMergeClips, CMICAScratchPad, CMICASaveAs, CMICAExport, CMICAOpenSourceApp, ToolStripSeparator2, CMICADelete})
         CMClipActions.Name = "CMClipActions"
-        CMClipActions.Size = New Size(277, 280)
+        CMClipActions.Size = New Size(277, 258)
         TipClipExplorer.SetText(CMClipActions, Nothing)
         ' 
         ' CMICAUseClip
