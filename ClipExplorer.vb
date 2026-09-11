@@ -104,9 +104,8 @@ Public Class ClipExplorer
         ' RIGHT-CLICK: Preserve existing multi-selection if clicking inside it
         If e.Button = MouseButtons.Right Then
             If DGV.Rows(e.RowIndex).Selected Then
-                Return ' Leave selection and _selectionOrder untouched!
+                Return
             Else
-                ' Right-clicked outside current selection: reset to clicked row
                 DGV.ClearSelection()
                 DGV.Rows(e.RowIndex).Selected = True
                 _selectionOrder.Clear()
@@ -115,19 +114,44 @@ Public Class ClipExplorer
             End If
         End If
 
-        ' LEFT-CLICK: Track order
-        Dim isMultiSelect As Boolean = (Control.ModifierKeys And Keys.Control) = Keys.Control OrElse
-                                   (Control.ModifierKeys And Keys.Shift) = Keys.Shift
+        ' LEFT-CLICK
+        Dim isCtrl As Boolean = (Control.ModifierKeys And Keys.Control) = Keys.Control
+        Dim isShift As Boolean = (Control.ModifierKeys And Keys.Shift) = Keys.Shift
 
-        If Not isMultiSelect Then
-            _selectionOrder.Clear()
-            _selectionOrder.Add(clipId)
-        Else
+        If isShift AndAlso _selectionOrder.Count > 0 Then
+            ' 1. Get anchor row index (the last active selection before pressing Shift)
+            Dim lastSelectedId = _selectionOrder.Last()
+            Dim anchorRow = DGV.Rows.Cast(Of DataGridViewRow)().FirstOrDefault(Function(r) CInt(r.Cells("Id").Value) = lastSelectedId)
+
+            If anchorRow IsNot Nothing Then
+                Dim startIdx As Integer = anchorRow.Index
+                Dim endIdx As Integer = e.RowIndex
+
+                ' Determine direction (top-to-bottom or bottom-to-top)
+                Dim stepVal As Integer = If(startIdx <= endIdx, 1, -1)
+
+                ' Walk every row in physical sequence and append to _selectionOrder
+                For i As Integer = startIdx To endIdx Step stepVal
+                    Dim rowId = CInt(DGV.Rows(i).Cells("Id").Value)
+                    If Not _selectionOrder.Contains(rowId) Then
+                        _selectionOrder.Add(rowId)
+                    End If
+                Next
+                Return
+            End If
+        End If
+
+        If isCtrl Then
+            ' Ctrl+Click: Toggle individual row
             If _selectionOrder.Contains(clipId) Then
                 _selectionOrder.Remove(clipId)
             Else
                 _selectionOrder.Add(clipId)
             End If
+        Else
+            ' Standard Left-Click: Reset sequence
+            _selectionOrder.Clear()
+            _selectionOrder.Add(clipId)
         End If
     End Sub
     Private Sub DGV_CellMouseUp(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DGV.CellMouseUp
