@@ -64,12 +64,18 @@ Partial Class Settings
         LblThemeAutoBadge = New Skye.UI.Label()
         LblThemeBadge = New Skye.UI.Label()
         PanelClips = New Panel()
+        BtnDBPerformMaintenance = New Button()
+        LblDBSize = New Skye.UI.Label()
+        LblDBLocation = New Skye.UI.Label()
+        LblDBMaintenance = New Skye.UI.Label()
         LblPlaySoundWithNotifyBadge = New Skye.UI.Label()
         LblNotifyOnNewClipBadge = New Skye.UI.Label()
         LblBlinkOnNewClipBadge = New Skye.UI.Label()
         LblMaxClipPreviewLengthBadge = New Skye.UI.Label()
         LblMaxClipsBadge = New Skye.UI.Label()
         PanelHotKeys = New Panel()
+        TxtBoxHotKeyTogglePin = New TextBox()
+        LblHotKeyTogglePin = New Label()
         PanelBackup = New Panel()
         PanelControls = New Panel()
         PanelProfiles = New Panel()
@@ -88,8 +94,6 @@ Partial Class Settings
         ColCondition = New ColumnHeader()
         ColAction = New ColumnHeader()
         ColSummary = New ColumnHeader()
-        TxtBoxHotKeyTogglePin = New TextBox()
-        LblHotKeyTogglePin = New Label()
         PanelPageSelector.SuspendLayout()
         PanelGeneral.SuspendLayout()
         PanelClips.SuspendLayout()
@@ -558,6 +562,10 @@ Partial Class Settings
         ' 
         ' PanelClips
         ' 
+        PanelClips.Controls.Add(BtnDBPerformMaintenance)
+        PanelClips.Controls.Add(LblDBSize)
+        PanelClips.Controls.Add(LblDBLocation)
+        PanelClips.Controls.Add(LblDBMaintenance)
         PanelClips.Controls.Add(LblPlaySoundWithNotifyBadge)
         PanelClips.Controls.Add(LblNotifyOnNewClipBadge)
         PanelClips.Controls.Add(LblBlinkOnNewClipBadge)
@@ -576,11 +584,57 @@ Partial Class Settings
         PanelClips.Controls.Add(ChkBoxBlinkOnNewClip)
         PanelClips.Controls.Add(LblMaxClipsBadge)
         TipSettings.SetImage(PanelClips, Nothing)
-        PanelClips.Location = New Point(99, 146)
+        PanelClips.Location = New Point(93, 0)
         PanelClips.Name = "PanelClips"
-        PanelClips.Size = New Size(170, 98)
+        PanelClips.Size = New Size(435, 440)
         PanelClips.TabIndex = 1112
         TipSettings.SetText(PanelClips, Nothing)
+        ' 
+        ' BtnDBPerformMaintenance
+        ' 
+        TipSettings.SetImage(BtnDBPerformMaintenance, Nothing)
+        BtnDBPerformMaintenance.Location = New Point(14, 363)
+        BtnDBPerformMaintenance.Name = "BtnDBPerformMaintenance"
+        BtnDBPerformMaintenance.Size = New Size(242, 32)
+        BtnDBPerformMaintenance.TabIndex = 1114
+        TipSettings.SetText(BtnDBPerformMaintenance, Nothing)
+        BtnDBPerformMaintenance.Text = "Compact && Optimize Database"
+        BtnDBPerformMaintenance.UseVisualStyleBackColor = True
+        ' 
+        ' LblDBSize
+        ' 
+        TipSettings.SetImage(LblDBSize, Nothing)
+        LblDBSize.Location = New Point(16, 333)
+        LblDBSize.Name = "LblDBSize"
+        LblDBSize.Size = New Size(406, 23)
+        LblDBSize.TabIndex = 1113
+        LblDBSize.Text = "Size"
+        TipSettings.SetText(LblDBSize, Nothing)
+        LblDBSize.TextAlign = ContentAlignment.MiddleLeft
+        ' 
+        ' LblDBLocation
+        ' 
+        LblDBLocation.AutoEllipsis = True
+        TipSettings.SetImage(LblDBLocation, Nothing)
+        LblDBLocation.Location = New Point(16, 306)
+        LblDBLocation.Name = "LblDBLocation"
+        LblDBLocation.Size = New Size(406, 23)
+        LblDBLocation.TabIndex = 1112
+        LblDBLocation.Text = "Location"
+        TipSettings.SetText(LblDBLocation, "Location")
+        LblDBLocation.TextAlign = ContentAlignment.MiddleLeft
+        ' 
+        ' LblDBMaintenance
+        ' 
+        LblDBMaintenance.Font = New Font("Segoe UI", 12F, FontStyle.Underline, GraphicsUnit.Point, CByte(0))
+        TipSettings.SetImage(LblDBMaintenance, Nothing)
+        LblDBMaintenance.Location = New Point(16, 279)
+        LblDBMaintenance.Name = "LblDBMaintenance"
+        LblDBMaintenance.Size = New Size(277, 23)
+        LblDBMaintenance.TabIndex = 1111
+        LblDBMaintenance.Text = "Database Storage && Maintenance"
+        TipSettings.SetText(LblDBMaintenance, Nothing)
+        LblDBMaintenance.TextAlign = ContentAlignment.MiddleLeft
         ' 
         ' LblPlaySoundWithNotifyBadge
         ' 
@@ -654,6 +708,30 @@ Partial Class Settings
         PanelHotKeys.Size = New Size(435, 440)
         PanelHotKeys.TabIndex = 1113
         TipSettings.SetText(PanelHotKeys, Nothing)
+        ' 
+        ' TxtBoxHotKeyTogglePin
+        ' 
+        TxtBoxHotKeyTogglePin.BorderStyle = BorderStyle.FixedSingle
+        TipSettings.SetImage(TxtBoxHotKeyTogglePin, My.Resources.Resources.ImageFavorites16)
+        TxtBoxHotKeyTogglePin.Location = New Point(146, 106)
+        TxtBoxHotKeyTogglePin.Name = "TxtBoxHotKeyTogglePin"
+        TxtBoxHotKeyTogglePin.ReadOnly = True
+        TxtBoxHotKeyTogglePin.ShortcutsEnabled = False
+        TxtBoxHotKeyTogglePin.Size = New Size(144, 29)
+        TxtBoxHotKeyTogglePin.TabIndex = 1103
+        TipSettings.SetText(TxtBoxHotKeyTogglePin, "Key or Key Combination to use on the tray menu to Favorite a clip.")
+        TxtBoxHotKeyTogglePin.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' LblHotKeyTogglePin
+        ' 
+        TipSettings.SetImage(LblHotKeyTogglePin, Nothing)
+        LblHotKeyTogglePin.Location = New Point(144, 85)
+        LblHotKeyTogglePin.Name = "LblHotKeyTogglePin"
+        LblHotKeyTogglePin.Size = New Size(146, 24)
+        LblHotKeyTogglePin.TabIndex = 1102
+        LblHotKeyTogglePin.Text = "Toggle Pin"
+        TipSettings.SetText(LblHotKeyTogglePin, Nothing)
+        LblHotKeyTogglePin.TextAlign = ContentAlignment.TopCenter
         ' 
         ' PanelBackup
         ' 
@@ -852,39 +930,15 @@ Partial Class Settings
         ColSummary.Text = "Summary"
         ColSummary.Width = 350
         ' 
-        ' TxtBoxHotKeyTogglePin
-        ' 
-        TxtBoxHotKeyTogglePin.BorderStyle = BorderStyle.FixedSingle
-        TipSettings.SetImage(TxtBoxHotKeyTogglePin, My.Resources.Resources.ImageFavorites16)
-        TxtBoxHotKeyTogglePin.Location = New Point(146, 106)
-        TxtBoxHotKeyTogglePin.Name = "TxtBoxHotKeyTogglePin"
-        TxtBoxHotKeyTogglePin.ReadOnly = True
-        TxtBoxHotKeyTogglePin.ShortcutsEnabled = False
-        TxtBoxHotKeyTogglePin.Size = New Size(144, 29)
-        TxtBoxHotKeyTogglePin.TabIndex = 1103
-        TipSettings.SetText(TxtBoxHotKeyTogglePin, "Key or Key Combination to use on the tray menu to Favorite a clip.")
-        TxtBoxHotKeyTogglePin.TextAlign = HorizontalAlignment.Center
-        ' 
-        ' LblHotKeyTogglePin
-        ' 
-        TipSettings.SetImage(LblHotKeyTogglePin, Nothing)
-        LblHotKeyTogglePin.Location = New Point(144, 85)
-        LblHotKeyTogglePin.Name = "LblHotKeyTogglePin"
-        LblHotKeyTogglePin.Size = New Size(146, 24)
-        LblHotKeyTogglePin.TabIndex = 1102
-        LblHotKeyTogglePin.Text = "Toggle Pin"
-        TipSettings.SetText(LblHotKeyTogglePin, Nothing)
-        LblHotKeyTogglePin.TextAlign = ContentAlignment.TopCenter
-        ' 
         ' Settings
         ' 
         AutoScaleDimensions = New SizeF(9F, 21F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(528, 531)
+        Controls.Add(PanelClips)
         Controls.Add(PanelHotKeys)
         Controls.Add(PanelAutomation)
         Controls.Add(PanelGeneral)
-        Controls.Add(PanelClips)
         Controls.Add(PanelProfiles)
         Controls.Add(PanelBackup)
         Controls.Add(PanelControls)
@@ -981,4 +1035,8 @@ Partial Class Settings
     Friend WithEvents PanelRule As Panel
     Friend WithEvents TxtBoxHotKeyTogglePin As TextBox
     Friend WithEvents LblHotKeyTogglePin As Label
+    Friend WithEvents LblDBMaintenance As Skye.UI.Label
+    Friend WithEvents LblDBSize As Skye.UI.Label
+    Friend WithEvents BtnDBPerformMaintenance As Button
+    Private WithEvents LblDBLocation As Skye.UI.Label
 End Class

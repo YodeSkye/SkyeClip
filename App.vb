@@ -1520,6 +1520,48 @@ Friend Module App
             End Using
         End Using
     End Sub
+    Friend Function GetDatabaseStorageSummary() As String
+        Dim dbFile As New IO.FileInfo(App.DBPath)
+
+        ' Fallback if database file doesn't exist yet
+        If Not dbFile.Exists Then Return "Database Size: 0.00 MB (0% fragmented)"
+
+        Dim size As String = Skye.Common.FormatFileSize(dbFile.Length, Skye.Common.FormatFileSizeUnits.Auto)
+        Dim totalPages As Long = 0
+        Dim freePages As Long = 0
+        Dim fragmentationPercent As Double = 0.0
+
+        Try
+            Using conn As New SQLiteConnection(App.DBConnectionString)
+                conn.Open()
+                Using cmd = conn.CreateCommand()
+                    ' Fetch total page count
+                    cmd.CommandText = "PRAGMA page_count;"
+                    Dim totalObj = cmd.ExecuteScalar()
+                    If totalObj IsNot Nothing AndAlso totalObj IsNot DBNull.Value Then
+                        totalPages = Convert.ToInt64(totalObj)
+                    End If
+
+                    ' Fetch unallocated/freelist page count
+                    cmd.CommandText = "PRAGMA freelist_count;"
+                    Dim freeObj = cmd.ExecuteScalar()
+                    If freeObj IsNot Nothing AndAlso freeObj IsNot DBNull.Value Then
+                        freePages = Convert.ToInt64(freeObj)
+                    End If
+
+                    ' Calculate fragmentation percentage
+                    If totalPages > 0 Then
+                        fragmentationPercent = (CDbl(freePages) / CDbl(totalPages)) * 100.0
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            Debug.WriteLine($"[Database Stats Error] {ex.Message}")
+        End Try
+
+        ' Format output: e.g., "Database Size: 4.25 MB (12.5% fragmented)"
+        Return $"Database Size: {size} ({fragmentationPercent:F1}% fragmented)"
+    End Function
 
     ' Clip Functions
     Friend Function BuildLiveClipboardPreview() As String

@@ -306,6 +306,9 @@ Public Class Settings
         App.Tray.repo.PurgeClips(cutoff)
         App.Tray.RefreshMenu()
     End Sub
+    Private Sub BtnDBPerformMaintenance_Click(sender As Object, e As EventArgs) Handles BtnDBPerformMaintenance.Click
+
+    End Sub
     Private Sub BtnBackupNow_Click(sender As Object, e As EventArgs) Handles BtnBackupNow.Click
         App.BackupManual()
     End Sub
@@ -668,6 +671,9 @@ Public Class Settings
             LVProfiles.Items.Add(lvi)
         Next
         RefreshRuleList()
+        LblDBLocation.Text = "Location: " & App.DBPath
+        TipSettings.SetText(LblDBLocation, App.DBPath)
+        LblDBSize.Text = App.GetDatabaseStorageSummary
 
         If App.Settings.UseProfiles Then
             LblThemeBadge.Visible = True
