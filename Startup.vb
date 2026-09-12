@@ -35,8 +35,8 @@ Module Startup
             Return
         End If
 
+        ' INITIALIZE APPLICATION LOGGING & REGISTRY
         Try
-            ' INITIALIZE APPLICATION LOGGING & REGISTRY
 #If DEBUG Then
             Skye.Common.Log.Initialize(App.GetAssemblyName() & "DEV") ' Use separate log file for debug builds
             Skye.Common.RegistryHelper.BaseKey = "Software\" + App.GetAssemblyName + "DEV" ' Use separate registry key for debug builds
@@ -80,6 +80,7 @@ Module Startup
             App.LoadScratchPadText()
             Text.Encoding.RegisterProvider(Text.CodePagesEncodingProvider.Instance) ' Allows use of Windows-1252 character encoding, needed for Scratch Pad Proper Case function.
 
+            App.InitializeDatabaseOnStartup()
             App.WarmUpDataTable() ' Pre-load DataTable to improve performance and stop errors when it's first used in the app.
 
             ' START APPLICATION
@@ -120,6 +121,7 @@ Module Startup
             Catch
             End Try
         End Try
+
     End Sub
 
     Private Sub OnUIThreadException(sender As Object, e As ThreadExceptionEventArgs)

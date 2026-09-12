@@ -1,5 +1,6 @@
 ﻿
 Imports System.ComponentModel
+Imports System.Data.SQLite
 Imports System.IO
 Imports System.IO.Compression
 Imports System.Net.NetworkInformation
@@ -95,7 +96,11 @@ Friend Module App
     Friend ReadOnly DBPath As String = UserPath & Application.ProductName & "Clipboard.db" 'DatabasePath is the path to the SQLite database file.
     Friend ReadOnly ScratchPadPath As String = UserPath & Application.ProductName & "ScratchPad.rtf" 'ScratchPadPath is the path to the ScratchPad KeepText RTF file.
 #End If
-    Friend ReadOnly DBConnectionString As String = "Data Source=" & DBPath & ";Version=3;"
+    Public ReadOnly Property DBConnectionString As String
+        Get
+            Return $"Data Source={DBPath};Version=3;Synchronous=Normal;"
+        End Get
+    End Property
 
     ' Settings
     Friend Class Settings
@@ -1063,7 +1068,271 @@ Friend Module App
         Next
     End Sub
 
-    ' FORMS
+    ' METHODS
+    Friend Function GetEnumDescription(value As [Enum]) As String
+        Dim fi = value.GetType().GetField(value.ToString())
+        Dim attributes = CType(fi.GetCustomAttributes(GetType(DescriptionAttribute), False), DescriptionAttribute())
+
+        If attributes IsNot Nothing AndAlso attributes.Length > 0 Then
+            Return attributes(0).Description
+        End If
+
+        Return value.ToString()
+    End Function
+    Friend Function GetAssemblyName() As String
+        Dim asm = Assembly.GetExecutingAssembly()
+        Dim name = asm.GetName().Name
+
+        If Not String.IsNullOrEmpty(name) Then
+            Return name
+        End If
+
+        ' Fallback: use the EXE filename
+        Return IO.Path.GetFileNameWithoutExtension(Application.ExecutablePath)
+    End Function
+    Friend Function GetAppTitle() As String
+        Dim asm = Assembly.GetExecutingAssembly()
+        Dim attr = asm.GetCustomAttribute(Of AssemblyTitleAttribute)()
+
+        If attr IsNot Nothing AndAlso Not String.IsNullOrEmpty(attr.Title) Then
+            Return attr.Title
+        End If
+
+        ' Fallback: use the EXE filename
+        Return IO.Path.GetFileNameWithoutExtension(Application.ExecutablePath)
+    End Function
+    Friend Function GetAppDescription() As String
+        Dim asm = Assembly.GetExecutingAssembly()
+        Dim attr = asm.GetCustomAttribute(Of AssemblyDescriptionAttribute)()
+
+        If attr IsNot Nothing AndAlso Not String.IsNullOrEmpty(attr.Description) Then
+            Return attr.Description
+        End If
+
+        ' Fallback: use the EXE filename
+        Return IO.Path.GetFileNameWithoutExtension(Application.ExecutablePath)
+    End Function
+    Friend Function GetSimpleVersion() As String
+        Dim ver = Assembly.GetExecutingAssembly().GetName().Version
+        GetSimpleVersion = ver.Major.ToString & "." & ver.Minor.ToString
+    End Function
+    Friend Function GetFullVersion() As String
+        Dim ver = Assembly.GetExecutingAssembly().GetName().Version
+        GetFullVersion = ver.Major.ToString & "." & ver.Minor.ToString & "." & ver.Build.ToString
+    End Function
+    Friend Function ResizeImage(src As Image, size As Integer) As Image
+        Dim bmp As New Bitmap(size, size)
+        Using g = Graphics.FromImage(bmp)
+            g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+            g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+            g.DrawImage(src, New Rectangle(0, 0, size, size))
+        End Using
+        Return bmp
+    End Function
+    Friend Function IsAutoStartEnabled() As Boolean
+        Dim runKey As String = "Software\Microsoft\Windows\CurrentVersion\Run"
+        Dim value As String = Skye.Common.RegistryHelper.GetStringFromHKCU(runKey, "SkyeClip", String.Empty)
+        Return Not String.IsNullOrEmpty(value)
+    End Function
+    Friend Sub SetAutoStart()
+        If Settings.AutoStartWithWindows Then
+            Dim runKey As String = "Software\Microsoft\Windows\CurrentVersion\Run"
+            Dim exePath As String = """" & Application.ExecutablePath & """"
+            Skye.Common.RegistryHelper.SetStringInHKCU(runKey, "SkyeClip", exePath)
+        Else
+            Dim runKey As String = "Software\Microsoft\Windows\CurrentVersion\Run"
+            Skye.Common.RegistryHelper.DeleteValueInHKCU(runKey, "SkyeClip")
+        End If
+    End Sub
+    Friend Function DetectWindowsTheme() As SkyeTheme
+        Const keyPath As String = "Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+        Using key = Registry.CurrentUser.OpenSubKey(keyPath)
+            Dim light As Integer = CInt(key.GetValue("AppsUseLightTheme", 1))
+            If light = 1 Then
+                Return Skye.UI.SkyeThemes.Light
+            Else
+                Return Skye.UI.SkyeThemes.Dark
+            End If
+        End Using
+    End Function
+    Friend Sub CheckForUpdatesIfNeeded()
+        Dim last = App.Settings.LastUpdateCheck.Date
+        Dim today = Date.Today
+
+        If last = today Then
+            ' Already checked today — use cached version
+            Exit Sub
+        End If
+
+        ' Not checked today — fetch fresh version
+        Dim latest = FetchLatestVersion()
+        If latest IsNot Nothing Then
+            App.Settings.LatestKnownVersion = latest
+            App.Settings.LastUpdateCheck = DateTime.Now
+            App.Settings.Save()
+        End If
+
+    End Sub
+    Private Function FetchLatestVersion() As String
+        Try
+            Using client As New Net.Http.HttpClient()
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeClip")
+                Dim versionText As String = client.GetStringAsync("https://raw.githubusercontent.com/yodeskye/SkyeClip/master/publishedversion.txt").Result
+                Debug.Print("Fetched Latest Version: " & versionText.Trim())
+                Return versionText.Trim()
+            End Using
+        Catch
+            Return Nothing
+        End Try
+    End Function
+    Friend Function IsNewerVersion(latest As String) As Boolean
+        Try
+            Dim vCurrent As New Version(GetFullVersion())
+            Dim vLatest As New Version(latest)
+            Debug.Print("Comparing Versions: Current=" & vCurrent.ToString() & " Latest=" & vLatest.ToString())
+            Return vLatest > vCurrent
+        Catch
+            Return False
+        End Try
+    End Function
+    Friend Function GetScratchPadProfiledPath(Optional profileID As Integer = -1) As String
+        Dim base As String = App.ScratchPadPath
+        Dim dir As String = IO.Path.GetDirectoryName(base)
+        Dim name As String = IO.Path.GetFileNameWithoutExtension(base)
+        Dim ext As String = IO.Path.GetExtension(base)
+
+        ' If no profileID was passed, use the current profile
+        If profileID = -1 Then
+            profileID = App.Settings.CurrentProfileID
+        End If
+
+        ' If profiles are enabled, return the profiled path
+        If App.Settings.UseProfiles Then
+            Return IO.Path.Combine(dir, $"{name}{profileID}{ext}")
+        End If
+
+        ' Otherwise return the global path
+        Return base
+    End Function
+    Friend Sub LoadScratchPadText()
+        Dim path = GetScratchPadProfiledPath()
+        If App.Settings.ScratchPadKeepText AndAlso IO.File.Exists(path) Then
+            App.ScratchPadText = IO.File.ReadAllText(path)
+        Else
+            App.ScratchPadText = String.Empty
+        End If
+    End Sub
+    Friend Sub WarmUpDataTable()
+        Dim dt As New DataTable()
+        dt.Columns.Add("Warmup", GetType(Integer))
+        dt.Rows.Add(1)
+    End Sub
+    Friend Function BuildProfiledTrayIcon(baseIcon As Icon, themeColor As Color) As Icon
+        Dim bmp As New Bitmap(16, 16, Imaging.PixelFormat.Format32bppArgb)
+
+        Using g = Graphics.FromImage(bmp)
+            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+            g.Clear(Color.Transparent)
+
+            ' Draw the original icon
+            g.DrawImage(baseIcon.ToBitmap(), 0, 0, 16, 16)
+
+            ' === border ===
+            'Using pen As New Pen(themeColor, 1)
+            '    g.DrawRectangle(pen, 0, 0, 15, 15)
+            'End Using
+
+            ' === Dot in upper-left ===
+            Dim dotSize As Integer = 8
+            Dim dotRect As New Rectangle(0, 0, dotSize, dotSize)
+            Using brush As New SolidBrush(themeColor)
+                g.FillEllipse(brush, dotRect)
+            End Using
+
+        End Using
+
+        ' Convert bitmap → icon
+        Dim hIcon = bmp.GetHicon()
+        Return Icon.FromHandle(hIcon)
+    End Function
+    Friend Function CreatePinBadgeIcon() As Bitmap
+        Dim bmp As New Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppArgb)
+
+        Using g As Graphics = Graphics.FromImage(bmp)
+            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+            ' 1. Clear background to fully transparent
+            g.Clear(Color.Transparent)
+            ' 2. Target the bottom-right corner (X: 7-15, Y: 7-15)
+            ' Draw pin head (Red accent with dark border for contrast)
+            ' With Opaque, high-contrast tweak
+            Using borderPen As New Pen(Color.FromArgb(255, 20, 20, 20), 1.0F),
+                  headBrush As New SolidBrush(Color.FromArgb(255, 230, 40, 40)), ' Bold Red
+                  needlePen As New Pen(Color.FromArgb(255, 220, 220, 220), 1.5F)
+                ' Draw needle pointing down-left
+                g.DrawLine(needlePen, 10, 10, 7, 13)
+                ' Draw pin head circle
+                g.FillEllipse(headBrush, 9, 7, 6, 6)
+                g.DrawEllipse(borderPen, 9, 7, 6, 6)
+                ' Tiny white highlight spot on head
+                g.FillEllipse(Brushes.White, 10, 8, 2, 2)
+            End Using
+        End Using
+
+        Return bmp
+    End Function
+    Friend Function CreatePinMenuIcon() As Bitmap
+        Dim bmp As New Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppArgb)
+
+        Using g As Graphics = Graphics.FromImage(bmp)
+            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+            g.Clear(Color.Transparent)
+
+            Using bodyBrush As New SolidBrush(Color.FromArgb(255, 230, 40, 40)),
+              borderPen As New Pen(Color.FromArgb(255, 30, 30, 30), 1.0F),
+              needlePen As New Pen(Color.FromArgb(255, 180, 180, 180), 1.5F),
+              collarBrush As New SolidBrush(Color.FromArgb(255, 180, 30, 30))
+
+                ' 1. Needle (Moved Y-start south 1px to 9.0, 9.0 for perfect center alignment)
+                g.DrawLine(needlePen, 9.0F, 9.0F, 3.0F, 15.0F)
+
+                ' 2. Collar / Base ring under head
+                g.FillEllipse(collarBrush, 5.5F, 7.5F, 5.0F, 5.0F)
+                g.DrawEllipse(borderPen, 5.5F, 7.5F, 5.0F, 5.0F)
+
+                ' 3. Main Rounded Pin Head
+                g.FillEllipse(bodyBrush, 7.0F, 2.0F, 8.0F, 8.0F)
+                g.DrawEllipse(borderPen, 7.0F, 2.0F, 8.0F, 8.0F)
+
+                ' 4. Specular Highlight
+                g.FillEllipse(Brushes.White, 8.5F, 3.5F, 2.5F, 2.5F)
+            End Using
+        End Using
+
+        Return bmp
+    End Function
+    ''' <summary>
+    ''' Shows a bottom-right progress toast, executes an async task off the UI thread,
+    ''' and automatically handles form updates and cleanup.
+    ''' </summary>
+    Public Async Function RunWithProgressAsync(title As String, taskFunc As Func(Of IProgress(Of App.ProgressInfo), Task)) As Task
+        Dim progressForm As New ProgressToast(title)
+        progressForm.Show()
+
+        ' Setup progress handler to route updates to the toast UI
+        Dim progress = New Progress(Of App.ProgressInfo)(Sub(info)
+                                                             progressForm.UpdateProgress(info)
+                                                         End Sub)
+
+        Try
+            Await taskFunc(progress)
+        Finally
+            progressForm.Close()
+            progressForm.Dispose()
+        End Try
+    End Function
+
+    ' Forms
     Friend Sub ShowClipExplorer()
         If FrmClipExplorer Is Nothing OrElse FrmClipExplorer.IsDisposed Then
             FrmClipExplorer = New ClipExplorer()
@@ -1234,7 +1503,25 @@ Friend Module App
         End If
     End Sub
 
-    ' CLIP FUNCTIONS
+    ' Database
+    Friend Sub InitializeDatabaseOnStartup()
+        Using conn As New SQLiteConnection(DBConnectionString)
+            conn.Open()
+            Using cmd = conn.CreateCommand()
+                ' Writes WAL mode to the DB header once
+                cmd.CommandText = "PRAGMA journal_mode=WAL;"
+                cmd.ExecuteNonQuery()
+                ' Quick sanity check
+                cmd.CommandText = "PRAGMA quick_check;"
+                Dim result As String = Convert.ToString(cmd.ExecuteScalar())
+                If result <> "ok" Then
+                    Skye.Common.Log.Write($"DATABASE WARNING on Startup Quick Check: {result}")
+                End If
+            End Using
+        End Using
+    End Sub
+
+    ' Clip Functions
     Friend Function BuildLiveClipboardPreview() As String
         Dim data = TryClipboard(Function() Clipboard.GetDataObject())
         If data Is Nothing OrElse data.GetFormats().Length = 0 Then
@@ -1541,7 +1828,7 @@ Friend Module App
         Return cleaned.Trim()
     End Function
 
-    ' SAVE TO FILE
+    ' Save To File
     Friend Sub SaveClipToFile(clipId As Integer)
         Dim formats = App.Tray.repo.GetClipFormats(clipId)
         If formats Is Nothing OrElse formats.Count = 0 Then
@@ -1798,7 +2085,7 @@ Friend Module App
         Next
     End Sub
 
-    ' BACKUP SYSTEM
+    ' Backup System
     Friend Sub BackupManual()
         Dim fileName As String = $"{Application.ProductName}{devFileTag}_Backup_{DateTime.Now:yyyyMMdd_HHmmss}.db"
         Dim path As String = IO.Path.Combine(App.UserPath, fileName)
@@ -1880,7 +2167,7 @@ Friend Module App
         End Select
     End Function
 
-    ' RULES & AUTOMATION
+    ' Rules & Automation
     Private Sub UpdateAppContext()
         Dim proc = GetActiveProcessName()
         Dim title = GetActiveWindowTitle()
@@ -2194,269 +2481,5 @@ Friend Module App
         Rules.Remove(rule)
         SaveAllRulesToRegistry()
     End Sub
-
-    ' METHODS
-    Friend Function GetEnumDescription(value As [Enum]) As String
-        Dim fi = value.GetType().GetField(value.ToString())
-        Dim attributes = CType(fi.GetCustomAttributes(GetType(DescriptionAttribute), False), DescriptionAttribute())
-
-        If attributes IsNot Nothing AndAlso attributes.Length > 0 Then
-            Return attributes(0).Description
-        End If
-
-        Return value.ToString()
-    End Function
-    Friend Function GetAssemblyName() As String
-        Dim asm = Assembly.GetExecutingAssembly()
-        Dim name = asm.GetName().Name
-
-        If Not String.IsNullOrEmpty(name) Then
-            Return name
-        End If
-
-        ' Fallback: use the EXE filename
-        Return IO.Path.GetFileNameWithoutExtension(Application.ExecutablePath)
-    End Function
-    Friend Function GetAppTitle() As String
-        Dim asm = Assembly.GetExecutingAssembly()
-        Dim attr = asm.GetCustomAttribute(Of AssemblyTitleAttribute)()
-
-        If attr IsNot Nothing AndAlso Not String.IsNullOrEmpty(attr.Title) Then
-            Return attr.Title
-        End If
-
-        ' Fallback: use the EXE filename
-        Return IO.Path.GetFileNameWithoutExtension(Application.ExecutablePath)
-    End Function
-    Friend Function GetAppDescription() As String
-        Dim asm = Assembly.GetExecutingAssembly()
-        Dim attr = asm.GetCustomAttribute(Of AssemblyDescriptionAttribute)()
-
-        If attr IsNot Nothing AndAlso Not String.IsNullOrEmpty(attr.Description) Then
-            Return attr.Description
-        End If
-
-        ' Fallback: use the EXE filename
-        Return IO.Path.GetFileNameWithoutExtension(Application.ExecutablePath)
-    End Function
-    Friend Function GetSimpleVersion() As String
-        Dim ver = Assembly.GetExecutingAssembly().GetName().Version
-        GetSimpleVersion = ver.Major.ToString & "." & ver.Minor.ToString
-    End Function
-    Friend Function GetFullVersion() As String
-        Dim ver = Assembly.GetExecutingAssembly().GetName().Version
-        GetFullVersion = ver.Major.ToString & "." & ver.Minor.ToString & "." & ver.Build.ToString
-    End Function
-    Friend Function ResizeImage(src As Image, size As Integer) As Image
-        Dim bmp As New Bitmap(size, size)
-        Using g = Graphics.FromImage(bmp)
-            g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
-            g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-            g.DrawImage(src, New Rectangle(0, 0, size, size))
-        End Using
-        Return bmp
-    End Function
-    Friend Function IsAutoStartEnabled() As Boolean
-        Dim runKey As String = "Software\Microsoft\Windows\CurrentVersion\Run"
-        Dim value As String = Skye.Common.RegistryHelper.GetStringFromHKCU(runKey, "SkyeClip", String.Empty)
-        Return Not String.IsNullOrEmpty(value)
-    End Function
-    Friend Sub SetAutoStart()
-        If Settings.AutoStartWithWindows Then
-            Dim runKey As String = "Software\Microsoft\Windows\CurrentVersion\Run"
-            Dim exePath As String = """" & Application.ExecutablePath & """"
-            Skye.Common.RegistryHelper.SetStringInHKCU(runKey, "SkyeClip", exePath)
-        Else
-            Dim runKey As String = "Software\Microsoft\Windows\CurrentVersion\Run"
-            Skye.Common.RegistryHelper.DeleteValueInHKCU(runKey, "SkyeClip")
-        End If
-    End Sub
-    Friend Function DetectWindowsTheme() As SkyeTheme
-        Const keyPath As String = "Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
-        Using key = Registry.CurrentUser.OpenSubKey(keyPath)
-            Dim light As Integer = CInt(key.GetValue("AppsUseLightTheme", 1))
-            If light = 1 Then
-                Return Skye.UI.SkyeThemes.Light
-            Else
-                Return Skye.UI.SkyeThemes.Dark
-            End If
-        End Using
-    End Function
-    Friend Sub CheckForUpdatesIfNeeded()
-        Dim last = App.Settings.LastUpdateCheck.Date
-        Dim today = Date.Today
-
-        If last = today Then
-            ' Already checked today — use cached version
-            Exit Sub
-        End If
-
-        ' Not checked today — fetch fresh version
-        Dim latest = FetchLatestVersion()
-        If latest IsNot Nothing Then
-            App.Settings.LatestKnownVersion = latest
-            App.Settings.LastUpdateCheck = DateTime.Now
-            App.Settings.Save()
-        End If
-
-    End Sub
-    Private Function FetchLatestVersion() As String
-        Try
-            Using client As New Net.Http.HttpClient()
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("SkyeClip")
-                Dim versionText As String = client.GetStringAsync("https://raw.githubusercontent.com/yodeskye/SkyeClip/master/publishedversion.txt").Result
-                Debug.Print("Fetched Latest Version: " & versionText.Trim())
-                Return versionText.Trim()
-            End Using
-        Catch
-            Return Nothing
-        End Try
-    End Function
-    Friend Function IsNewerVersion(latest As String) As Boolean
-        Try
-            Dim vCurrent As New Version(GetFullVersion())
-            Dim vLatest As New Version(latest)
-            Debug.Print("Comparing Versions: Current=" & vCurrent.ToString() & " Latest=" & vLatest.ToString())
-            Return vLatest > vCurrent
-        Catch
-            Return False
-        End Try
-    End Function
-    Friend Function GetScratchPadProfiledPath(Optional profileID As Integer = -1) As String
-        Dim base As String = App.ScratchPadPath
-        Dim dir As String = IO.Path.GetDirectoryName(base)
-        Dim name As String = IO.Path.GetFileNameWithoutExtension(base)
-        Dim ext As String = IO.Path.GetExtension(base)
-
-        ' If no profileID was passed, use the current profile
-        If profileID = -1 Then
-            profileID = App.Settings.CurrentProfileID
-        End If
-
-        ' If profiles are enabled, return the profiled path
-        If App.Settings.UseProfiles Then
-            Return IO.Path.Combine(dir, $"{name}{profileID}{ext}")
-        End If
-
-        ' Otherwise return the global path
-        Return base
-    End Function
-    Friend Sub LoadScratchPadText()
-        Dim path = GetScratchPadProfiledPath()
-        If App.Settings.ScratchPadKeepText AndAlso IO.File.Exists(path) Then
-            App.ScratchPadText = IO.File.ReadAllText(path)
-        Else
-            App.ScratchPadText = String.Empty
-        End If
-    End Sub
-    Friend Function BuildProfiledTrayIcon(baseIcon As Icon, themeColor As Color) As Icon
-        Dim bmp As New Bitmap(16, 16, Imaging.PixelFormat.Format32bppArgb)
-
-        Using g = Graphics.FromImage(bmp)
-            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
-            g.Clear(Color.Transparent)
-
-            ' Draw the original icon
-            g.DrawImage(baseIcon.ToBitmap(), 0, 0, 16, 16)
-
-            ' === border ===
-            'Using pen As New Pen(themeColor, 1)
-            '    g.DrawRectangle(pen, 0, 0, 15, 15)
-            'End Using
-
-            ' === Dot in upper-left ===
-            Dim dotSize As Integer = 8
-            Dim dotRect As New Rectangle(0, 0, dotSize, dotSize)
-            Using brush As New SolidBrush(themeColor)
-                g.FillEllipse(brush, dotRect)
-            End Using
-
-        End Using
-
-        ' Convert bitmap → icon
-        Dim hIcon = bmp.GetHicon()
-        Return Icon.FromHandle(hIcon)
-    End Function
-    Friend Sub WarmUpDataTable()
-        Dim dt As New DataTable()
-        dt.Columns.Add("Warmup", GetType(Integer))
-        dt.Rows.Add(1)
-    End Sub
-    Friend Function CreatePinBadgeIcon() As Bitmap
-        Dim bmp As New Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppArgb)
-
-        Using g As Graphics = Graphics.FromImage(bmp)
-            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
-            ' 1. Clear background to fully transparent
-            g.Clear(Color.Transparent)
-            ' 2. Target the bottom-right corner (X: 7-15, Y: 7-15)
-            ' Draw pin head (Red accent with dark border for contrast)
-            ' With Opaque, high-contrast tweak
-            Using borderPen As New Pen(Color.FromArgb(255, 20, 20, 20), 1.0F),
-                  headBrush As New SolidBrush(Color.FromArgb(255, 230, 40, 40)), ' Bold Red
-                  needlePen As New Pen(Color.FromArgb(255, 220, 220, 220), 1.5F)
-                ' Draw needle pointing down-left
-                g.DrawLine(needlePen, 10, 10, 7, 13)
-                ' Draw pin head circle
-                g.FillEllipse(headBrush, 9, 7, 6, 6)
-                g.DrawEllipse(borderPen, 9, 7, 6, 6)
-                ' Tiny white highlight spot on head
-                g.FillEllipse(Brushes.White, 10, 8, 2, 2)
-            End Using
-        End Using
-
-            Return bmp
-    End Function
-    Friend Function CreatePinMenuIcon() As Bitmap
-        Dim bmp As New Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppArgb)
-
-        Using g As Graphics = Graphics.FromImage(bmp)
-            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
-            g.Clear(Color.Transparent)
-
-            Using bodyBrush As New SolidBrush(Color.FromArgb(255, 230, 40, 40)),
-              borderPen As New Pen(Color.FromArgb(255, 30, 30, 30), 1.0F),
-              needlePen As New Pen(Color.FromArgb(255, 180, 180, 180), 1.5F),
-              collarBrush As New SolidBrush(Color.FromArgb(255, 180, 30, 30))
-
-                ' 1. Needle (Moved Y-start south 1px to 9.0, 9.0 for perfect center alignment)
-                g.DrawLine(needlePen, 9.0F, 9.0F, 3.0F, 15.0F)
-
-                ' 2. Collar / Base ring under head
-                g.FillEllipse(collarBrush, 5.5F, 7.5F, 5.0F, 5.0F)
-                g.DrawEllipse(borderPen, 5.5F, 7.5F, 5.0F, 5.0F)
-
-                ' 3. Main Rounded Pin Head
-                g.FillEllipse(bodyBrush, 7.0F, 2.0F, 8.0F, 8.0F)
-                g.DrawEllipse(borderPen, 7.0F, 2.0F, 8.0F, 8.0F)
-
-                ' 4. Specular Highlight
-                g.FillEllipse(Brushes.White, 8.5F, 3.5F, 2.5F, 2.5F)
-            End Using
-        End Using
-
-        Return bmp
-    End Function
-    ''' <summary>
-    ''' Shows a bottom-right progress toast, executes an async task off the UI thread,
-    ''' and automatically handles form updates and cleanup.
-    ''' </summary>
-    Public Async Function RunWithProgressAsync(title As String, taskFunc As Func(Of IProgress(Of App.ProgressInfo), Task)) As Task
-        Dim progressForm As New ProgressToast(title)
-        progressForm.Show()
-
-        ' Setup progress handler to route updates to the toast UI
-        Dim progress = New Progress(Of App.ProgressInfo)(Sub(info)
-                                                             progressForm.UpdateProgress(info)
-                                                         End Sub)
-
-        Try
-            Await taskFunc(progress)
-        Finally
-            progressForm.Close()
-            progressForm.Dispose()
-        End Try
-    End Function
 
 End Module
