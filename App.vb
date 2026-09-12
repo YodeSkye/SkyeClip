@@ -1522,10 +1522,7 @@ Friend Module App
     End Sub
     Friend Function GetDatabaseStorageSummary() As String
         Dim dbFile As New IO.FileInfo(App.DBPath)
-
-        ' Fallback if database file doesn't exist yet
-        If Not dbFile.Exists Then Return "Database Size: 0.00 MB (0% fragmented)"
-
+        If Not dbFile.Exists Then Return "Database Size: 0.00 MB (0% fragmented)" ' Fallback if database file doesn't exist yet
         Dim size As String = Skye.Common.FormatFileSize(dbFile.Length, Skye.Common.FormatFileSizeUnits.Auto)
         Dim totalPages As Long = 0
         Dim freePages As Long = 0
@@ -1538,25 +1535,17 @@ Friend Module App
                     ' Fetch total page count
                     cmd.CommandText = "PRAGMA page_count;"
                     Dim totalObj = cmd.ExecuteScalar()
-                    If totalObj IsNot Nothing AndAlso totalObj IsNot DBNull.Value Then
-                        totalPages = Convert.ToInt64(totalObj)
-                    End If
-
+                    If totalObj IsNot Nothing AndAlso totalObj IsNot DBNull.Value Then totalPages = Convert.ToInt64(totalObj)
                     ' Fetch unallocated/freelist page count
                     cmd.CommandText = "PRAGMA freelist_count;"
                     Dim freeObj = cmd.ExecuteScalar()
-                    If freeObj IsNot Nothing AndAlso freeObj IsNot DBNull.Value Then
-                        freePages = Convert.ToInt64(freeObj)
-                    End If
-
+                    If freeObj IsNot Nothing AndAlso freeObj IsNot DBNull.Value Then freePages = Convert.ToInt64(freeObj)
                     ' Calculate fragmentation percentage
-                    If totalPages > 0 Then
-                        fragmentationPercent = (CDbl(freePages) / CDbl(totalPages)) * 100.0
-                    End If
+                    If totalPages > 0 Then fragmentationPercent = (CDbl(freePages) / CDbl(totalPages)) * 100.0
                 End Using
             End Using
         Catch ex As Exception
-            Debug.WriteLine($"[Database Stats Error] {ex.Message}")
+            Skye.Common.Log.Write($"DATABASE STATS ERROR: {ex.Message}")
         End Try
 
         ' Format output: e.g., "Database Size: 4.25 MB (12.5% fragmented)"
