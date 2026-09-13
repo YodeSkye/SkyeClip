@@ -1239,6 +1239,52 @@ Friend Class ClipRepository
         ' No markers → return whole HTML
         Return rawHtml
     End Function
+    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")>
+    Public Async Function RunFullMaintenanceAsync(progress As IProgress(Of App.ProgressInfo)) As Task(Of Boolean)
+        Return Await Task.Run(
+        Function()
+            Try
+                Using conn As New SQLiteConnection(App.DBConnectionString)
+                    conn.Open()
+                    Using cmd = conn.CreateCommand()
+
+                        ' Step 1 of 3: Checkpoint WAL
+                        progress?.Report(New App.ProgressInfo With {
+                            .CurrentIndex = 1,
+                            .TotalCount = 3,
+                            .Message = "Flushing write-ahead logs..."
+                        })
+                        cmd.CommandText = "PRAGMA wal_checkpoint(TRUNCATE);"
+                        cmd.ExecuteNonQuery()
+
+                        ' Step 2 of 3: Rebuild and defragment database
+                        progress?.Report(New App.ProgressInfo With {
+                            .CurrentIndex = 2,
+                            .TotalCount = 3,
+                            .Message = "Reclaiming unused disk space..."
+                        })
+                        cmd.CommandText = "VACUUM;"
+                        cmd.ExecuteNonQuery()
+
+                        ' Step 3 of 3: Update query optimizer stats
+                        progress?.Report(New App.ProgressInfo With {
+                            .CurrentIndex = 3,
+                            .TotalCount = 3,
+                            .Message = "Optimizing query performance..."
+                        })
+                        cmd.CommandText = "ANALYZE;"
+                        cmd.ExecuteNonQuery()
+
+                    End Using
+                End Using
+                Skye.Common.Log.Write($"DATABASE MAINTENANCE COMPLETED SUCCESSFULLY")
+                Return True
+            Catch ex As Exception
+                Skye.Common.Log.Write($"DATABASE MAINTENANCE ERROR: {ex.Message}")
+                Return False
+            End Try
+        End Function)
+    End Function
 
     ' Export/Import
     Friend Async Function ExportClipsAsync(clipIds As IEnumerable(Of Integer), destinationZipPath As String, progress As IProgress(Of App.ProgressInfo)) As Task

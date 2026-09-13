@@ -259,6 +259,7 @@ Friend Module App
         Friend Shared ClipExplorerSize As Size ' size of the Clip Explorer window
         Friend Shared LastUpdateCheck As DateTime ' the last date when update check was performed
         Friend Shared LatestKnownVersion As String ' the latest known version
+        Friend Shared LastMaintenanceRun As DateTime ' the last date when maintenance tasks were run
         Private Shared _currentProfileID As Integer ' the ID of the currently active profile, used when profiles are enabled. 0 is the default profile.
         Friend Shared Property CurrentProfileID As Integer ' the ID of the currently active profile, used when profiles are enabled. 0 is the default profile.
             Get
@@ -370,6 +371,7 @@ Friend Module App
             ClipExplorerSize = New Size(w, h)
             LastUpdateCheck = Skye.Common.RegistryHelper.GetDateTime("LastUpdateCheck", DateTime.MinValue)
             LatestKnownVersion = Skye.Common.RegistryHelper.GetString("LatestKnownVersion", String.Empty)
+            LastMaintenanceRun = Skye.Common.RegistryHelper.GetDateTime("LastMaintenanceRun", DateTime.MinValue)
 
             ' Profiles
             _currentProfileID = Skye.Common.RegistryHelper.GetInt("CurrentProfileID", 0)
@@ -473,6 +475,7 @@ Friend Module App
             Skye.Common.RegistryHelper.SetInt("ClipExplorerSizeH", ClipExplorerSize.Height)
             Skye.Common.RegistryHelper.SetDateTime("LastUpdateCheck", LastUpdateCheck)
             Skye.Common.RegistryHelper.SetString("LatestKnownVersion", LatestKnownVersion)
+            Skye.Common.RegistryHelper.SetDateTime("LastMaintenanceRun", LastMaintenanceRun)
 
             ' Profiles
             Skye.Common.RegistryHelper.SetInt("CurrentProfileID", _currentProfileID)
@@ -1315,7 +1318,7 @@ Friend Module App
     ''' Shows a bottom-right progress toast, executes an async task off the UI thread,
     ''' and automatically handles form updates and cleanup.
     ''' </summary>
-    Public Async Function RunWithProgressAsync(title As String, taskFunc As Func(Of IProgress(Of App.ProgressInfo), Task)) As Task
+    Friend Async Function RunWithProgressAsync(title As String, taskFunc As Func(Of IProgress(Of App.ProgressInfo), Task)) As Task
         Dim progressForm As New ProgressToast(title)
         progressForm.Show()
 
@@ -1330,6 +1333,20 @@ Friend Module App
             progressForm.Close()
             progressForm.Dispose()
         End Try
+    End Function
+    Friend Function GenerateEllipsis(g As Graphics, s As String, f As Font, width As Integer) As String
+        If String.IsNullOrEmpty(s) OrElse width <= 0 Then Return s
+        If TextRenderer.MeasureText(g, s, f).Width <= width Then Return s
+        Const Ellipsis As String = "..."
+        Dim ellipsisWidth As Integer = TextRenderer.MeasureText(g, Ellipsis, f).Width
+        If width <= ellipsisWidth Then Return Ellipsis ' If the container can't even fit "...", return "..."
+        Dim remainingText As String = s ' Trim from the left until "..." + remaining_text fits within width
+
+        Do While remainingText.Length > 0 AndAlso (TextRenderer.MeasureText(g, remainingText, f).Width + ellipsisWidth) > width
+            remainingText = remainingText.Substring(1)
+        Loop
+
+        Return Ellipsis & remainingText
     End Function
 
     ' Forms

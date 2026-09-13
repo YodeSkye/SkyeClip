@@ -64,6 +64,8 @@ Partial Class Settings
         LblThemeAutoBadge = New Skye.UI.Label()
         LblThemeBadge = New Skye.UI.Label()
         PanelClips = New Panel()
+        LblDBLastMaintenanceRun = New Skye.UI.Label()
+        LblDBLocationHeader = New Skye.UI.Label()
         BtnDBPerformMaintenance = New Button()
         LblDBSize = New Skye.UI.Label()
         LblDBLocation = New Skye.UI.Label()
@@ -562,6 +564,7 @@ Partial Class Settings
         ' 
         ' PanelClips
         ' 
+        PanelClips.Controls.Add(LblDBLocationHeader)
         PanelClips.Controls.Add(BtnDBPerformMaintenance)
         PanelClips.Controls.Add(LblDBSize)
         PanelClips.Controls.Add(LblDBLocation)
@@ -583,6 +586,7 @@ Partial Class Settings
         PanelClips.Controls.Add(ChkBoxNotifyOnNewClip)
         PanelClips.Controls.Add(ChkBoxBlinkOnNewClip)
         PanelClips.Controls.Add(LblMaxClipsBadge)
+        PanelClips.Controls.Add(LblDBLastMaintenanceRun)
         TipSettings.SetImage(PanelClips, Nothing)
         PanelClips.Location = New Point(93, 0)
         PanelClips.Name = "PanelClips"
@@ -590,12 +594,34 @@ Partial Class Settings
         PanelClips.TabIndex = 1112
         TipSettings.SetText(PanelClips, Nothing)
         ' 
+        ' LblDBLastMaintenanceRun
+        ' 
+        TipSettings.SetImage(LblDBLastMaintenanceRun, Nothing)
+        LblDBLastMaintenanceRun.Location = New Point(14, 386)
+        LblDBLastMaintenanceRun.Name = "LblDBLastMaintenanceRun"
+        LblDBLastMaintenanceRun.Size = New Size(408, 23)
+        LblDBLastMaintenanceRun.TabIndex = 1116
+        LblDBLastMaintenanceRun.Text = "Last Run On:"
+        TipSettings.SetText(LblDBLastMaintenanceRun, Nothing)
+        LblDBLastMaintenanceRun.TextAlign = ContentAlignment.TopCenter
+        ' 
+        ' LblDBLocationHeader
+        ' 
+        LblDBLocationHeader.AutoSize = True
+        TipSettings.SetImage(LblDBLocationHeader, Nothing)
+        LblDBLocationHeader.Location = New Point(16, 300)
+        LblDBLocationHeader.Name = "LblDBLocationHeader"
+        LblDBLocationHeader.Size = New Size(72, 21)
+        LblDBLocationHeader.TabIndex = 1115
+        LblDBLocationHeader.Text = "Location:"
+        TipSettings.SetText(LblDBLocationHeader, Nothing)
+        ' 
         ' BtnDBPerformMaintenance
         ' 
         TipSettings.SetImage(BtnDBPerformMaintenance, Nothing)
-        BtnDBPerformMaintenance.Location = New Point(14, 363)
+        BtnDBPerformMaintenance.Location = New Point(14, 356)
         BtnDBPerformMaintenance.Name = "BtnDBPerformMaintenance"
-        BtnDBPerformMaintenance.Size = New Size(242, 32)
+        BtnDBPerformMaintenance.Size = New Size(408, 32)
         BtnDBPerformMaintenance.TabIndex = 1114
         TipSettings.SetText(BtnDBPerformMaintenance, Nothing)
         BtnDBPerformMaintenance.Text = "Compact && Optimize Database"
@@ -604,7 +630,7 @@ Partial Class Settings
         ' LblDBSize
         ' 
         TipSettings.SetImage(LblDBSize, Nothing)
-        LblDBSize.Location = New Point(16, 333)
+        LblDBSize.Location = New Point(16, 326)
         LblDBSize.Name = "LblDBSize"
         LblDBSize.Size = New Size(406, 23)
         LblDBSize.TabIndex = 1113
@@ -614,11 +640,10 @@ Partial Class Settings
         ' 
         ' LblDBLocation
         ' 
-        LblDBLocation.AutoEllipsis = True
         TipSettings.SetImage(LblDBLocation, Nothing)
-        LblDBLocation.Location = New Point(16, 306)
+        LblDBLocation.Location = New Point(90, 299)
         LblDBLocation.Name = "LblDBLocation"
-        LblDBLocation.Size = New Size(406, 23)
+        LblDBLocation.Size = New Size(332, 23)
         LblDBLocation.TabIndex = 1112
         LblDBLocation.Text = "Location"
         TipSettings.SetText(LblDBLocation, "Location")
@@ -628,7 +653,7 @@ Partial Class Settings
         ' 
         LblDBMaintenance.Font = New Font("Segoe UI", 12F, FontStyle.Underline, GraphicsUnit.Point, CByte(0))
         TipSettings.SetImage(LblDBMaintenance, Nothing)
-        LblDBMaintenance.Location = New Point(16, 279)
+        LblDBMaintenance.Location = New Point(16, 272)
         LblDBMaintenance.Name = "LblDBMaintenance"
         LblDBMaintenance.Size = New Size(277, 23)
         LblDBMaintenance.TabIndex = 1111
@@ -1039,4 +1064,6 @@ Partial Class Settings
     Friend WithEvents LblDBSize As Skye.UI.Label
     Friend WithEvents BtnDBPerformMaintenance As Button
     Private WithEvents LblDBLocation As Skye.UI.Label
+    Friend WithEvents LblDBLocationHeader As Skye.UI.Label
+    Friend WithEvents LblDBLastMaintenanceRun As Skye.UI.Label
 End Class

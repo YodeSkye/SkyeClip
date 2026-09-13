@@ -306,8 +306,24 @@ Public Class Settings
         App.Tray.repo.PurgeClips(cutoff)
         App.Tray.RefreshMenu()
     End Sub
-    Private Sub BtnDBPerformMaintenance_Click(sender As Object, e As EventArgs) Handles BtnDBPerformMaintenance.Click
+    Private Async Sub BtnDBPerformMaintenance_Click(sender As Object, e As EventArgs) Handles BtnDBPerformMaintenance.Click
+        BtnDBPerformMaintenance.Enabled = False
 
+        Dim maintenanceSuccess As Boolean = False
+
+        ' Run maintenance wrapped inside your ProgressToast handler
+        Await RunWithProgressAsync("Optimizing Database", Async Function(progress)
+                                                              maintenanceSuccess = Await App.Tray.repo.RunFullMaintenanceAsync(progress)
+                                                          End Function)
+
+        ' Post-maintenance UI update
+        If maintenanceSuccess Then
+            App.Settings.LastMaintenanceRun = DateTime.Now
+            App.Settings.Save()
+        End If
+
+        LoadSettings()
+        BtnDBPerformMaintenance.Enabled = True
     End Sub
     Private Sub BtnBackupNow_Click(sender As Object, e As EventArgs) Handles BtnBackupNow.Click
         App.BackupManual()
@@ -671,9 +687,11 @@ Public Class Settings
             LVProfiles.Items.Add(lvi)
         Next
         RefreshRuleList()
-        LblDBLocation.Text = "Location: " & App.DBPath
+
+        LblDBLocation.Text = App.GenerateEllipsis(LblDBLocation.CreateGraphics, App.DBPath, LblDBLocation.Font, LblDBLocation.Width)
         TipSettings.SetText(LblDBLocation, App.DBPath)
         LblDBSize.Text = App.GetDatabaseStorageSummary
+        LblDBLastMaintenanceRun.Text = If(App.Settings.LastMaintenanceRun = DateTime.MinValue, "Never Run", $"Last Run On: {App.Settings.LastMaintenanceRun:g}")
 
         If App.Settings.UseProfiles Then
             LblThemeBadge.Visible = True
