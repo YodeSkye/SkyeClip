@@ -81,6 +81,9 @@ Public Class Settings
     Private Sub Settings_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         App.Settings.Save()
     End Sub
+    Private Sub Settings_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
+        RemoveHandler App.Tray.ProfileChanged, AddressOf OnProfileChanged
+    End Sub
     Private Sub Settings_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MyBase.MouseDown
         Dim cSender As Control
         If e.Button = MouseButtons.Left AndAlso WindowState = FormWindowState.Normal Then
@@ -620,7 +623,7 @@ Public Class Settings
     End Sub
 
     ' Handlers
-    Private Sub OnProfileChanged()
+    Private Sub OnProfileChanged(sender As Object, e As EventArgs)
         LoadSettings()
     End Sub
     Private Sub OnRuleSaved(editor As UserControl, rule As App.IRulePreview)
@@ -643,6 +646,7 @@ Public Class Settings
 
     ' Methods
     Private Sub LoadSettings()
+        If Me.IsDisposed OrElse Me.Disposing Then Return
         Text = "Settings for " & GetAppTitle()
         If App.Settings.UseProfiles Then Text &= " (" & App.Settings.GetProfileName(App.Settings.CurrentProfileID) & " Profile)"
         ChkBoxThemeAuto.Checked = App.Settings.ThemeAuto
@@ -688,7 +692,7 @@ Public Class Settings
         Next
         RefreshRuleList()
 
-        LblDBLocation.Text = App.GenerateEllipsis(LblDBLocation.CreateGraphics, App.DBPath, LblDBLocation.Font, LblDBLocation.Width)
+        LblDBLocation.Text = App.GenerateEllipsis(App.DBPath, LblDBLocation.Font, LblDBLocation.Width)
         TipSettings.SetText(LblDBLocation, App.DBPath)
         LblDBSize.Text = App.GetDatabaseStorageSummary
         LblDBLastMaintenanceRun.Text = If(App.Settings.LastMaintenanceRun = DateTime.MinValue, "Never Run", $"Last Run On: {App.Settings.LastMaintenanceRun:g}")

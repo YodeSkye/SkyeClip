@@ -1334,21 +1334,20 @@ Friend Module App
             progressForm.Dispose()
         End Try
     End Function
-    Friend Function GenerateEllipsis(g As Graphics, s As String, f As Font, width As Integer) As String
+    Friend Function GenerateEllipsis(s As String, f As Font, width As Integer) As String
         If String.IsNullOrEmpty(s) OrElse width <= 0 Then Return s
-        If TextRenderer.MeasureText(g, s, f).Width <= width Then Return s
+        If TextRenderer.MeasureText(s, f).Width <= width Then Return s ' Check if full text fits
         Const Ellipsis As String = "..."
-        Dim ellipsisWidth As Integer = TextRenderer.MeasureText(g, Ellipsis, f).Width
-        If width <= ellipsisWidth Then Return Ellipsis ' If the container can't even fit "...", return "..."
-        Dim remainingText As String = s ' Trim from the left until "..." + remaining_text fits within width
+        Dim ellipsisWidth As Integer = TextRenderer.MeasureText(Ellipsis, f).Width
+        If width <= ellipsisWidth Then Return Ellipsis ' If container can't even fit "...", return "..."
+        Dim remainingText As String = s
 
-        Do While remainingText.Length > 0 AndAlso (TextRenderer.MeasureText(g, remainingText, f).Width + ellipsisWidth) > width
+        Do While remainingText.Length > 0 AndAlso (TextRenderer.MeasureText(remainingText, f).Width + ellipsisWidth) > width
             remainingText = remainingText.Substring(1)
         Loop
 
         Return Ellipsis & remainingText
     End Function
-
     ' Forms
     Friend Sub ShowClipExplorer()
         If FrmClipExplorer Is Nothing OrElse FrmClipExplorer.IsDisposed Then
