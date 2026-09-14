@@ -272,6 +272,18 @@ SkyeClip allows customization of:\par
 - Purge Functions\par
 - and more\par
 \par
+\cf2\b Database Maintenance & Compaction\cf0\b0\par
+\par
+Over time, adding and deleting clipboard items creates fragmented, unused space inside the database file. Running the Database Maintenance tool cleans up this space and keeps SkyeClip running fast.\par
+\par
+\i What It Does\i0\par
+Flushes pending background logs, defragments the database file to reduce its size on disk, and updates query indexes for optimal search speeds.\par
+\par
+\i What To Expect\i0\par
+A progress window will appear while the database is being optimized. For larger databases, this process may take a minute or two to finish.\par
+\par
+Ensure your computer has sufficient free disk space during maintenance, as a temporary working copy of the database will be created during the compaction process.\par
+\par
 \cf2\b Importing & Exporting Clips\cf0\b0\par
 \par
 SkyeClip lets you transfer your clipboard history across machines using portable .zip packages. You can export specific clips directly from the ClipExplorer context menu, or export an entire profile by clicking the Export button in the App View. When exporting from the App View, a standard Left-Click exports the currently active profile (or all clips if profiles are not active), while a Right-Click exports all profiles and clips across the entire database.\par
