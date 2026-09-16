@@ -659,6 +659,9 @@ Automatic maintenance never interferes with manual actions.\par
   <data name="ImageRefreshLog32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>My Project\ImageRefreshLog32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImageRegex16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>My Project\ImageRegex16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ImageRestore16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>My Project\ImageRestore16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -682,5 +685,8 @@ Automatic maintenance never interferes with manual actions.\par
   </data>
   <data name="ImageSettings48" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>My Project\ImageSettings48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImageShowAll16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>My Project\ImageShowAll16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
