@@ -27,6 +27,8 @@ Partial Class ClipExplorer
         StatusStripCE = New StatusStrip()
         TSSLabelStatus = New ToolStripStatusLabel()
         PanelCE = New Panel()
+        ChkBoxRegex = New CheckBox()
+        ChkBoxCase = New CheckBox()
         ChkBoxShowAll = New CheckBox()
         GrpBoxSearch = New GroupBox()
         RadBtnHTML = New RadioButton()
@@ -104,6 +106,8 @@ Partial Class ClipExplorer
         ' PanelCE
         ' 
         PanelCE.BorderStyle = BorderStyle.FixedSingle
+        PanelCE.Controls.Add(ChkBoxRegex)
+        PanelCE.Controls.Add(ChkBoxCase)
         PanelCE.Controls.Add(ChkBoxShowAll)
         PanelCE.Controls.Add(GrpBoxSearch)
         PanelCE.Controls.Add(TxtBoxDays)
@@ -120,17 +124,43 @@ Partial Class ClipExplorer
         PanelCE.TabStop = True
         TipClipExplorer.SetText(PanelCE, Nothing)
         ' 
+        ' ChkBoxRegex
+        ' 
+        ChkBoxRegex.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        ChkBoxRegex.Appearance = Appearance.Button
+        ChkBoxRegex.Image = My.Resources.Resources.ImageRegex16
+        TipClipExplorer.SetImage(ChkBoxRegex, My.Resources.Resources.ImageRegex16)
+        ChkBoxRegex.Location = New Point(393, 13)
+        ChkBoxRegex.Name = "ChkBoxRegex"
+        ChkBoxRegex.Size = New Size(32, 32)
+        ChkBoxRegex.TabIndex = 33
+        TipClipExplorer.SetText(ChkBoxRegex, "Use Regular Expressions")
+        ChkBoxRegex.UseVisualStyleBackColor = True
+        ' 
+        ' ChkBoxCase
+        ' 
+        ChkBoxCase.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        ChkBoxCase.Appearance = Appearance.Button
+        ChkBoxCase.Image = My.Resources.Resources.ImageEditCaseProper16
+        TipClipExplorer.SetImage(ChkBoxCase, My.Resources.Resources.ImageEditCaseProper16)
+        ChkBoxCase.Location = New Point(355, 13)
+        ChkBoxCase.Name = "ChkBoxCase"
+        ChkBoxCase.Size = New Size(32, 32)
+        ChkBoxCase.TabIndex = 32
+        TipClipExplorer.SetText(ChkBoxCase, "Match Case")
+        ChkBoxCase.UseVisualStyleBackColor = True
+        ' 
         ' ChkBoxShowAll
         ' 
         ChkBoxShowAll.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        ChkBoxShowAll.AutoSize = True
-        TipClipExplorer.SetImage(ChkBoxShowAll, Nothing)
-        ChkBoxShowAll.Location = New Point(309, 28)
+        ChkBoxShowAll.Appearance = Appearance.Button
+        ChkBoxShowAll.Image = My.Resources.Resources.ImageShowAll16
+        TipClipExplorer.SetImage(ChkBoxShowAll, My.Resources.Resources.ImageShowAll16)
+        ChkBoxShowAll.Location = New Point(469, 13)
         ChkBoxShowAll.Name = "ChkBoxShowAll"
-        ChkBoxShowAll.Size = New Size(128, 25)
+        ChkBoxShowAll.Size = New Size(32, 32)
         ChkBoxShowAll.TabIndex = 31
         TipClipExplorer.SetText(ChkBoxShowAll, "If Profiles are enabled, this option becomes available." & vbCrLf & "It toggles between showing only the current profile’s clips or showing all clips.")
-        ChkBoxShowAll.Text = "Show All Clips"
         ChkBoxShowAll.UseVisualStyleBackColor = True
         ' 
         ' GrpBoxSearch
@@ -205,7 +235,7 @@ Partial Class ClipExplorer
         TxtBoxDays.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         TxtBoxDays.ContextMenuStrip = CMTxtBox
         TipClipExplorer.SetImage(TxtBoxDays, Nothing)
-        TxtBoxDays.Location = New Point(508, 11)
+        TxtBoxDays.Location = New Point(508, 14)
         TxtBoxDays.Name = "TxtBoxDays"
         TxtBoxDays.PlaceholderText = "Days"
         TxtBoxDays.ShortcutsEnabled = False
@@ -225,14 +255,14 @@ Partial Class ClipExplorer
         ' ChkBoxFavorites
         ' 
         ChkBoxFavorites.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        ChkBoxFavorites.AutoSize = True
-        TipClipExplorer.SetImage(ChkBoxFavorites, Nothing)
-        ChkBoxFavorites.Location = New Point(309, 5)
+        ChkBoxFavorites.Appearance = Appearance.Button
+        ChkBoxFavorites.Image = My.Resources.Resources.ImageFavorites16
+        TipClipExplorer.SetImage(ChkBoxFavorites, My.Resources.Resources.ImageFavorites16)
+        ChkBoxFavorites.Location = New Point(431, 13)
         ChkBoxFavorites.Name = "ChkBoxFavorites"
-        ChkBoxFavorites.Size = New Size(179, 25)
+        ChkBoxFavorites.Size = New Size(32, 32)
         ChkBoxFavorites.TabIndex = 20
         TipClipExplorer.SetText(ChkBoxFavorites, "Only Search through Favorite Clips.")
-        ChkBoxFavorites.Text = "Search Only Favorites"
         ChkBoxFavorites.UseVisualStyleBackColor = True
         ' 
         ' BtnClearSearch
@@ -240,7 +270,7 @@ Partial Class ClipExplorer
         BtnClearSearch.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         BtnClearSearch.Image = My.Resources.Resources.ImageClearRemoveDelete16
         TipClipExplorer.SetImage(BtnClearSearch, Nothing)
-        BtnClearSearch.Location = New Point(251, 9)
+        BtnClearSearch.Location = New Point(298, 13)
         BtnClearSearch.Name = "BtnClearSearch"
         BtnClearSearch.Size = New Size(32, 32)
         BtnClearSearch.TabIndex = 15
@@ -252,11 +282,11 @@ Partial Class ClipExplorer
         TxtBoxSearch.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
         TxtBoxSearch.ContextMenuStrip = CMTxtBox
         TipClipExplorer.SetImage(TxtBoxSearch, Nothing)
-        TxtBoxSearch.Location = New Point(11, 11)
+        TxtBoxSearch.Location = New Point(11, 14)
         TxtBoxSearch.Name = "TxtBoxSearch"
         TxtBoxSearch.PlaceholderText = "Search For"
         TxtBoxSearch.ShortcutsEnabled = False
-        TxtBoxSearch.Size = New Size(240, 29)
+        TxtBoxSearch.Size = New Size(286, 29)
         TxtBoxSearch.TabIndex = 10
         TipClipExplorer.SetText(TxtBoxSearch, "Search for the entered text.")
         ' 
@@ -629,4 +659,6 @@ Partial Class ClipExplorer
     Friend WithEvents Pinned As DataGridViewCheckBoxColumn
     Friend WithEvents Favorite As DataGridViewCheckBoxColumn
     Friend WithEvents CMICAMergeClips As ToolStripMenuItem
+    Friend WithEvents ChkBoxRegex As CheckBox
+    Friend WithEvents ChkBoxCase As CheckBox
 End Class

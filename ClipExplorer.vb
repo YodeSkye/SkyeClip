@@ -2,6 +2,7 @@
 Imports System.ComponentModel
 Imports System.IO
 Imports System.Text
+Imports System.Text.RegularExpressions
 Imports Skye.UI
 Imports SkyeClip.ClipRepository
 
@@ -11,6 +12,9 @@ Public Class ClipExplorer
     Private mMove As Boolean = False
     Private mOffset, mPosition As Point
     Private _searchText As String = String.Empty
+    Private _searchCaseSensitive As Boolean = False
+    Private _searchRegex As Boolean = False
+    Private _searchShowAll As Boolean = False
     Private _searchFavoritesOnly As Boolean = False
     Private _searchDays As Integer = 0 ' 0 means all days
     Private _searchMode As App.TextSearchMode
@@ -472,11 +476,20 @@ Public Class ClipExplorer
         _searchText = TxtBoxSearch.Text.Trim
         LoadClips()
     End Sub
-    Private Sub ChkBoxShowAll_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxShowAll.CheckedChanged
+    Private Sub ChkBoxCase_Click(sender As Object, e As EventArgs) Handles ChkBoxCase.Click
+        _searchCaseSensitive = ChkBoxCase.Checked
         LoadClips()
     End Sub
-    Private Sub ChkBoxFavorites_CheckedChanged(sender As Object, e As EventArgs) Handles ChkBoxFavorites.CheckedChanged
+    Private Sub ChkBoxRegex_Click(sender As Object, e As EventArgs) Handles ChkBoxRegex.Click
+        _searchRegex = ChkBoxRegex.Checked
+        LoadClips()
+    End Sub
+    Private Sub ChkBoxFavorites_Click(sender As Object, e As EventArgs) Handles ChkBoxFavorites.Click
         _searchFavoritesOnly = ChkBoxFavorites.Checked
+        LoadClips()
+    End Sub
+    Private Sub ChkBoxShowAll_Click(sender As Object, e As EventArgs) Handles ChkBoxShowAll.Click
+        _searchShowAll = ChkBoxShowAll.Checked
         LoadClips()
     End Sub
     Private Sub TxtBoxDays_Validated(sender As Object, e As EventArgs) Handles TxtBoxDays.Validated
@@ -523,7 +536,7 @@ Public Class ClipExplorer
             DGV.Rows.Add(r)
         Next
 
-        Dim profiletext As String = If(Not Me.ChkBoxShowAll.Checked AndAlso App.Settings.UseProfiles, $"in {App.Settings.GetProfileName(App.Settings.CurrentProfileID)}", "Total")
+        Dim profiletext As String = If(Not _searchShowAll AndAlso App.Settings.UseProfiles, $"in {App.Settings.GetProfileName(App.Settings.CurrentProfileID)}", "Total")
         TSSLabelStatus.Text = $"Showing {result.FilteredCount} of {result.TotalCount} {If(result.TotalCount = 1, "Clip", "Clips")} {profiletext}"
         TSSLabelStatus.ResetForeColor()
     End Sub
@@ -534,7 +547,7 @@ Public Class ClipExplorer
         Dim allClips As List(Of ExplorerClipInfo)
 
         If App.Settings.UseProfiles Then
-            If ChkBoxShowAll.Checked Then
+            If _searchShowAll Then
                 ' Profiles ON + Show All → show everything
                 allClips = App.Tray.repo.GetAllClips()
             Else
@@ -559,11 +572,43 @@ Public Class ClipExplorer
             filtered = filtered.Where(Function(c) c.CreatedAt >= cutoff).ToList()
         End If
 
+        'If _searchText <> "" Then
+        '    filtered = filtered.Where(Function(c)
+        '                                  Dim text = GetCachedSearchText(c.Id)
+        '                                  Return text.Contains(_searchText, StringComparison.OrdinalIgnoreCase)
+        '                              End Function).ToList()
+        'End If
         If _searchText <> "" Then
-            filtered = filtered.Where(Function(c)
-                                          Dim text = GetCachedSearchText(c.Id)
-                                          Return text.Contains(_searchText, StringComparison.OrdinalIgnoreCase)
-                                      End Function).ToList()
+            If _searchRegex Then
+                Try
+                    ' Configure Regex matching options based on the Match Case toggle state
+                    Dim opts As RegexOptions = RegexOptions.Compiled
+                    If Not _searchCaseSensitive Then
+                        opts = opts Or RegexOptions.IgnoreCase
+                    End If
+
+                    Dim rx As New Regex(_searchText, opts)
+
+                    filtered = filtered.Where(Function(c)
+                                                  Dim text = GetCachedSearchText(c.Id)
+                                                  Return rx.IsMatch(text)
+                                              End Function).ToList()
+                Catch ex As ArgumentException
+                    ' If the user types an incomplete regex pattern (e.g. "[a-z"), 
+                    ' catch the exception so the app doesn't crash while typing
+                    filtered = New List(Of ExplorerClipInfo)()
+                End Try
+            Else
+                ' Standard Text Search using StringComparison
+                Dim comp As StringComparison = If(_searchCaseSensitive,
+                                          StringComparison.Ordinal,
+                                          StringComparison.OrdinalIgnoreCase)
+
+                filtered = filtered.Where(Function(c)
+                                              Dim text = GetCachedSearchText(c.Id)
+                                              Return text.IndexOf(_searchText, comp) >= 0
+                                          End Function).ToList()
+            End If
         End If
 
         result.FilteredCount = filtered.Count
