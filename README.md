@@ -64,7 +64,7 @@ Rules can switch profiles, block capture, or perform other automated actions.
 - Filter using regular expressions (Regex)
 - Sort by text, date, favorites, or last used date
 
-### Import & Export
+### 📦 Import & Export
 - Export clips to a zip file for backup or sharing
 - Import clips from a file to restore or share between machines
 - Import clips to the top of the tray menu
