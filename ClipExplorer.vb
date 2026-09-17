@@ -572,12 +572,6 @@ Public Class ClipExplorer
             filtered = filtered.Where(Function(c) c.CreatedAt >= cutoff).ToList()
         End If
 
-        'If _searchText <> "" Then
-        '    filtered = filtered.Where(Function(c)
-        '                                  Dim text = GetCachedSearchText(c.Id)
-        '                                  Return text.Contains(_searchText, StringComparison.OrdinalIgnoreCase)
-        '                              End Function).ToList()
-        'End If
         If _searchText <> "" Then
             If _searchRegex Then
                 Try
@@ -586,13 +580,13 @@ Public Class ClipExplorer
                     If Not _searchCaseSensitive Then
                         opts = opts Or RegexOptions.IgnoreCase
                     End If
-
                     Dim rx As New Regex(_searchText, opts)
 
                     filtered = filtered.Where(Function(c)
                                                   Dim text = GetCachedSearchText(c.Id)
                                                   Return rx.IsMatch(text)
                                               End Function).ToList()
+
                 Catch ex As ArgumentException
                     ' If the user types an incomplete regex pattern (e.g. "[a-z"), 
                     ' catch the exception so the app doesn't crash while typing
@@ -608,9 +602,9 @@ Public Class ClipExplorer
                                               Dim text = GetCachedSearchText(c.Id)
                                               Return text.IndexOf(_searchText, comp) >= 0
                                           End Function).ToList()
+
             End If
         End If
-
         result.FilteredCount = filtered.Count
 
         ' Build rows
