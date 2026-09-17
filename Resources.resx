@@ -121,7 +121,27 @@
     <value>{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset134 SimSun;}{\f2\fnil\fcharset0 SimSun;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset0 Segoe UI Symbol;}{\f5\fnil Segoe UI Symbol;}{\f6\fnil Segoe UI;}}
 {\colortbl ;\red0\green102\blue204;\red51\green153\blue102;}
 {\*\generator Riched20 10.0.26100}\viewkind4\uc1 
-\pard\cf1\b\f0\fs28\lang9 SkyeClip v1.3 What's New\par
+\pard\cf1\b\f0\fs28\lang9 SkyeClip v1.4 What's New\par
+\cf0\fs24 Released September 2026\par
+\cf1\fs28\par
+\cf2\fs24 New Features\par
+\cf0\b0\f1\lang1033\'a3\'ab\f2  \f0 Advanced Search Capabilities: Added a full Regular Expression (.*) search engine via in-memory LINQ filtering for fast, flexible pattern matching. Also added Case-Sensitive Filtering to both Regex and normal searches.\f1\par
+\'a3\'ab\f2  \f0 Database Optimization &amp; Maintenance: Added database optimization and integrity checks to the startup routine, alongside a manual Maintenance tool in Settings (Clips section). This tool defragments and compacts the database and displays database location, total size, and fragmentation stats.\f1\par
+\'a3\'ab\f0  Merge Clips in Clip Explorer: You can now merge selected text clips into one. The clips merge in order of selection.\f1\par
+\'a3\'ab\f0  Plain Text Paste Shortcut: Hold 'Shift' while clicking a clipboard item in the tray menu to restore only raw text (CF_UNICODETEXT/CF_TEXT), stripping RTF, HTML, or other formatting.\f1\par
+\'a3\'ab\f0  Added Clip Pinning to allow frequently used clips to stay pinned at the top of the tray menu for instant access. Pin states can be toggled manually in the tray menu or Clip Explorer, and automated via the Rules Engine based on source app, keywords, or clipboard format.\f1\par
+\'a3\'ab\f0  Cross-Machine Data Portability (Import &amp; Export): Added full import and export functionality to package clips into portable .zip archives. Users can export targeted selections from Clip Explorer or issue full profile dumps directly from the system tray via App View. The import engine includes automatic deduplication via aggregate hashing, along with flexible options to either preserve original timestamps or bring imported items straight to the top of the list. Ensured complete cross-machine visual and data fidelity across RTF, HTML, images, and custom dynamic clipboard formats. Dynamic Win32 format IDs are automatically re-registered on target host machines during import, guaranteeing that complex clips restore cleanly anywhere SkyeClip runs.\cf1\b\fs28\lang9\par
+\cf2\fs24\par
+Improvements\par
+\cf0\b0\f3\u10003?\f4\lang1033  The Profiles Tray Menu now bolds the currently selected profile, making it easier to identify the active profile at a glance.\f5\lang9\par
+\f3\u10003?\f4\lang1033  Clicking the favorites column in Clip Explorer now changes the favorite status of the clip.\f5\lang9\par
+\f3\u10003?\f4\lang1033  \f5\lang9 Improved Data Storage &amp; Automated Migration\f4\lang1033 . \f5\lang9 Core application files have moved to AppData\\Local\\Skye\\ for better system compatibility and faster file access. Existing files from Documents\\Skye are moved automatically on first launch, featuring built-in startup protection against background file locks.\par
+\f3\u10003?\f4\lang1033  \f5\lang9 Hardened application startup and shutdown sequences to eliminate resource leaks, ghost system tray icons, orphaned clipboard hooks\f4\lang1033 , and to provide necessary logging in the event of an error.\par
+\cf2\b\f0\lang9\par
+Fixes\par
+\cf0\b0\f3\u10005?\f4\lang1033  Windows clipboard contention can cause intermittent ExternalException errors when another app temporarily locks the clipboard. SkyeClip now handles these situations safely. All clipboard access paths \f5\emdash  including text, RTF, images, and file drops \emdash  have been updated to use a unified, retry\_safe helper. This eliminates random clipboard\_related crashes and ensures smooth, predictable behavior across the entire app.\f4\par
+\cf1\b\f0\fs28\lang9\par
+\fs24 SkyeClip v1.3\fs28\par
 \cf0\fs24 Released April 2026\par
 \cf1\fs28\par
 \cf2\fs24 New Features\par
@@ -215,11 +235,15 @@ Fixes\par
 SkyeClip is a lightweight clipboard manager that stores your recent clips, lets you mark favorites, and provides quick access through the tray menu and hotkeys.\par
 \cf2\b\par
 Tray Menu\par
-\cf0\b0 To make it easier to identify the type of content stored in each clip, SkyeClip adds small format indicators to the end of the preview text. Clips that contain Rich Text Format data will include the suffix &lt;RTF&gt;. Clips that contain HTML data will include the suffix &lt;HTML&gt;. These indicators appear only in the preview list to help you quickly understand what formats are available for each clip. The full Clip Viewer still shows the complete content using the appropriate viewer (plain text, rich text, HTML, image, or file list)\par
+\cf0\b0 To make it easier to identify the type of content stored in each clip, SkyeClip adds small format indicators to the end of the preview text. Clips that contain Rich Text Format data will include the suffix &lt;RTF&gt;. Clips that contain HTML data will include the suffix &lt;HTML&gt;. These indicators appear only in the preview list to help you quickly understand what formats are available for each clip. The full Clip Viewer still shows the complete content using the appropriate viewer (plain text, rich text, HTML, image, or file list). Left-Clicking a clip in the tray menu will set that clip as the active clip. Holding the Shift-Key down while clicking will set the clip as plain text only.\par
 \cf2\b\par
 Tray Menu HotKeys (Customizable)\par
 \cf0\par
-\b0\i &lt;F&gt;\par
+\b0\i &lt;P&gt;\par
+Toggle Pinned\par
+\i0 Pins or unpins the selected clip. Pinned clips appear at the top of the tray menu for quick access.\par
+\i\par
+&lt;F&gt;\par
 Toggle Favorite\par
 \i0 Marks or unmarks the selected clip as a Favorite. Favorited clips appear in the Favorites menu for quick access.\par
 \b\par
@@ -231,12 +255,20 @@ Show Clip Viewer\par
 Show Scratch Pad\par
 Opens the Scratch Pad with the selected clip appended to the current text, if any.\f2\lang9\par
 \par
-\cf2\b\f1 Favorites\par
+\cf2\b\f1 Pinned Clips\par
+\par
+\cf0\b0 Pinned clips allow quick access to your most used clips by 'pinning' them to the top of the tray menu.\par
+\i How to use:\i0\par
+- Press 'P' on a clip\par
+- Or right\f2\_click \f3\u8594?\f1  Pin/Unpin\par
+- Pinned clips appear at the top of the tray menu for quick access\par
+\cf2\b\lang9\par
+Favorites\par
 \par
 \cf0\b0 Favorites let you keep important clips accessible at all times.\par
 \i How to use:\i0\par
-- Press Spacebar on a clip\par
-- Or right\f2\_click \f3\u8594?\f1  Toggle Favorite\par
+- Press 'F' on a clip\par
+- Or right\f2\_click \f3\u8594?\f1  Favorite/Unfavorite\par
 - Favorites appear in their own menu for quick access\par
 \cf2\b\lang9\par
 Clip Viewer\par
@@ -316,8 +348,11 @@ Browse your clipboard history in a clean, scrollable list\par
 Preview clips without opening the viewer\par
 Use Clip to restore an item back to the clipboard\par
 Open in Viewer for a detailed look\par
+Pin clips to the top of the tray menu\par
 Favorite important clips for quick access\par
 Filter by favorites, age, or text type\par
+Use regular expressions (Regex) to filter your clips\par
+Merge selected clips into one, in the order selected\par
 \par
 \i When to Use Clip Explorer\i0\par
 Use Clip Explorer when you want a quick overview of your clipboard history without digging through menus. It\rquote s ideal for finding something you copied earlier today, comparing similar clips, or jumping back to a favorite you saved some time earlier.\par
@@ -465,6 +500,24 @@ SkyeClip allows customization of:\par
 - Purge Functions\par
 - and more\par
 \par
+\cf2\b Database Maintenance &amp; Compaction\cf0\b0\par
+\par
+Over time, adding and deleting clipboard items creates fragmented, unused space inside the database file. Running the Database Maintenance tool cleans up this space and keeps SkyeClip running fast.\par
+\par
+\i What It Does\i0\par
+Flushes pending background logs, defragments the database file to reduce its size on disk, and updates query indexes for optimal search speeds.\par
+\par
+\i What To Expect\i0\par
+A progress window will appear while the database is being optimized. For larger databases, this process may take a minute or two to finish.\par
+\par
+Ensure your computer has sufficient free disk space during maintenance, as a temporary working copy of the database will be created during the compaction process.\par
+\par
+\cf2\b Importing &amp; Exporting Clips\cf0\b0\par
+\par
+SkyeClip lets you transfer your clipboard history across machines using portable .zip packages. You can export specific clips directly from the ClipExplorer context menu, or export an entire profile by clicking the Export button in the App View. When exporting from the App View, a standard Left-Click exports the currently active profile (or all clips if profiles are not active), while a Right-Click exports all profiles and clips across the entire database.\par
+\par
+When importing a package, SkyeClip automatically runs duplicate detection against your existing history to prevent identical clips from cluttering your list. Left-clicking the Import button restores clips while keeping their original creation timestamps intact. Right-clicking the Import button brings all imported clips straight to the top of your history by updating their timestamps to the current time. All underlying data\f2\emdash including rich text, HTML, images,\f1\lang1033  \f2\lang9 and specialized application formats\emdash is fully preserved and re-registered seamlessly on host machines.\par
+\f1\par
 \cf2\b Automatic Backups\par
 \cf0\b0\par
 SkyeClip can create periodic backups of your clipboard database according to your selected schedule.\par
