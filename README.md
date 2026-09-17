@@ -9,7 +9,7 @@ A lightweight, fast, and elegant clipboard manager for Windows.
 ## ⚡ Quick Overview
 SkyeClip is a modern clipboard manager for Windows that captures everything you copy, 
 keeps your history organized, and gives you fast access through a clean tray menu, 
-Clip Explorer, and customizable HotKeys. SkyeClip now includes Profiles
+Clip Explorer, and customizable HotKeys. SkyeClip includes Profiles
 and a powerful Rules System that adapts to your workflow automatically.
 
 
@@ -22,8 +22,12 @@ and a powerful Rules System that adapts to your workflow automatically.
 - Keeps a clean, searchable history  
 - Smart duplicate detection prevents clutter  
 
+### 📌 Pins
+- Pin important clips to keep them safe and accessible
+- Pinned clips are always available on top of the tray menu
+
 ### ⭐ Favorites
-- Pin important clips for quick access  
+- Keep important clips for quick access  
 - Favorites stay safe during purges  
 - HotKey support for instant access  
 
@@ -57,12 +61,22 @@ Rules can switch profiles, block capture, or perform other automated actions.
 ### 🔍 Clip Explorer
 - Browse and search your entire clipboard history in a dedicated window
 - Filter by type: Text, RTF, or HTML
+- Filter using regular expressions (Regex)
 - Sort by text, date, favorites, or last used date
+
+### Import & Export
+- Export clips to a zip file for backup or sharing
+- Import clips from a file to restore or share between machines
+- Import clips to the top of the tray menu
 
 ### 🧹 Auto‑Purge & Cleanup
 - Automatically remove old clips after X days  
 - Manual purge option for instant cleanup  
 - Favorites are always preserved
+
+### 🛠️ Database Optimization & Maintenance
+- startup optimization to ensure database integrity
+- Manual database vacuuming to reduce file size and improve performance
 
 ### ⚙️ Automatic Backups
 - Regular backups of clipboard history
@@ -76,6 +90,7 @@ Rules can switch profiles, block capture, or perform other automated actions.
 ### 🚀 HotKeys
 SkyeClip supports customizable HotKeys for:
 
+- Pinning / Unpinning the current clip
 - Favorites / Unfavorite the current clip
 - Opening the Viewer for the current clip
 - Opening the Scratch Pad and pasting the current clip into it
@@ -120,19 +135,21 @@ No additional dependencies required.
 
 ---
 
-## 📝 What’s New (v1.3)
+## 📝 What’s New (v1.4)
 
 ### New Features
-- Added a full Rules System that reacts to your context
-- Added Profile Support with separate histories, favorites, themes, and settings
+- Import & Export
+- Clip Pinning
+- Plain Text Pasting
+- Clip Merging
+- Advanced Search Capabilities
+- Database Optimization & Maintenance
 
 ### Improvements
-- Renamed “Export Clip” to Save To File
-- Added Home Page link in About window
+- Various Improvements to Startup, data storage location, and UI
 
 ### Fixes
-- Fixed a rare issue where the Clip Viewer could fail to open until restarting the app.
-- Fixed an issue that prevented certain keystrokes in Scratch Pad.
+- Fixed critical exception bug
 
 Full changelog available in app.
 
@@ -166,10 +183,10 @@ GPL-3.0 License
 - Visual Studio 2022 or 2026
 - .NET 10 SDK
 
-## 📥 Installing SkyeLibrary from a Local `.nupkg` File (included in the repo)
+## 📥 Installing SkyeLibrary from a Local `.nupkg` File
 
-SkyeClip depends on SkyeLibrary, which is included as a .nupkg file in this repository.
-To install it (After cloning this repo):
+SkyeClip depends on SkyeLibrary, which is included in the release. But you can also download it from my SkyeLibrary repository to install into your development environment.
+To install it in Visual Studio(After cloning this repo):
 
 1. Open **Visual Studio**
 2. Go to **Tools > NuGet Package Manager > Package Manager Console**
