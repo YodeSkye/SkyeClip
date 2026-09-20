@@ -1348,6 +1348,7 @@ Friend Module App
 
         Return Ellipsis & remainingText
     End Function
+
     ' Forms
     Friend Sub ShowClipExplorer()
         If FrmClipExplorer Is Nothing OrElse FrmClipExplorer.IsDisposed Then

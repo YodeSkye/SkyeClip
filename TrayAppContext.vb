@@ -1,6 +1,7 @@
 ﻿
 Imports System.ComponentModel.Design.ObjectSelectorEditor
 Imports System.IO
+Imports System.Media
 Imports System.Runtime.InteropServices
 Imports Skye.UI
 
@@ -554,6 +555,7 @@ Friend Class TrayAppContext
         RaiseEvent ProfileChanged(Me, EventArgs.Empty)
     End Sub
     Friend Sub ShowToast(message As String)
+        Debug.Print("Sound On: " & App.Settings.PlaySoundWithNotify.ToString())
         App.Tray.RunOnUI(Sub()
                              Dim t As New Skye.UI.ToastOptions With {
                                     .Title = App.GetAppTitle,
