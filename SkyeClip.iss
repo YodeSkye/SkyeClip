@@ -1,7 +1,7 @@
 [Setup]
 AppName=SkyeClip
-AppVersion=1.3
-AppVerName=SkyeClip v1.3
+AppVersion=1.4
+AppVerName=SkyeClip v1.4
 DefaultDirName={commonpf64}\Skye\SkyeClip
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
