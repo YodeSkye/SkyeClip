@@ -47,7 +47,7 @@ Public Class MenuBuilder
                 Dim preview = If(String.IsNullOrWhiteSpace(previewText), "< No Preview >", previewText)
 
                 Dim item As New ClipMenuItem() With {
-                    .Text = preview,
+                    .Text = preview.Replace("&", "&&"),
                     .Tag = clip.Id,
                     .Checked = clip.IsFavorite,
                     .IsPinned = clip.IsPinned,
