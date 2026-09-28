@@ -54,7 +54,6 @@ Friend Module App
     Friend ReadOnly SponsorGitHub As String = "https://github.com/sponsors/YodeSkye" 'SponsorGitHub is the URL for the GitHub Sponsors page of the application's developer.
     Friend ReadOnly SponsorPayPal As String = "https://www.paypal.com/donate/?hosted_button_id=RVH5T9H69G6CS" 'SponsorPayPal is the URL for the PayPal donation page for the application's developer.
     Friend ReadOnly PinOverlayBadge As Image = CreatePinBadgeIcon()
-    Friend ReadOnly PinMenuIcon As Image = CreatePinMenuIcon()
     Friend ScratchPadText As String = String.Empty
     Friend Property ChangeLogLastVersionShown As String = String.Empty
     Friend Property CBLivePreview As String
@@ -1279,36 +1278,6 @@ Friend Module App
                 g.DrawEllipse(borderPen, 9, 7, 6, 6)
                 ' Tiny white highlight spot on head
                 g.FillEllipse(Brushes.White, 10, 8, 2, 2)
-            End Using
-        End Using
-
-        Return bmp
-    End Function
-    Friend Function CreatePinMenuIcon() As Bitmap
-        Dim bmp As New Bitmap(16, 16, System.Drawing.Imaging.PixelFormat.Format32bppArgb)
-
-        Using g As Graphics = Graphics.FromImage(bmp)
-            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
-            g.Clear(Color.Transparent)
-
-            Using bodyBrush As New SolidBrush(Color.FromArgb(255, 230, 40, 40)),
-              borderPen As New Pen(Color.FromArgb(255, 30, 30, 30), 1.0F),
-              needlePen As New Pen(Color.FromArgb(255, 180, 180, 180), 1.5F),
-              collarBrush As New SolidBrush(Color.FromArgb(255, 180, 30, 30))
-
-                ' 1. Needle (Moved Y-start south 1px to 9.0, 9.0 for perfect center alignment)
-                g.DrawLine(needlePen, 9.0F, 9.0F, 3.0F, 15.0F)
-
-                ' 2. Collar / Base ring under head
-                g.FillEllipse(collarBrush, 5.5F, 7.5F, 5.0F, 5.0F)
-                g.DrawEllipse(borderPen, 5.5F, 7.5F, 5.0F, 5.0F)
-
-                ' 3. Main Rounded Pin Head
-                g.FillEllipse(bodyBrush, 7.0F, 2.0F, 8.0F, 8.0F)
-                g.DrawEllipse(borderPen, 7.0F, 2.0F, 8.0F, 8.0F)
-
-                ' 4. Specular Highlight
-                g.FillEllipse(Brushes.White, 8.5F, 3.5F, 2.5F, 2.5F)
             End Using
         End Using
 
